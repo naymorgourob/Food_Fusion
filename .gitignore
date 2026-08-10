@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Environment variables — see each package's .env.example for the template
+.env
+.env.*
+!.env.example
+
+# Build output
+dist/
+dist-ssr/
+build/
+
+# Generated Prisma Client (regenerated via `npm run prisma:generate`)
+server/src/generated/
+
+# Uploaded files
+server/uploads/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.sw?

@@ -1,0 +1,35 @@
+import { validateInventoryItem } from '../validators/inventory.validator.js'
+import {
+  listInventoryItems,
+  createInventoryItem,
+  updateInventoryItem,
+  deleteInventoryItem,
+} from '../services/inventory.service.js'
+import { sendSuccess } from '../utils/ApiResponse.js'
+import { ApiError } from '../utils/ApiError.js'
+
+export async function getInventoryItems(req, res) {
+  const items = await listInventoryItems()
+  sendSuccess(res, { message: 'Inventory fetched successfully.', data: { items } })
+}
+
+export async function postInventoryItem(req, res) {
+  const errors = validateInventoryItem(req.body)
+  if (errors.length > 0) throw new ApiError(400, 'Validation failed.', errors)
+
+  const item = await createInventoryItem(req.body)
+  sendSuccess(res, { statusCode: 201, message: 'Inventory item created successfully.', data: { item } })
+}
+
+export async function putInventoryItem(req, res) {
+  const errors = validateInventoryItem(req.body)
+  if (errors.length > 0) throw new ApiError(400, 'Validation failed.', errors)
+
+  const item = await updateInventoryItem(req.params.id, req.body)
+  sendSuccess(res, { message: 'Inventory item updated successfully.', data: { item } })
+}
+
+export async function removeInventoryItem(req, res) {
+  await deleteInventoryItem(req.params.id)
+  sendSuccess(res, { message: 'Inventory item deleted successfully.' })
+}

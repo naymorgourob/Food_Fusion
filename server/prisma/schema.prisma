@@ -1,0 +1,434 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Fixed set of three roles for this system — see docs/02-database-design.md
+// Step 2 for why this is a plain enum and not a configurable Role table.
+enum UserRole {
+  ADMIN
+  STAFF
+  CUSTOMER
+}
+
+// Single identity table for every role (Phase 2 decision: Admin/Staff/Customer
+// share one table since Customer needs no extra fields, and Staff-only fields
+// would be added to a separate StaffProfile model in a later part, not here).
+model User {
+  id           String   @id @default(cuid())
+  fullName     String   @map("full_name")
+  email        String   @unique
+  phone        String
+  password     String
+  role         UserRole @default(CUSTOMER)
+  // Staff-only in practice (job title, e.g. "Waiter", "Chef"); null for
+  // Admin/Customer. A single nullable column here — not a separate
+  // StaffProfile table — since it's the only field Staff needs that
+  // Customer/Admin don't (Part 14: Customer & Staff Management).
+  position     String?  @map("position")
+  profileImage String?  @map("profile_image")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  reservations Reservation[]
+  orders       Order[]
+  // Orders this Staff member is assigned to (Part 18) — named relation
+  // since User already relates to Order once as "customer"; Prisma needs
+  // the second relation disambiguated.
+  assignedOrders Order[] @relation("AssignedOrders")
+  // Part 18.1 — Customer-only in practice.
+  loyaltyTransactions LoyaltyTransaction[]
+  favorites           FavoriteMenuItem[]
+
+  @@map("users")
+}
+
+// Groups menu items. Deletion is blocked at both the application layer
+// (category.service.js checks first, for a friendly error message) and the
+// database layer (onDelete: Restrict on Food.category below, as a
+// guarantee that holds even if the application check is ever bypassed).
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  foods       Food[]
+
+  @@map("categories")
+}
+
+// A sellable menu item. price is Decimal, never Float — see
+// docs/02-database-design.md Step 15 (#1): floating-point currency is a
+// classic, avoidable source of receipts that don't add up.
+model Food {
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  price           Decimal  @db.Decimal(10, 2)
+  imageUrl        String?  @map("image_url")
+  isAvailable     Boolean  @default(true) @map("is_available")
+  prepTimeMinutes Int?     @map("prep_time_minutes")
+  categoryId      String   @map("category_id")
+  category        Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  orderItems      OrderItem[]
+  favoritedBy     FavoriteMenuItem[]
+
+  @@index([categoryId])
+  @@map("foods")
+}
+
+enum TableStatus {
+  AVAILABLE
+  OCCUPIED
+  RESERVED
+  INACTIVE
+}
+
+model Table {
+  id           String        @id @default(cuid())
+  number       Int           @unique
+  capacity     Int
+  status       TableStatus   @default(AVAILABLE)
+  description  String?
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  reservations Reservation[]
+  orders       Order[]
+
+  @@map("tables")
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+// Part 18.1 — lets the restaurant prepare appropriately (a birthday cake,
+// a quiet table for a business meeting). OTHER pairs with the free-text
+// `occasionNote` below so "Others" isn't a dead end.
+enum ReservationOccasion {
+  BIRTHDAY
+  ANNIVERSARY
+  FAMILY_DINNER
+  BUSINESS_MEETING
+  DATE
+  OTHER
+}
+
+// customerName/customerPhone are captured directly on the reservation
+// (not derived from User) because the person a booking is under can
+// reasonably differ from the account holder's own profile details.
+// customerId is what enforces "customers can only view their own" —
+// see reservation.service.js.
+model Reservation {
+  id              String            @id @default(cuid())
+  customerId      String            @map("customer_id")
+  customerName    String            @map("customer_name")
+  customerPhone   String            @map("customer_phone")
+  tableId         String            @map("table_id")
+  guestCount      Int               @map("guest_count")
+  reservationDate DateTime          @db.Date @map("reservation_date")
+  reservationTime String            @map("reservation_time")
+  specialRequest  String?           @map("special_request")
+  // Part 18.1 — optional; occasionNote only carries meaning when
+  // occasion is OTHER, but isn't constrained to it at the DB level.
+  occasion        ReservationOccasion? @map("occasion")
+  occasionNote    String?              @map("occasion_note")
+  status          ReservationStatus @default(PENDING)
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  customer User  @relation(fields: [customerId], references: [id])
+  table    Table @relation(fields: [tableId], references: [id], onDelete: Restrict)
+
+  @@index([customerId])
+  @@index([tableId])
+  @@map("reservations")
+}
+
+enum OrderType {
+  DINE_IN
+  DELIVERY
+  TAKEAWAY
+}
+
+// ACCEPTED and ON_THE_WAY are the two values added in Part 18 (Customer
+// Portal / Live Order Tracking) — everything else already existed and
+// keeps its original meaning; only the display label changes (PENDING
+// reads as "Placed", SERVED reads as "Ready to Serve" in the UI).
+// Adding enum values is purely additive in Postgres — no data migration
+// needed for existing rows.
+enum OrderStatus {
+  PENDING
+  ACCEPTED
+  PREPARING
+  READY
+  ON_THE_WAY
+  SERVED
+  COMPLETED
+  CANCELLED
+}
+
+// orderNumber is a separate autoincrementing integer, not the cuid `id` —
+// Postgres's own sequence guarantees two concurrent orders can never get
+// the same number, unlike computing "count + 1" in application code,
+// which races under concurrent inserts. Display it padded, e.g. ORD-000042.
+// No customerName/Phone snapshot like Reservation has — every place an
+// order is shown already includes the `customer` relation, so there is
+// nothing a snapshot would add here.
+model Order {
+  id          String      @id @default(cuid())
+  orderNumber Int         @unique @default(autoincrement()) @map("order_number")
+  customerId  String      @map("customer_id")
+  tableId     String?     @map("table_id")
+  totalAmount Decimal     @db.Decimal(10, 2) @map("total_amount")
+  status      OrderStatus @default(PENDING)
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  // --- Smart Ordering (Part 18) ---
+  // Required on every new order ("customer must first choose"); no
+  // @default, so createOrder always has to supply it explicitly.
+  orderType OrderType @map("order_type")
+
+  // Delivery-only
+  deliveryAddress       String?   @map("delivery_address")
+  deliveryPhone         String?   @map("delivery_phone")
+  deliveryCharge        Decimal?  @db.Decimal(10, 2) @map("delivery_charge")
+  estimatedDeliveryTime DateTime? @map("estimated_delivery_time")
+
+  // Takeaway-only: when the customer wants to collect it
+  scheduledPickupTime DateTime? @map("scheduled_pickup_time")
+
+  // Dine-in-only: only set when "Schedule Dine-In" is chosen, not
+  // "Dine-In Now"
+  scheduledArrivalTime DateTime? @map("scheduled_arrival_time")
+  guestCount           Int?      @map("guest_count")
+
+  specialInstructions String? @map("special_instructions")
+
+  // Staff-set kitchen ETA — covers both "ready for pickup" (takeaway) and
+  // "food ready before arrival" (scheduled dine-in). Distinct from
+  // estimatedDeliveryTime, which is "arrives at the customer," not
+  // "leaves the kitchen."
+  estimatedReadyTime DateTime? @map("estimated_ready_time")
+
+  assignedStaffId String? @map("assigned_staff_id")
+
+  // Part 18.1 — what the customer actually redeemed at checkout, recorded
+  // on the order itself so the discount is auditable later even if the
+  // point value in Settings changes. loyaltyDiscount is the currency
+  // amount those points were worth at the time.
+  pointsRedeemed  Int     @default(0) @map("points_redeemed")
+  loyaltyDiscount Decimal @default(0) @db.Decimal(10, 2) @map("loyalty_discount")
+
+  // --- Order Timeline (Part 18) ---
+  // Each set exactly once, the first time the order transitions into that
+  // status — this is the whole timeline, no separate history table.
+  // createdAt already covers "Placed."
+  acceptedAt  DateTime? @map("accepted_at")
+  preparingAt DateTime? @map("preparing_at")
+  readyAt     DateTime? @map("ready_at")
+  onTheWayAt  DateTime? @map("on_the_way_at")
+  servedAt    DateTime? @map("served_at")
+  completedAt DateTime? @map("completed_at")
+  cancelledAt DateTime? @map("cancelled_at")
+
+  customer User        @relation(fields: [customerId], references: [id])
+  // Optional, unlike Reservation.table: a takeaway order has no table at
+  // all. SetNull (not Restrict) — if a table is ever deleted, past orders
+  // should just lose the reference, not block the deletion.
+  table    Table?      @relation(fields: [tableId], references: [id], onDelete: SetNull)
+  items    OrderItem[]
+  bill     Bill?
+  // Chef/Waiter/Delivery Staff assigned to this order — role STAFF only,
+  // enforced in order.service.js, not by a DB constraint (Prisma can't
+  // express "only rows where role = STAFF" in a foreign key).
+  assignedStaff User? @relation("AssignedOrders", fields: [assignedStaffId], references: [id], onDelete: SetNull)
+  loyaltyTransactions LoyaltyTransaction[]
+
+  @@index([customerId])
+  @@index([tableId])
+  @@index([assignedStaffId])
+  @@map("orders")
+}
+
+// unitPrice/subtotal are captured at order time, never read live off Food —
+// a later menu price change must not silently rewrite a past order's total.
+model OrderItem {
+  id         String   @id @default(cuid())
+  orderId    String   @map("order_id")
+  menuItemId String   @map("menu_item_id")
+  quantity   Int
+  unitPrice  Decimal  @db.Decimal(10, 2) @map("unit_price")
+  subtotal   Decimal  @db.Decimal(10, 2)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  // Restrict, same reasoning as Food.category in Part 9 — a menu item that
+  // has ever been ordered can't be hard-deleted (it can still be marked
+  // unavailable), so historical order records are never left dangling.
+  menuItem Food  @relation(fields: [menuItemId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([menuItemId])
+  @@map("order_items")
+}
+
+enum BillPaymentStatus {
+  UNPAID
+  PAID
+}
+
+// One Bill per Order — orderId is @unique, enforced at the database level
+// (not just an application check), so two bills can never be generated for
+// the same order even under a race condition. subtotal/vatPercent/
+// vatAmount/discount/grandTotal are all snapshotted here at generation
+// time — the restaurant's VAT rate changing next month must never
+// silently recalculate a bill already issued today. No customerId here:
+// a bill's customer is reached through order.customer, the same "don't
+// duplicate a fact you can get through the relation" rule Order itself
+// follows for Reservation/Table.
+model Bill {
+  id            String            @id @default(cuid())
+  billNumber    Int               @unique @default(autoincrement()) @map("bill_number")
+  orderId       String            @unique @map("order_id")
+  billDate      DateTime          @default(now()) @map("bill_date")
+  subtotal      Decimal           @db.Decimal(10, 2)
+  vatPercent    Decimal           @db.Decimal(5, 2) @map("vat_percent")
+  vatAmount     Decimal           @db.Decimal(10, 2) @map("vat_amount")
+  discount      Decimal           @db.Decimal(10, 2) @default(0)
+  grandTotal    Decimal           @db.Decimal(10, 2) @map("grand_total")
+  paymentStatus BillPaymentStatus @default(UNPAID) @map("payment_status")
+  updatedAt     DateTime          @updatedAt @map("updated_at")
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@map("bills")
+}
+
+enum InventoryUnit {
+  KG
+  GRAM
+  LITER
+  ML
+  PIECE
+  BOX
+  PACK
+}
+
+// Standalone — no relation to Food/Category (that's the menu's own
+// category system) and no supplier module, per this part's scope.
+// Deliberately no `status` column: In Stock/Low Stock/Out of Stock is
+// fully determined by quantity vs minStockLevel, so storing it would let
+// it silently drift out of sync the moment quantity changes without a
+// matching status update. It's computed on every read in
+// inventory.service.js instead.
+model InventoryItem {
+  id             String        @id @default(cuid())
+  itemName       String        @map("item_name")
+  category       String
+  unit           InventoryUnit
+  quantity       Decimal       @db.Decimal(10, 2)
+  minStockLevel  Decimal       @db.Decimal(10, 2) @map("min_stock_level")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  @@map("inventory_items")
+}
+
+// Singleton — `id` has a fixed literal default rather than cuid(), so
+// there is exactly one row, ever. GET /settings upserts it into existence
+// on first read, so no seed step is needed. vatPercentage is the default
+// Billing (Part 13) falls back to when Admin/Staff doesn't override VAT
+// per bill — closing the seam Part 13 deliberately left open.
+model Settings {
+  id                String   @id @default("singleton")
+  restaurantName    String   @default("FoodFusion") @map("restaurant_name")
+  restaurantAddress String   @default("") @map("restaurant_address")
+  restaurantPhone   String   @default("") @map("restaurant_phone")
+  restaurantEmail   String   @default("") @map("restaurant_email")
+  vatPercentage     Decimal  @default(13) @db.Decimal(5, 2) @map("vat_percentage")
+  currencySymbol    String   @default("$") @map("currency_symbol")
+
+  // --- Loyalty configuration (Part 18.1) ---
+  // Points earned per 1 unit of currency spent. Default 0.1 gives the
+  // spec's example rate: 100 spent -> 10 points. Admin-editable, which is
+  // the whole reason these live in Settings rather than as constants.
+  loyaltyPointsPerCurrency Decimal @default(0.1) @db.Decimal(6, 3) @map("loyalty_points_per_currency")
+  // Currency each point is worth when redeemed at checkout.
+  loyaltyPointValue        Decimal @default(1) @db.Decimal(6, 3) @map("loyalty_point_value")
+  // One-time bonus on a customer's first completed order.
+  firstOrderBonusPoints    Int     @default(50) @map("first_order_bonus_points")
+
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("settings")
+}
+
+enum LoyaltyTransactionType {
+  EARNED
+  REDEEMED
+  BONUS
+}
+
+// An append-only ledger: the customer's balance is
+// sum(EARNED + BONUS) - sum(REDEEMED), computed on read in
+// loyalty.service.js. Deliberately NO denormalized User.loyaltyPoints
+// column — two sources of truth for the same number inevitably drift
+// apart, the same reasoning that keeps InventoryItem.status (Part 15)
+// and Bill totals (Part 13) derived rather than stored.
+//
+// `points` is always a positive magnitude; `type` carries the direction,
+// so a negative value here would always be a bug.
+model LoyaltyTransaction {
+  id         String                 @id @default(cuid())
+  customerId String                 @map("customer_id")
+  type       LoyaltyTransactionType
+  points     Int
+  reason     String
+  // Nullable: a BONUS (e.g. first-order) may not tie to a specific order,
+  // and SetNull keeps history readable if an order is ever removed.
+  orderId    String?                @map("order_id")
+  createdAt  DateTime               @default(now()) @map("created_at")
+
+  customer User   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  order    Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([customerId])
+  @@index([orderId])
+  @@map("loyalty_transactions")
+}
+
+// Join table, Customer <-> Food. The compound unique is what makes
+// "favorite" idempotent at the database level, so a double-tap on the
+// heart can never create two rows.
+model FavoriteMenuItem {
+  id         String   @id @default(cuid())
+  customerId String   @map("customer_id")
+  menuItemId String   @map("menu_item_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  customer User @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  menuItem Food @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, menuItemId])
+  @@index([customerId])
+  @@map("favorite_menu_items")
+}

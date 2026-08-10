@@ -1,0 +1,328 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens from docs/03-design-system.md.
+ * Everything inside @theme registers a Tailwind utility (bg-paper, text-ink,
+ * rounded-lg, font-mono, ...). Nothing else in the app should hardcode a hex
+ * value or a spacing number — it should reach for one of these instead.
+ *
+ * Spacing is intentionally NOT redefined here: Tailwind's default scale
+ * (p-1=4px, p-2=8px, p-3=12px, p-4=16px, p-5=20px, p-6=24px, p-8=32px,
+ * p-10=40px, p-12=48px, p-16=64px, p-20=80px, p-24=96px) already is the
+ * exact 8pt-grid scale from the design system, so there is nothing to add.
+ */
+@theme {
+  /* Inter for body/UI, Poppins for headings (font-display utility).
+     Both keep the original system stack as a fallback, so the app still
+     renders correctly if the webfont request fails. */
+  --font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: Poppins, Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+
+  /* Neutral scale (warm, hue-biased toward the accent) */
+  --color-stone-50: #FAF8F6;
+  --color-stone-100: #F3EFEB;
+  --color-stone-200: #E7E0D9;
+  --color-stone-300: #D3C7BB;
+  --color-stone-400: #A99C8E;
+  --color-stone-500: #8A7D70;
+  --color-stone-600: #6B5F54;
+  --color-stone-700: #4F453C;
+  --color-stone-800: #362E27;
+  --color-stone-900: #211B16;
+  --color-stone-950: #14100D;
+
+  /* Accent — "ember" */
+  --color-ember-50: #FCEEE7;
+  --color-ember-100: #F8D5C4;
+  --color-ember-300: #E28654;
+  --color-ember-500: #A6431A;
+  --color-ember-600: #8A3614;
+  --color-ember-700: #6E2B10;
+
+  /* --- Landing page palette (premium restaurant) --------------------
+   * Deep emerald + luxury gold on warm white — the fine-dining
+   * combination (deep green reads "considered", gold reads "premium"),
+   * as opposed to the red/amber of fast-casual.
+   *
+   * These are ADDITIVE tokens. The app-wide semantic aliases below are
+   * untouched, so the dashboard, auth pages, and customer portal keep
+   * their existing appearance exactly.
+   *
+   * Every pairing used for text is contrast-checked — see the table in
+   * the redesign notes; the weakest shipped pairing is 4.6:1.
+   */
+
+  /* Primary — deep emerald */
+  --color-brand-50: #ECF7F2;
+  --color-brand-100: #D2ECE1;
+  --color-brand-200: #A5D9C4;
+  --color-brand-400: #2E9B77;
+  --color-brand-600: #0F6B50;
+  --color-brand-700: #0B5D46;
+  --color-brand-800: #084736;
+  --color-brand-900: #063528;
+
+  /* Accent — luxury gold. gold-700 is the darkened variant reserved for
+     gold text on light surfaces, where gold-500 would fail contrast. */
+  --color-gold-100: #FAF0D7;
+  --color-gold-300: #E8CD8A;
+  --color-gold-400: #DCBA65;
+  --color-gold-500: #C9A227;
+  --color-gold-700: #8A6D12;
+
+  /* Neutrals — warm white page, white cards, charcoal ink. */
+  --color-linen: #FBFAF7;
+  --color-linen-2: #F4F1EA;
+  --color-charcoal: #1C1B18;
+  --color-charcoal-muted: #56534C;
+  --color-charcoal-faint: #6B6860;
+  --color-hairline: #E6E2D8;
+
+  /* Shared surface aliases for the public site AND the customer app. Only
+     these flip between light and dark (see the overrides further down) —
+     components reference them rather than linen/charcoal directly, so dark
+     mode is a value change in one place instead of a `dark:` variant on
+     every element. The customer dashboard reuses the same tokens as the
+     landing page so the two feel like one product. */
+  --color-canvas: #FBFAF7;
+  --color-canvas-2: #F4F1EA;
+  --color-card: #FFFFFF;
+  --color-rule: #E6E2D8;
+  --color-body: #1C1B18;
+  --color-body-muted: #56534C;
+  --color-body-faint: #6B6860;
+
+  /* Semantic */
+  --color-success: #325736;
+  --color-success-soft: #EEF4EC;
+  --color-warning: #93600F;
+  --color-warning-soft: #FBF3E3;
+  --color-danger: #8F1E17;
+  --color-danger-soft: #FBEAEA;
+  --color-info: #204A85;
+  --color-info-soft: #EAF0F7;
+
+  /* Semantic aliases — the ones components actually use.
+     Their VALUES are re-pointed for dark mode below; the names never change. */
+  --color-paper: #FAF8F6;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #F3EFEB;
+  --color-border: #E7E0D9;
+  --color-border-strong: #D3C7BB;
+  --color-ink: #211B16;
+  --color-ink-muted: #6B5F54;
+  --color-ink-faint: #A99C8E;
+  --color-accent: #A6431A;
+  --color-accent-strong: #8A3614;
+  --color-accent-soft: #FCEEE7;
+  --color-accent-contrast: #FFFFFF;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Type scale — generates text-display / text-h1 / ... utilities.
+     Weight is applied separately via font-semibold/font-bold since Tailwind
+     keeps size and weight as independent utilities. */
+  --text-display: 2.75rem;
+  --text-display--line-height: 3.25rem;
+  --text-h1: 2rem;
+  --text-h1--line-height: 2.5rem;
+  --text-h2: 1.5rem;
+  --text-h2--line-height: 2rem;
+  --text-h3: 1.1875rem;
+  --text-h3--line-height: 1.75rem;
+  --text-h4: 1rem;
+  --text-h4--line-height: 1.5rem;
+  --text-body-lg: 1rem;
+  --text-body-lg--line-height: 1.625rem;
+  --text-caption: 0.71875rem;
+  --text-caption--line-height: 1rem;
+}
+
+/*
+ * Dark mode overrides — same variable names, new values.
+ * :root[data-theme] wins over the media query in both directions because it
+ * has higher specificity, so an in-app toggle always overrides the OS setting.
+ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-paper: #14100D;
+    --color-surface: #1D1712;
+    --color-surface-2: #241C16;
+    --color-border: #362C23;
+    --color-border-strong: #4A3C30;
+    --color-ink: #F3EEE8;
+    --color-ink-muted: #B7A995;
+    --color-ink-faint: #7C6F60;
+    --color-accent: #E28654;
+    --color-accent-strong: #F0A876;
+    --color-accent-soft: #3B2415;
+    --color-accent-contrast: #1D1712;
+
+    /* Landing surfaces — dark mode. Deep green-black rather than neutral
+       black, so the emerald brand still feels present in the background. */
+    --color-canvas: #0A100D;
+    --color-canvas-2: #0F1714;
+    --color-card: #141D19;
+    --color-rule: #24302B;
+    --color-body: #F2F5F3;
+    --color-body-muted: #B4BFB9;
+    --color-body-faint: #93A099;
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-paper: #14100D;
+  --color-surface: #1D1712;
+  --color-surface-2: #241C16;
+  --color-border: #362C23;
+  --color-border-strong: #4A3C30;
+  --color-ink: #F3EEE8;
+  --color-ink-muted: #B7A995;
+  --color-ink-faint: #7C6F60;
+  --color-accent: #E28654;
+  --color-accent-strong: #F0A876;
+  --color-accent-soft: #3B2415;
+  --color-accent-contrast: #1D1712;
+
+  /* Landing surfaces — dark mode. Deep green-black rather than neutral
+     black, so the emerald brand still feels present in the background. */
+  --color-canvas: #0A100D;
+  --color-canvas-2: #0F1714;
+  --color-card: #141D19;
+  --color-rule: #24302B;
+  --color-body: #F2F5F3;
+  --color-body-muted: #B4BFB9;
+  --color-body-faint: #93A099;
+}
+
+:root[data-theme="light"] {
+  --color-paper: #FAF8F6;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #F3EFEB;
+  --color-border: #E7E0D9;
+  --color-border-strong: #D3C7BB;
+  --color-ink: #211B16;
+  --color-ink-muted: #6B5F54;
+  --color-ink-faint: #A99C8E;
+  --color-accent: #A6431A;
+  --color-accent-strong: #8A3614;
+  --color-accent-soft: #FCEEE7;
+  --color-accent-contrast: #FFFFFF;
+
+  /* Landing surfaces — light mode (the default values above). */
+  --color-canvas: #FBFAF7;
+  --color-canvas-2: #F4F1EA;
+  --color-card: #FFFFFF;
+  --color-rule: #E6E2D8;
+  --color-body: #1C1B18;
+  --color-body-muted: #56534C;
+  --color-body-faint: #6B6860;
+}
+
+@layer base {
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+  }
+}
+
+/*
+ * Landing-page utilities. Kept here rather than inline because each is used
+ * across several sections, and because the reduced-motion rule below has to
+ * switch all of them off in one place.
+ */
+@layer utilities {
+  /* Poppins, for headings only. Body copy stays on Inter. */
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  /* The gold rule used under section eyebrows and beside overline labels. */
+  .rule-gold {
+    background-image: linear-gradient(to right, transparent, var(--color-gold-500), transparent);
+  }
+
+  /* Slow drift for the hero's ambient background shapes. */
+  .animate-float-slow {
+    animation: ff-float 14s ease-in-out infinite;
+  }
+  .animate-float-slower {
+    animation: ff-float 20s ease-in-out infinite reverse;
+  }
+
+  /* Continuous horizontal scroll (gallery / logo strips). */
+  .animate-marquee {
+    animation: ff-marquee 40s linear infinite;
+  }
+
+  /* Skeleton shimmer for the customer dashboard's loading states. */
+  .skeleton {
+    background-image: linear-gradient(
+      90deg,
+      var(--color-canvas-2) 25%,
+      color-mix(in srgb, var(--color-canvas-2) 55%, var(--color-card)) 37%,
+      var(--color-canvas-2) 63%
+    );
+    background-size: 400% 100%;
+    animation: ff-shimmer 1.4s ease-in-out infinite;
+  }
+
+  /* Horizontal scrollers (recommended dishes) — hides the scrollbar but
+     keeps the element genuinely scrollable, including by keyboard. */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Pauses the marquee on hover so a visitor can actually look at an image
+     they're interested in. */
+  .marquee-pausable:hover .animate-marquee {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes ff-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2%, -4%, 0) scale(1.06);
+  }
+}
+
+@keyframes ff-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@keyframes ff-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    /* -50% because the track renders its content twice for a seamless loop. */
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* MotionConfig reducedMotion="user" covers Framer Motion, but not these
+   CSS animations — this is the equivalent for them. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-slow,
+  .animate-float-slower,
+  .animate-marquee,
+  .skeleton {
+    animation: none;
+  }
+}
