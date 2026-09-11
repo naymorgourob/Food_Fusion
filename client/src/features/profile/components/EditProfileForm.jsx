@@ -31,7 +31,7 @@ export function EditProfileForm({ user, onSubmit, isSubmitting, errors, successM
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5 rounded-2xl border border-rule bg-card p-6">
       <div className="flex flex-col gap-1">
-        <h2 className="font-display text-lg font-semibold text-body">Personal information</h2>
+        <h2 className="font-display text-lg font-semibold text-body">Personal informations</h2>
         <p className="text-sm text-body-muted">Your name and contact details.</p>
       </div>
 
