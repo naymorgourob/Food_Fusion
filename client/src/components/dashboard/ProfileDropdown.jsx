@@ -16,7 +16,7 @@ export function ProfileDropdown() {
   function handleLogout() {
     setOpen(false)
     logout()
-    navigate(ROUTES.LOGIN, { replace: true })
+    navigate(ROUTES.HOME, { replace: true })
   }
 
   const initial = user?.fullName?.charAt(0).toUpperCase() ?? '?'

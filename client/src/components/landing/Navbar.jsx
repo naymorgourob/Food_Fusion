@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Menu, X, Search, ShoppingBag } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { ROUTES, USER_ROLES, getHomeRouteForRole } from '@/constants'
@@ -138,6 +138,7 @@ export function Navbar() {
 }
 
 function AuthActions({ user, logout, solid, stacked }) {
+  const navigate = useNavigate()
   const layout = stacked ? 'flex flex-col gap-2' : 'flex items-center gap-2'
   const quiet = solid
     ? 'text-body-muted hover:text-body'
@@ -145,11 +146,16 @@ function AuthActions({ user, logout, solid, stacked }) {
   const solidButton =
     'rounded-full bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-800'
 
+  function handleLogout() {
+    logout()
+    navigate(ROUTES.HOME, { replace: true })
+  }
+
   if (user) {
     const isAdmin = user.role === USER_ROLES.ADMIN
     return (
       <div className={layout}>
-        <Link to={getHomeRouteForRole(user.role)} className={`px-3 text-sm font-medium ${quiet}`}>
+        <Link to={getHomeRouteForRole(user.role, user)} className={`px-3 text-sm font-medium ${quiet}`}>
           Dashboard
         </Link>
         {/* Admin has a dedicated dashboard profile page; Staff/Customer use
@@ -160,7 +166,7 @@ function AuthActions({ user, logout, solid, stacked }) {
         >
           Profile
         </Link>
-        <button onClick={logout} className={solidButton}>
+        <button onClick={handleLogout} className={solidButton}>
           Log out
         </button>
       </div>

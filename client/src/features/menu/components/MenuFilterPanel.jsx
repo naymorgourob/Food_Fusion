@@ -78,7 +78,7 @@ function FilterBody({ filters, onChange, onReset, maxPrice }) {
             Max price
           </label>
           <span className="font-display text-sm font-semibold text-brand-700 dark:text-brand-400">
-            ${Number(priceMax).toFixed(0)}
+            ৳{Number(priceMax).toFixed(0)}
           </span>
         </div>
         <input
@@ -92,8 +92,8 @@ function FilterBody({ filters, onChange, onReset, maxPrice }) {
           className="w-full accent-brand-700"
         />
         <div className="flex justify-between text-xs text-body-faint">
-          <span>$0</span>
-          <span>${maxPrice}</span>
+          <span>৳0</span>
+          <span>৳{maxPrice}</span>
         </div>
       </div>
 

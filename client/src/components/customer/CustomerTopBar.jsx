@@ -43,7 +43,7 @@ export function CustomerTopBar({ onOpenMobileSidebar, notifications = [], cartCo
   function handleLogout() {
     setProfileOpen(false)
     logout()
-    navigate(ROUTES.LOGIN, { replace: true })
+    navigate(ROUTES.HOME, { replace: true })
   }
 
   return (

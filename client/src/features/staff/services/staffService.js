@@ -9,6 +9,11 @@ export async function fetchStaff() {
   return data.data.staff
 }
 
+export async function fetchStaffById(id) {
+  const { data } = await api.get(`/employees/${id}`)
+  return data.data.staff
+}
+
 export async function createStaff(payload) {
   const { data } = await api.post('/employees', payload)
   return data.data.staff

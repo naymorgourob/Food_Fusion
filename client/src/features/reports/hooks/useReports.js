@@ -17,6 +17,7 @@ export function useReports(queryParams) {
   const [revenueSummary, setRevenueSummary] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [refetchIndex, setRefetchIndex] = useState(0)
 
   const { date, month, year } = queryParams
 
@@ -51,7 +52,9 @@ export function useReports(queryParams) {
     return () => {
       cancelled = true
     }
-  }, [date, month, year])
+  }, [date, month, year, refetchIndex])
 
-  return { stats, ordersSummary, reservationsSummary, revenueSummary, isLoading, error }
+  const refetch = () => setRefetchIndex((i) => i + 1)
+
+  return { stats, ordersSummary, reservationsSummary, revenueSummary, isLoading, error, refetch }
 }

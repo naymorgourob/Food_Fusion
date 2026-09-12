@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { authenticateUser, authorizeCustomer, authorizeStaffOrAdmin } from '../middlewares/auth.middleware.js'
+import { authenticateUser, authorizeStaffOrAdmin } from '../middlewares/auth.middleware.js'
 import {
   getOrders,
   getOrder,
@@ -20,7 +20,8 @@ router.get('/', authenticateUser, getOrders)
 // "assignable-staff" as an :id value.
 router.get('/assignable-staff', authenticateUser, authorizeStaffOrAdmin, getAssignableStaff)
 router.get('/:id', authenticateUser, getOrder)
-router.post('/', authenticateUser, authorizeCustomer, postOrder)
+// Customer places own order; Waiter/Staff places dining or takeaway order for guests
+router.post('/', authenticateUser, postOrder)
 router.put('/:id', authenticateUser, authorizeStaffOrAdmin, putOrderStatus)
 router.patch('/:id/assign-staff', authenticateUser, authorizeStaffOrAdmin, patchAssignStaff)
 router.patch('/:id/estimated-time', authenticateUser, authorizeStaffOrAdmin, patchEstimatedTime)

@@ -7,9 +7,17 @@ const STAFF_SELECT = {
   fullName: true,
   email: true,
   phone: true,
+  role: true,
   position: true,
+  profileImage: true,
   isActive: true,
   createdAt: true,
+  updatedAt: true,
+  _count: {
+    select: {
+      assignedOrders: true,
+    },
+  },
 }
 
 // Check-first-then-DB-constraint-as-safety-net, same pattern as
@@ -38,7 +46,26 @@ export async function listStaff() {
 }
 
 export async function getStaffById(id) {
-  return getStaffOrThrow(id)
+  const staff = await prisma.user.findFirst({
+    where: { id, role: 'STAFF' },
+    select: {
+      ...STAFF_SELECT,
+      assignedOrders: {
+        take: 5,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          orderNumber: true,
+          orderType: true,
+          totalAmount: true,
+          status: true,
+          createdAt: true,
+        },
+      },
+    },
+  })
+  if (!staff) throw new ApiError(404, 'Staff member not found.')
+  return staff
 }
 
 // Admin sets the initial password directly (this is an internal staff

@@ -1,4 +1,5 @@
 import { Sparkles } from 'lucide-react'
+import { money } from '@/utils/format'
 
 /**
  * The checkout redemption control. Everything shown here is a preview —
@@ -61,7 +62,7 @@ export function LoyaltyRedeemField({ summary, itemsTotal, pointsToRedeem, onChan
         </div>
         <div className="flex justify-between">
           <dt className="text-ink-muted">Discount Applied</dt>
-          <dd className="font-medium text-success">−${discount.toFixed(2)}</dd>
+          <dd className="font-medium text-success">−{money(discount)}</dd>
         </div>
         <div className="flex justify-between">
           <dt className="text-ink-muted">Remaining Points</dt>

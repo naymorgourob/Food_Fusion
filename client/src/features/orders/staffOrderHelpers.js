@@ -64,9 +64,16 @@ export function minutesFromNow(iso) {
 }
 
 /** Next actionable status in the kitchen flow, or null if there isn't one. */
-export function nextKitchenAction(status) {
-  if (status === 'PENDING') return { status: 'ACCEPTED', label: 'Accept order' }
-  if (status === 'ACCEPTED') return { status: 'PREPARING', label: 'Start cooking' }
-  if (status === 'PREPARING') return { status: 'READY', label: 'Mark ready' }
+export function nextKitchenAction(status, orderType = 'DINE_IN') {
+  if (status === 'PENDING') return { status: 'ACCEPTED', label: 'Accept Order' }
+  if (status === 'ACCEPTED') return { status: 'PREPARING', label: 'Start Cooking' }
+  if (status === 'PREPARING') return { status: 'READY', label: 'Mark Ready' }
+  if (status === 'READY') {
+    if (orderType === 'DELIVERY') return { status: 'ON_THE_WAY', label: 'Dispatch Delivery' }
+    return { status: 'SERVED', label: 'Mark Served' }
+  }
+  if (status === 'SERVED' || status === 'ON_THE_WAY') {
+    return { status: 'COMPLETED', label: 'Complete Order' }
+  }
   return null
 }

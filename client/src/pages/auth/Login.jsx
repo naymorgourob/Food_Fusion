@@ -5,13 +5,12 @@ import { useAuth } from '@/hooks/useAuth'
 import { PasswordInput } from '@/components/PasswordInput'
 import { AuthFormMessage } from '@/components/AuthFormMessage'
 import { FIELD, LABEL } from '@/components/authFieldStyles'
-import { ROUTES, getHomeRouteForRole } from '@/constants'
+import { ROUTES, getHomeRouteForRole, canAccessPath } from '@/constants'
 
 /**
- * Login (UI-09 redesign). All logic is unchanged from before — same
- * useAuth().login() call, same redirect-back-to-where-you-came-from
- * behaviour, same rememberMe flag (which decides localStorage vs
- * sessionStorage in AuthProvider, not anything new here).
+ * Login (UI-09 redesign). Validates return destination against user role
+ * so unauthorized pages are never targeted, and safely falls back to each
+ * user's specific role workspace.
  */
 export default function Login() {
   const { login } = useAuth()
@@ -31,7 +30,12 @@ export default function Login() {
 
     try {
       const user = await login({ email, password, rememberMe })
-      const redirectTo = location.state?.from?.pathname ?? getHomeRouteForRole(user.role)
+      const fromPath = location.state?.from?.pathname
+      const fromSearch = location.state?.from?.search || ''
+      const canAccessFrom = fromPath && canAccessPath(fromPath, user?.role, user)
+      const redirectTo = canAccessFrom
+        ? `${fromPath}${fromSearch}`
+        : getHomeRouteForRole(user?.role, user)
       navigate(redirectTo, { replace: true })
     } catch (error) {
       setErrorMessage(error.response?.data?.message ?? 'Something went wrong. Please try again.')

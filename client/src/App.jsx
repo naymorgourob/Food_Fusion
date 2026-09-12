@@ -1,11 +1,19 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import LandingLayout from '@/layouts/LandingLayout'
 import AuthLayout from '@/layouts/AuthLayout'
 import DashboardLayout from '@/layouts/DashboardLayout'
 import CustomerLayout from '@/layouts/CustomerLayout'
-import StaffLayout from '@/layouts/StaffLayout'
+import ChefLayout from '@/layouts/ChefLayout'
+import WaiterLayout from '@/layouts/WaiterLayout'
 import ErrorLayout from '@/layouts/ErrorLayout'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
+import { StaffPositionGuard } from '@/components/staff/StaffPositionGuard'
+import {
+  StaffRootRedirect,
+  StaffOrdersRedirect,
+  StaffProfileRedirect,
+  StaffSettingsRedirect,
+} from '@/components/staff/StaffRootRedirect'
 import { USER_ROLES } from '@/constants'
 import Home from '@/pages/landing/Home'
 import Login from '@/pages/auth/Login'
@@ -23,6 +31,7 @@ import OrdersPage from '@/pages/dashboard/orders/OrdersPage'
 import MyOrdersPage from '@/pages/orders/MyOrdersPage'
 import NewOrderPage from '@/pages/orders/NewOrderPage'
 import OrderTrackingPage from '@/pages/orders/OrderTrackingPage'
+import TrackOrderRedirect from '@/pages/orders/TrackOrderRedirect'
 import BillingPage from '@/pages/dashboard/billing/BillingPage'
 import MyBillsPage from '@/pages/billing/MyBillsPage'
 import LoyaltyPage from '@/pages/loyalty/LoyaltyPage'
@@ -35,11 +44,13 @@ import ProfilePage from '@/pages/dashboard/profile/ProfilePage'
 import MyProfilePage from '@/pages/profile/MyProfilePage'
 import AccountSettingsPage from '@/pages/profile/AccountSettingsPage'
 import SettingsPage from '@/pages/dashboard/settings/SettingsPage'
-import StaffDashboardPage from '@/pages/staff/StaffDashboardPage'
-import KitchenQueuePage from '@/pages/staff/KitchenQueuePage'
-import StaffOrdersPage from '@/pages/staff/StaffOrdersPage'
-import StaffReservationsPage from '@/pages/staff/StaffReservationsPage'
-import StaffTablesPage from '@/pages/staff/StaffTablesPage'
+import ChefDashboardPage from '@/pages/staff/chef/ChefDashboardPage'
+import ChefOrdersPage from '@/pages/staff/chef/ChefOrdersPage'
+import ChefInventoryPage from '@/pages/staff/chef/ChefInventoryPage'
+import WaiterDashboardPage from '@/pages/staff/waiter/WaiterDashboardPage'
+import WaiterOrdersPage from '@/pages/staff/waiter/WaiterOrdersPage'
+import WaiterTablesPage from '@/pages/staff/waiter/WaiterTablesPage'
+import WaiterReservationsPage from '@/pages/staff/waiter/WaiterReservationsPage'
 import StaffSettingsPage from '@/pages/staff/StaffSettingsPage'
 import NotFound from '@/pages/NotFound'
 import Unauthorized from '@/pages/Unauthorized'
@@ -78,6 +89,8 @@ const router = createBrowserRouter([
           { path: '/reservations', element: <MyReservationsPage /> },
           { path: '/orders', element: <MyOrdersPage /> },
           { path: '/orders/new', element: <NewOrderPage /> },
+          { path: '/orders/track', element: <TrackOrderRedirect /> },
+          { path: '/track-order', element: <TrackOrderRedirect /> },
           { path: '/orders/:id', element: <OrderTrackingPage /> },
           { path: '/bills', element: <MyBillsPage /> },
           { path: '/loyalty', element: <LoyaltyPage /> },
@@ -87,25 +100,54 @@ const router = createBrowserRouter([
     ],
   },
   {
-    // Staff's own workspace (UI-07) — /staff/*, gated to STAFF only.
-    // Separate from the Admin-only /dashboard/* branch below: Admin's
-    // Sidebar/DashboardLayout/Modal-based CRUD pages are untouched by this
-    // redesign, so Staff gets a parallel set of routes instead of a
-    // reskinned version of Admin's. /dashboard/orders and
-    // /dashboard/billing still work for Staff exactly as before (see the
-    // shared ADMIN+STAFF branch further down) — nothing there was removed.
+    // Staff workspaces — separate CHEF and WAITER workspaces determined by user position.
+    // Gated to STAFF role, with StaffPositionGuard preventing cross-workspace access.
     element: <ProtectedRoute allowedRoles={[USER_ROLES.STAFF]} />,
     children: [
+      // /staff root dynamically redirects to /staff/chef or /staff/waiter based on position
+      { path: '/staff', element: <StaffRootRedirect /> },
+
+      // Legacy path redirects for backward compatibility
+      { path: '/staff/kitchen', element: <Navigate to="/staff/chef/orders" replace /> },
+      { path: '/staff/orders', element: <StaffOrdersRedirect /> },
+      { path: '/staff/inventory', element: <Navigate to="/staff/chef/inventory" replace /> },
+      { path: '/staff/tables', element: <Navigate to="/staff/waiter/tables" replace /> },
+      { path: '/staff/reservations', element: <Navigate to="/staff/waiter/reservations" replace /> },
+      { path: '/staff/profile', element: <StaffProfileRedirect /> },
+      { path: '/staff/settings', element: <StaffSettingsRedirect /> },
+
+      // CHEF WORKSPACE (/staff/chef/*)
       {
-        element: <StaffLayout />,
+        element: <StaffPositionGuard allowedWorkspace="chef" />,
         children: [
-          { path: '/staff', element: <StaffDashboardPage /> },
-          { path: '/staff/kitchen', element: <KitchenQueuePage /> },
-          { path: '/staff/orders', element: <StaffOrdersPage /> },
-          { path: '/staff/reservations', element: <StaffReservationsPage /> },
-          { path: '/staff/tables', element: <StaffTablesPage /> },
-          { path: '/staff/profile', element: <ProfilePage /> },
-          { path: '/staff/settings', element: <StaffSettingsPage /> },
+          {
+            element: <ChefLayout />,
+            children: [
+              { path: '/staff/chef', element: <ChefDashboardPage /> },
+              { path: '/staff/chef/orders', element: <ChefOrdersPage /> },
+              { path: '/staff/chef/inventory', element: <ChefInventoryPage /> },
+              { path: '/staff/chef/profile', element: <ProfilePage /> },
+              { path: '/staff/chef/settings', element: <StaffSettingsPage profilePath="/staff/chef/profile" /> },
+            ],
+          },
+        ],
+      },
+
+      // WAITER WORKSPACE (/staff/waiter/*)
+      {
+        element: <StaffPositionGuard allowedWorkspace="waiter" />,
+        children: [
+          {
+            element: <WaiterLayout />,
+            children: [
+              { path: '/staff/waiter', element: <WaiterDashboardPage /> },
+              { path: '/staff/waiter/orders', element: <WaiterOrdersPage /> },
+              { path: '/staff/waiter/tables', element: <WaiterTablesPage /> },
+              { path: '/staff/waiter/reservations', element: <WaiterReservationsPage /> },
+              { path: '/staff/waiter/profile', element: <ProfilePage /> },
+              { path: '/staff/waiter/settings', element: <StaffSettingsPage profilePath="/staff/waiter/profile" /> },
+            ],
+          },
         ],
       },
     ],

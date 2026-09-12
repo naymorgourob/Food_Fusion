@@ -1,25 +1,101 @@
-import { useState } from 'react'
-import { Plus, Pencil, UserCheck, UserX } from 'lucide-react'
-import { DataTable } from '@/components/dashboard/DataTable'
+import { useMemo, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  Plus,
+  Search,
+  SlidersHorizontal,
+  ListFilter,
+  Users,
+  SearchX,
+  CheckCircle2,
+  AlertCircle,
+  Briefcase,
+} from 'lucide-react'
+import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog'
+import { StaffStatsSummary } from '@/features/staff/components/StaffStatsSummary'
+import { AdminStaffRow } from '@/features/staff/components/AdminStaffRow'
+import { AdminStaffDrawer } from '@/features/staff/components/AdminStaffDrawer'
 import { StaffFormModal } from '@/features/staff/components/StaffFormModal'
 import { useStaff } from '@/features/staff/hooks/useStaff'
 import * as staffService from '@/features/staff/services/staffService'
+import {
+  STATUS_FILTERS,
+  SORT_OPTIONS,
+  filterStaff,
+  sortStaff,
+} from '@/features/staff/staffHelpers'
 
-// Admin-only (see App.jsx) — this part's Authorization section grants no
-// other role any access to this module.
+/**
+ * Admin Staff Management (UI-08.8 redesign).
+ *
+ * Fully integrated with existing `/employees` endpoints:
+ * - Real PostgreSQL employee data loading via `useStaff`
+ * - Live status toggles with safety confirmation dialog
+ * - Complete Staff creation with password hashing and validation
+ * - In-place staff editing for name, email, phone, and position
+ * - Metric summary cards with clickable status filter shortcuts
+ * - Instant multi-field search and position/status filtering
+ * - Detailed slide-in staff drawer with assigned orders history
+ */
 export default function StaffPage() {
-  const { staff, isLoading, refetch } = useStaff()
+  const { staff, isLoading, error, refetch } = useStaff()
 
+  // --- Filter & sort state ---
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [positionFilter, setPositionFilter] = useState('')
+  const [sortBy, setSortBy] = useState('newest')
+  const [filtersOpen, setFiltersOpen] = useState(false)
+
+  // --- Modals & drawer state ---
+  const [viewingStaff, setViewingStaff] = useState(null)
   const [formModalOpen, setFormModalOpen] = useState(false)
   const [editingStaff, setEditingStaff] = useState(null)
   const [formErrors, setFormErrors] = useState([])
   const [isSubmitting, setIsSubmitting] = useState(false)
-  // Same modalKey remount pattern as TablesPage — without it, two
-  // successive "Add Staff" opens would share the same 'create' key and the
-  // second would start from whatever was left over in the first.
   const [modalKey, setModalKey] = useState(0)
 
-  const [togglingId, setTogglingId] = useState(null)
+  // --- Status confirmation state ---
+  const [statusTarget, setStatusTarget] = useState(null)
+  const [isToggling, setIsToggling] = useState(false)
+  const [statusError, setStatusError] = useState('')
+  const [feedbackMessage, setFeedbackMessage] = useState(null)
+
+  // Extract unique positions from existing staff for the position filter dropdown
+  const uniquePositions = useMemo(() => {
+    const set = new Set()
+    for (const member of staff) {
+      if (member.position) set.add(member.position.trim())
+    }
+    return Array.from(set).sort()
+  }, [staff])
+
+  // Filtered & sorted staff list
+  const filtered = useMemo(
+    () =>
+      filterStaff(staff, {
+        search: searchTerm,
+        status: statusFilter,
+        position: positionFilter,
+      }),
+    [staff, searchTerm, statusFilter, positionFilter],
+  )
+  const sorted = useMemo(() => sortStaff(filtered, sortBy), [filtered, sortBy])
+
+  const activeFilterCount =
+    (statusFilter ? 1 : 0) + (positionFilter ? 1 : 0) + (sortBy !== 'newest' ? 1 : 0)
+  const isFiltered = Boolean(searchTerm) || activeFilterCount > 0
+
+  function handleStatCardFilter(status) {
+    setStatusFilter(status)
+  }
+
+  function resetFilters() {
+    setSearchTerm('')
+    setStatusFilter('')
+    setPositionFilter('')
+    setSortBy('newest')
+  }
 
   function openCreateModal() {
     setEditingStaff(null)
@@ -46,94 +122,341 @@ export default function StaffPage() {
     try {
       if (editingStaff) {
         await staffService.updateStaff(editingStaff.id, payload)
+        setFeedbackMessage({
+          type: 'success',
+          text: `${payload.fullName}'s profile was updated successfully.`,
+        })
       } else {
         await staffService.createStaff(payload)
+        setFeedbackMessage({
+          type: 'success',
+          text: `Staff account for ${payload.fullName} was created successfully.`,
+        })
       }
+      setTimeout(() => setFeedbackMessage(null), 4000)
       closeFormModal()
+
+      // If drawer is open for this member, refresh
+      if (viewingStaff && editingStaff && viewingStaff.id === editingStaff.id) {
+        setViewingStaff((prev) => (prev ? { ...prev, ...payload } : null))
+      }
+
       refetch()
-    } catch (error) {
-      const details = error.response?.data?.details
-      const message = error.response?.data?.message ?? 'Something went wrong. Please try again.'
+    } catch (err) {
+      const details = err.response?.data?.details
+      const message = err.response?.data?.message ?? 'Something went wrong. Please try again.'
       setFormErrors(details && details.length > 0 ? details : [message])
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  // Same "trivially reversible, no ConfirmDialog needed" reasoning as
-  // CustomersPage's status toggle.
-  async function handleToggleStatus(staffMember) {
-    setTogglingId(staffMember.id)
+  function promptToggleStatus(member) {
+    setStatusError('')
+    setStatusTarget(member)
+  }
+
+  async function handleConfirmToggleStatus() {
+    if (!statusTarget) return
+    setIsToggling(true)
+    setStatusError('')
+
+    const nextStatus = !statusTarget.isActive
+
     try {
-      await staffService.updateStaffStatus(staffMember.id, !staffMember.isActive)
+      await staffService.updateStaffStatus(statusTarget.id, nextStatus)
+      setFeedbackMessage({
+        type: 'success',
+        text: nextStatus
+          ? `${statusTarget.fullName}'s account is now active.`
+          : `${statusTarget.fullName}'s account has been suspended.`,
+      })
+      setTimeout(() => setFeedbackMessage(null), 4000)
+
+      if (viewingStaff?.id === statusTarget.id) {
+        setViewingStaff((prev) => (prev ? { ...prev, isActive: nextStatus } : null))
+      }
+
+      setStatusTarget(null)
       refetch()
+    } catch (err) {
+      setStatusError(err.response?.data?.message || 'Failed to update staff status.')
     } finally {
-      setTogglingId(null)
+      setIsToggling(false)
     }
   }
 
-  const columns = [
-    { key: 'fullName', header: 'Full Name' },
-    { key: 'email', header: 'Email' },
-    { key: 'phone', header: 'Phone' },
-    { key: 'position', header: 'Position' },
-    {
-      key: 'isActive',
-      header: 'Status',
-      render: (row) => (
-        <span
-          className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-            row.isActive ? 'bg-success-soft text-success' : 'bg-surface-2 text-ink-muted'
-          }`}
-        >
-          {row.isActive ? 'Active' : 'Inactive'}
-        </span>
-      ),
-    },
-    {
-      key: 'actions',
-      header: '',
-      render: (row) => (
-        <div className="flex justify-end gap-1">
-          <button
-            onClick={() => openEditModal(row)}
-            aria-label={`Edit ${row.fullName}`}
-            className="rounded-md p-1.5 text-ink-muted hover:bg-surface-2 hover:text-ink"
-          >
-            <Pencil className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => handleToggleStatus(row)}
-            disabled={togglingId === row.id}
-            aria-label={row.isActive ? `Deactivate ${row.fullName}` : `Activate ${row.fullName}`}
-            className="rounded-md p-1.5 text-ink-muted hover:bg-surface-2 hover:text-ink disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {row.isActive ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
-          </button>
-        </div>
-      ),
-    },
-  ]
-
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-end">
+      {/* ── Page Header ────────────────────────────────────────────── */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2.5">
+            <h1 className="font-display text-2xl font-bold text-body">Staff Directory</h1>
+            <span className="flex h-6 items-center justify-center rounded-full bg-brand-50 px-2.5 text-xs font-semibold text-brand-700 dark:bg-brand-900/30 dark:text-brand-300">
+              {staff.length} staff members
+            </span>
+          </div>
+          <p className="text-sm text-body-muted">
+            Manage team accounts, assign positions, and control shift authorization.
+          </p>
+        </div>
+
         <button
+          type="button"
           onClick={openCreateModal}
-          className="flex items-center gap-2 rounded-md bg-ember-600 px-4 py-2 text-sm font-semibold text-white hover:bg-ember-700"
+          className="inline-flex flex-none items-center justify-center gap-2 rounded-full bg-gold-500 px-5 py-2.5 text-sm font-bold text-charcoal shadow-sm transition-all hover:-translate-y-0.5 hover:bg-gold-400"
         >
-          <Plus className="h-4 w-4" /> Add Staff
+          <Plus className="h-4 w-4" />
+          Add Staff Member
         </button>
       </div>
 
-      <DataTable
-        columns={columns}
-        rows={staff}
-        getRowKey={(row) => row.id}
-        isLoading={isLoading}
-        emptyMessage="No staff accounts yet — add your first one to get started."
+      {/* ── Feedback Notification ──────────────────────────────────── */}
+      <AnimatePresence>
+        {feedbackMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className={`flex items-center gap-2.5 rounded-2xl border px-4 py-3 text-sm shadow-sm ${
+              feedbackMessage.type === 'success'
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-300'
+                : 'border-red-200 bg-red-50 text-red-800 dark:border-red-900/40 dark:bg-red-950/20 dark:text-red-300'
+            }`}
+          >
+            {feedbackMessage.type === 'success' ? (
+              <CheckCircle2 className="h-4 w-4 flex-none text-emerald-600 dark:text-emerald-400" />
+            ) : (
+              <AlertCircle className="h-4 w-4 flex-none text-red-600 dark:text-red-400" />
+            )}
+            <span className="font-medium">{feedbackMessage.text}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Metrics Summary Bar ────────────────────────────────────── */}
+      <StaffStatsSummary
+        staff={staff}
+        activeStatusFilter={statusFilter}
+        onStatusFilterChange={handleStatCardFilter}
       />
 
+      {/* ── Search & Filter Controls ───────────────────────────────── */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        {/* Search input */}
+        <div className="relative flex-1">
+          <Search className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-body-faint" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search by staff name, email, phone, or position…"
+            aria-label="Search staff"
+            className="w-full rounded-full border border-rule bg-card py-2.5 pr-4 pl-10 text-sm text-body placeholder:text-body-faint focus:border-brand-400 focus:ring-3 focus:ring-brand-100 focus:outline-none dark:focus:ring-brand-900"
+          />
+        </div>
+
+        {/* Sort selector */}
+        <div className="relative flex-none">
+          <ListFilter className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-body-faint" />
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            aria-label="Sort staff"
+            className="rounded-full border border-rule bg-card py-2.5 pr-4 pl-9 text-sm text-body focus:border-brand-400 focus:ring-3 focus:ring-brand-100 focus:outline-none dark:focus:ring-brand-900"
+          >
+            {SORT_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Expandable filters trigger */}
+        <button
+          type="button"
+          onClick={() => setFiltersOpen((open) => !open)}
+          aria-expanded={filtersOpen}
+          className="inline-flex flex-none items-center justify-center gap-2 rounded-full border border-rule bg-card px-5 py-2.5 text-sm font-semibold text-body-muted transition-colors hover:border-brand-200 hover:text-brand-700 dark:hover:text-brand-400"
+        >
+          <SlidersHorizontal className="h-4 w-4" />
+          Filters
+          {activeFilterCount > 0 && (
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-700 px-1.5 text-[0.65rem] font-bold text-white">
+              {activeFilterCount}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* ── Expanded Filter Tray ───────────────────────────────────── */}
+      <AnimatePresence>
+        {filtersOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-rule bg-card p-4">
+              {/* Status filter */}
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                aria-label="Filter by account status"
+                className="rounded-xl border border-rule bg-canvas px-3.5 py-2 text-sm text-body focus:border-brand-400 focus:ring-3 focus:ring-brand-100 focus:outline-none dark:focus:ring-brand-900"
+              >
+                {STATUS_FILTERS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+
+              {/* Position filter */}
+              <div className="relative">
+                <select
+                  value={positionFilter}
+                  onChange={(e) => setPositionFilter(e.target.value)}
+                  aria-label="Filter by position"
+                  className="rounded-xl border border-rule bg-canvas px-3.5 py-2 text-sm text-body focus:border-brand-400 focus:ring-3 focus:ring-brand-100 focus:outline-none dark:focus:ring-brand-900"
+                >
+                  <option value="">All Positions</option>
+                  {uniquePositions.map((pos) => (
+                    <option key={pos} value={pos}>
+                      {pos}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {isFiltered && (
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="ml-auto text-sm font-semibold text-brand-700 transition-colors hover:text-brand-800 dark:text-brand-400"
+                >
+                  Clear all filters
+                </button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Results List ───────────────────────────────────────────── */}
+      {error ? (
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-300">
+          {error}
+        </div>
+      ) : isLoading ? (
+        <div className="flex flex-col gap-3">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between rounded-2xl border border-rule bg-card p-4"
+            >
+              <div className="flex items-center gap-3">
+                <div className="skeleton h-11 w-11 rounded-xl" />
+                <div className="flex flex-col gap-1.5">
+                  <div className="skeleton h-4 w-32 rounded" />
+                  <div className="skeleton h-3 w-48 rounded" />
+                </div>
+              </div>
+              <div className="skeleton h-8 w-24 rounded-lg" />
+            </div>
+          ))}
+        </div>
+      ) : sorted.length === 0 ? (
+        isFiltered ? (
+          <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-rule bg-card/50 py-16 text-center">
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-canvas text-body-faint">
+              <SearchX className="h-6 w-6" />
+            </span>
+            <div className="flex flex-col gap-1">
+              <h3 className="font-display text-base font-bold text-body">No staff members found</h3>
+              <p className="max-w-sm text-xs text-body-muted">
+                No staff account matches your current search or active filters. Try adjusting your query or resetting filters.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="mt-2 rounded-full border border-rule bg-card px-4 py-2 text-xs font-semibold text-body transition-colors hover:border-brand-300 hover:text-brand-700"
+            >
+              Clear all filters
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-rule bg-card/50 py-16 text-center">
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-canvas text-body-faint">
+              <Users className="h-6 w-6" />
+            </span>
+            <div className="flex flex-col gap-1">
+              <h3 className="font-display text-base font-bold text-body">No staff accounts yet</h3>
+              <p className="max-w-sm text-xs text-body-muted">
+                Get started by adding chefs, waiters, bartenders, and managers to your team.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={openCreateModal}
+              className="mt-2 inline-flex items-center gap-2 rounded-full bg-gold-500 px-5 py-2.5 text-xs font-bold text-charcoal hover:bg-gold-400"
+            >
+              <Plus className="h-4 w-4" />
+              Add First Staff Member
+            </button>
+          </div>
+        )
+      ) : (
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between text-xs text-body-muted px-1">
+            <span>
+              Showing <strong className="text-body font-semibold">{sorted.length}</strong> of{' '}
+              <strong className="text-body font-semibold">{staff.length}</strong> staff members
+            </span>
+            {isFiltered && (
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="font-medium text-brand-700 hover:underline dark:text-brand-400"
+              >
+                Reset
+              </button>
+            )}
+          </div>
+
+          <AnimatePresence initial={false}>
+            {sorted.map((member) => (
+              <AdminStaffRow
+                key={member.id}
+                member={member}
+                onView={(m) => setViewingStaff(m)}
+                onEdit={(m) => openEditModal(m)}
+                onToggleStatus={promptToggleStatus}
+                isToggling={isToggling && statusTarget?.id === member.id}
+              />
+            ))}
+          </AnimatePresence>
+        </div>
+      )}
+
+      {/* ── Slide-in Staff Drawer ──────────────────────────────────── */}
+      <AdminStaffDrawer
+        member={viewingStaff}
+        isOpen={Boolean(viewingStaff)}
+        onClose={() => setViewingStaff(null)}
+        onEdit={(m) => {
+          setViewingStaff(null)
+          openEditModal(m)
+        }}
+        onToggleStatus={promptToggleStatus}
+        isToggling={isToggling && statusTarget?.id === viewingStaff?.id}
+      />
+
+      {/* ── Add / Edit Staff Modal ─────────────────────────────────── */}
       <StaffFormModal
         key={modalKey}
         isOpen={formModalOpen}
@@ -142,6 +465,25 @@ export default function StaffPage() {
         staffMember={editingStaff}
         isSubmitting={isSubmitting}
         errors={formErrors}
+      />
+
+      {/* ── Status Confirmation Dialog ─────────────────────────────── */}
+      <ConfirmDialog
+        isOpen={Boolean(statusTarget)}
+        onClose={() => {
+          if (!isToggling) setStatusTarget(null)
+        }}
+        onConfirm={handleConfirmToggleStatus}
+        title={statusTarget?.isActive ? 'Deactivate Staff Account' : 'Activate Staff Account'}
+        message={
+          statusTarget?.isActive
+            ? `Are you sure you want to suspend ${statusTarget.fullName}'s account? They will be unable to log in to the Staff Portal or take orders until reactivated.`
+            : `Are you sure you want to activate ${statusTarget?.fullName}'s account? They will regain immediate access to the Staff Portal.`
+        }
+        confirmLabel={statusTarget?.isActive ? 'Deactivate Account' : 'Activate Account'}
+        confirmingLabel={statusTarget?.isActive ? 'Deactivating…' : 'Activating…'}
+        isConfirming={isToggling}
+        error={statusError}
       />
     </div>
   )

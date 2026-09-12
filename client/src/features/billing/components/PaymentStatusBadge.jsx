@@ -1,17 +1,18 @@
-const STATUS_STYLES = {
-  UNPAID: 'bg-warning-soft text-warning',
-  PAID: 'bg-success-soft text-success',
-}
-
-const STATUS_LABELS = {
-  UNPAID: 'Unpaid',
-  PAID: 'Paid',
-}
+import { PAYMENT_STATUS_CONFIG } from '@/features/billing/billingHelpers'
 
 export function PaymentStatusBadge({ status }) {
+  const config = PAYMENT_STATUS_CONFIG[status] ?? PAYMENT_STATUS_CONFIG.UNPAID
+
   return (
-    <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_STYLES[status]}`}>
-      {STATUS_LABELS[status]}
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${config.badge}`}
+    >
+      <span
+        className={`h-1.5 w-1.5 rounded-full ${config.dot} ${
+          status === 'UNPAID' ? 'animate-pulse' : ''
+        }`}
+      />
+      {config.label}
     </span>
   )
 }

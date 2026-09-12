@@ -4,16 +4,34 @@ import { ApiError } from '../utils/ApiError.js'
 import { calculateBillTotals } from '../utils/billing.js'
 import { getSettings } from './settings.service.js'
 
-const CUSTOMER_SELECT = { id: true, fullName: true, email: true }
+const CUSTOMER_SELECT = { id: true, fullName: true, email: true, phone: true }
 
 const BILL_INCLUDE = {
   order: {
     select: {
       id: true,
       orderNumber: true,
+      orderType: true,
       status: true,
+      totalAmount: true,
+      createdAt: true,
       customerId: true,
       customer: { select: CUSTOMER_SELECT },
+      items: {
+        select: {
+          id: true,
+          quantity: true,
+          unitPrice: true,
+          subtotal: true,
+          menuItem: {
+            select: {
+              id: true,
+              name: true,
+              imageUrl: true,
+            },
+          },
+        },
+      },
     },
   },
 }

@@ -1,3 +1,5 @@
+import { Calendar, CalendarDays, RotateCcw, SlidersHorizontal } from 'lucide-react'
+
 const MONTH_LABELS = [
   'January',
   'February',
@@ -15,94 +17,118 @@ const MONTH_LABELS = [
 
 function recentYears() {
   const current = new Date().getFullYear()
-  return [current, current - 1, current - 2]
+  return [current, current - 1, current - 2, current - 3]
 }
 
 const YEAR_OPTIONS = recentYears()
 
-const SELECT_CLASSES =
-  'rounded-md border border-border-strong bg-paper px-3 py-2 text-sm text-ink focus:border-ember-500 focus:outline-none focus:ring-3 focus:ring-ember-100'
+export function ReportFilters({ filters, onChange, onReset }) {
+  const isCustomPeriod =
+    filters.mode !== 'year' || filters.year !== new Date().getFullYear()
 
-/**
- * One filter, three shapes — which fields are shown depends on `mode`,
- * matching resolveDateRange on the backend exactly: 'date' sends just a
- * date, 'month' sends year+month, 'year' sends year alone. Every report
- * on the page (stats aside) reads the same filter, so this lives once at
- * the top of ReportsPage rather than once per chart.
- */
-export function ReportFilters({ filters, onChange }) {
   return (
-    <div className="flex flex-wrap items-end gap-4 rounded-lg border border-border bg-surface p-4">
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="report-filter-mode" className="text-xs font-semibold uppercase tracking-wide text-ink-faint">
-          Filter By
-        </label>
-        <select
-          id="report-filter-mode"
-          value={filters.mode}
-          onChange={(event) => onChange({ mode: event.target.value })}
-          className={SELECT_CLASSES}
+    <div className="flex flex-col gap-3 rounded-2xl border border-rule bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
+      {/* Mode selection tabs */}
+      <div className="flex items-center gap-1 rounded-xl border border-rule bg-canvas p-1">
+        <button
+          type="button"
+          onClick={() => onChange({ mode: 'year' })}
+          className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+            filters.mode === 'year'
+              ? 'bg-card text-body shadow-sm ring-1 ring-rule'
+              : 'text-body-muted hover:text-body'
+          }`}
         >
-          <option value="year">Year</option>
-          <option value="month">Month</option>
-          <option value="date">Date</option>
-        </select>
+          Yearly
+        </button>
+        <button
+          type="button"
+          onClick={() => onChange({ mode: 'month' })}
+          className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+            filters.mode === 'month'
+              ? 'bg-card text-body shadow-sm ring-1 ring-rule'
+              : 'text-body-muted hover:text-body'
+          }`}
+        >
+          Monthly
+        </button>
+        <button
+          type="button"
+          onClick={() => onChange({ mode: 'date' })}
+          className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+            filters.mode === 'date'
+              ? 'bg-card text-body shadow-sm ring-1 ring-rule'
+              : 'text-body-muted hover:text-body'
+          }`}
+        >
+          Daily Date
+        </button>
       </div>
 
-      {(filters.mode === 'year' || filters.mode === 'month') && (
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="report-filter-year" className="text-xs font-semibold uppercase tracking-wide text-ink-faint">
-            Year
-          </label>
-          <select
-            id="report-filter-year"
-            value={filters.year}
-            onChange={(event) => onChange({ year: Number(event.target.value) })}
-            className={SELECT_CLASSES}
-          >
-            {YEAR_OPTIONS.map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+      {/* Selectors depending on active mode */}
+      <div className="flex flex-wrap items-center gap-2.5">
+        {(filters.mode === 'year' || filters.mode === 'month') && (
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-medium text-body-muted hidden sm:inline">Year:</span>
+            <select
+              value={filters.year}
+              onChange={(e) => onChange({ year: Number(e.target.value) })}
+              aria-label="Filter by year"
+              className="rounded-xl border border-rule bg-canvas px-3 py-1.5 text-xs font-semibold text-body focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900"
+            >
+              {YEAR_OPTIONS.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
-      {filters.mode === 'month' && (
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="report-filter-month" className="text-xs font-semibold uppercase tracking-wide text-ink-faint">
-            Month
-          </label>
-          <select
-            id="report-filter-month"
-            value={filters.month}
-            onChange={(event) => onChange({ month: Number(event.target.value) })}
-            className={SELECT_CLASSES}
-          >
-            {MONTH_LABELS.map((label, index) => (
-              <option key={label} value={index + 1}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+        {filters.mode === 'month' && (
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-medium text-body-muted hidden sm:inline">Month:</span>
+            <select
+              value={filters.month}
+              onChange={(e) => onChange({ month: Number(e.target.value) })}
+              aria-label="Filter by month"
+              className="rounded-xl border border-rule bg-canvas px-3 py-1.5 text-xs font-semibold text-body focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900"
+            >
+              {MONTH_LABELS.map((label, index) => (
+                <option key={label} value={index + 1}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
-      {filters.mode === 'date' && (
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="report-filter-date" className="text-xs font-semibold uppercase tracking-wide text-ink-faint">
-            Date
-          </label>
-          <input
-            id="report-filter-date"
-            type="date"
-            value={filters.date}
-            onChange={(event) => onChange({ date: event.target.value })}
-            className={SELECT_CLASSES}
-          />
-        </div>
-      )}
+        {filters.mode === 'date' && (
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-medium text-body-muted hidden sm:inline">Date:</span>
+            <input
+              type="date"
+              value={filters.date}
+              onChange={(e) => onChange({ date: e.target.value })}
+              aria-label="Filter by exact date"
+              className="rounded-xl border border-rule bg-canvas px-3 py-1.5 text-xs font-semibold text-body focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900"
+            />
+          </div>
+        )}
+
+        {/* Reset button */}
+        {isCustomPeriod && onReset && (
+          <button
+            type="button"
+            onClick={onReset}
+            title="Reset to current year"
+            className="inline-flex items-center gap-1 rounded-xl border border-rule bg-canvas px-2.5 py-1.5 text-xs font-medium text-body-muted transition-colors hover:bg-canvas-2 hover:text-body"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+            <span className="hidden md:inline">Reset</span>
+          </button>
+        )}
+      </div>
     </div>
   )
 }

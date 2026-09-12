@@ -206,6 +206,14 @@ export async function createOrder(customerId, input) {
       )
     }
 
+    // When dine-in order is placed, mark table as OCCUPIED
+    if (resolvedTableId) {
+      await tx.table.update({
+        where: { id: resolvedTableId },
+        data: { status: 'OCCUPIED' },
+      })
+    }
+
     return order
   })
 }
@@ -247,6 +255,27 @@ export async function updateOrderStatus(id, status) {
     if (status === 'COMPLETED') {
       await awardPointsForCompletedOrder(updated, settings, tx)
     }
+
+    // When order completes or is cancelled, if no other active orders remain for table, mark AVAILABLE
+    if (['COMPLETED', 'CANCELLED'].includes(status) && order.tableId) {
+      const remainingActive = await tx.order.count({
+        where: {
+          tableId: order.tableId,
+          id: { not: order.id },
+          status: { notIn: ['COMPLETED', 'CANCELLED'] },
+        },
+      })
+      if (remainingActive === 0) {
+        const table = await tx.table.findUnique({ where: { id: order.tableId } })
+        if (table && table.status === 'OCCUPIED') {
+          await tx.table.update({
+            where: { id: order.tableId },
+            data: { status: 'AVAILABLE' },
+          })
+        }
+      }
+    }
+
     return updated
   })
 }

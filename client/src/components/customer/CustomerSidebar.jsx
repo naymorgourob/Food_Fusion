@@ -18,14 +18,13 @@ import { useAuth } from '@/hooks/useAuth'
 import { ROUTES } from '@/constants'
 
 // Every destination already exists as a customer route — this sidebar
-// surfaces them, it doesn't add new pages. "Track Order" points at the
-// orders list because tracking is per-order (/orders/:id); the list is
-// where a customer picks which one to track.
+// surfaces them, it doesn't add new pages. "Track Order" routes to the
+// active order tracking page or the track order resolver.
 const NAV_ITEMS = [
   { label: 'Dashboard', to: ROUTES.ACCOUNT, icon: LayoutDashboard, end: true },
   { label: 'Order Food', to: `${ROUTES.ORDERS}/new`, icon: UtensilsCrossed },
   { label: 'My Orders', to: ROUTES.ORDERS, icon: ClipboardList, end: true },
-  { label: 'Track Order', to: ROUTES.ORDERS, icon: Radar, matchTracking: true },
+  { label: 'Track Order', to: ROUTES.TRACK_ORDER || '/orders/track', icon: Radar, matchTracking: true },
   { label: 'Reservations', to: ROUTES.RESERVATIONS, icon: CalendarCheck },
   { label: 'Favorites', to: ROUTES.FAVORITES, icon: Heart },
   { label: 'Loyalty Rewards', to: ROUTES.LOYALTY, icon: Sparkles },
@@ -34,16 +33,12 @@ const NAV_ITEMS = [
 ]
 
 /**
- * "My Orders" and "Track Order" share the /orders path, so NavLink alone
- * can't tell them apart: an un-`end`ed link to /orders matches /orders/new
- * too, which lit up "Track Order" while the customer was ordering food.
- *
- * Tracking is therefore active only on a specific order's page —
+ * Tracking is active on the tracking route or a specific order's page —
  * /orders/<id> — and never on /orders or /orders/new.
  */
 function resolveActive(routerActive, matchTracking, pathname) {
   if (!matchTracking) return routerActive
-  return /^\/orders\/(?!new$)[^/]+$/.test(pathname)
+  return pathname === '/orders/track' || pathname === '/track-order' || /^\/orders\/(?!new$)[^/]+$/.test(pathname)
 }
 
 /**
@@ -52,14 +47,14 @@ function resolveActive(routerActive, matchTracking, pathname) {
  * public site, and a sidebar that inverts with the theme makes the two
  * modes feel like different products.
  */
-export function CustomerSidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobile }) {
+export function CustomerSidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobile, activeOrderId }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const { pathname } = useLocation()
 
   function handleLogout() {
     logout()
-    navigate(ROUTES.LOGIN, { replace: true })
+    navigate(ROUTES.HOME, { replace: true })
   }
 
   const initial = user?.fullName?.charAt(0)?.toUpperCase() ?? '?'
@@ -109,11 +104,13 @@ export function CustomerSidebar({ collapsed, onToggleCollapsed, mobileOpen, onCl
 
         <nav className="flex-1 overflow-y-auto px-3 py-4">
           <ul className="flex flex-col gap-1">
-            {NAV_ITEMS.map(({ label, to, icon: Icon, end, matchTracking }) => (
-              <li key={label}>
-                <NavLink
-                  to={to}
-                  end={end}
+            {NAV_ITEMS.map(({ label, to, icon: Icon, end, matchTracking }) => {
+              const targetTo = matchTracking && activeOrderId ? `${ROUTES.ORDERS}/${activeOrderId}` : to
+              return (
+                <li key={label}>
+                  <NavLink
+                    to={targetTo}
+                    end={end}
                   onClick={onCloseMobile}
                   title={collapsed ? label : undefined}
                   className={({ isActive }) =>
@@ -143,7 +140,7 @@ export function CustomerSidebar({ collapsed, onToggleCollapsed, mobileOpen, onCl
                   }}
                 </NavLink>
               </li>
-            ))}
+            )})}
           </ul>
         </nav>
 

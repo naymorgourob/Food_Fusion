@@ -11,6 +11,7 @@ const PUBLIC_USER_FIELDS = {
   email: true,
   phone: true,
   role: true,
+  position: true,
   profileImage: true,
   isActive: true,
   createdAt: true,

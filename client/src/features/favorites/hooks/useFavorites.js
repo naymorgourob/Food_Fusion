@@ -10,27 +10,26 @@ import * as favoriteService from '@/features/favorites/services/favoriteService'
 export function useFavorites() {
   const [favorites, setFavorites] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [pendingId, setPendingId] = useState(null)
 
-  useEffect(() => {
-    let cancelled = false
-
-    async function load() {
-      try {
-        const data = await favoriteService.fetchFavorites()
-        if (!cancelled) setFavorites(data)
-      } catch {
-        if (!cancelled) setFavorites([])
-      } finally {
-        if (!cancelled) setIsLoading(false)
-      }
-    }
-
-    load()
-    return () => {
-      cancelled = true
+  const load = useCallback(async () => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const data = await favoriteService.fetchFavorites()
+      setFavorites(data)
+    } catch (err) {
+      setError(err?.response?.data?.message || err?.message || 'Failed to load favorites')
+      setFavorites([])
+    } finally {
+      setIsLoading(false)
     }
   }, [])
+
+  useEffect(() => {
+    load()
+  }, [load])
 
   const isFavorite = useCallback(
     (menuItemId) => favorites.some((item) => item.id === menuItemId),
@@ -46,6 +45,8 @@ export function useFavorites() {
           ? await favoriteService.removeFavorite(menuItemId)
           : await favoriteService.addFavorite(menuItemId)
         setFavorites(updated)
+      } catch (err) {
+        setError(err?.response?.data?.message || err?.message || 'Failed to update favorite')
       } finally {
         setPendingId(null)
       }
@@ -53,5 +54,6 @@ export function useFavorites() {
     [favorites],
   )
 
-  return { favorites, isLoading, isFavorite, toggleFavorite, pendingId }
+  return { favorites, isLoading, error, refetch: load, isFavorite, toggleFavorite, pendingId }
 }
+

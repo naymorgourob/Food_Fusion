@@ -14,6 +14,7 @@ import { useFavorites } from '@/features/favorites/hooks/useFavorites'
 import { useLoyalty } from '@/features/loyalty/hooks/useLoyalty'
 import { fetchTables } from '@/features/tables/services/tableService'
 import { createOrder, fetchOrderById } from '@/features/orders/services/orderService'
+import { money } from '@/utils/format'
 
 // Must match DELIVERY_CHARGE in server/src/services/order.service.js —
 // this is a display-only preview, the server applies the real charge.
@@ -314,7 +315,7 @@ export default function NewOrderPage() {
           >
             <ShoppingBag className="h-5 w-5" />
             <span className="text-sm font-bold">{cart.count}</span>
-            <span className="hidden text-sm font-semibold sm:inline">· {cart.subtotal.toFixed(2)}</span>
+            <span className="hidden text-sm font-semibold sm:inline">· {money(cart.subtotal)}</span>
           </motion.button>
         )}
       </AnimatePresence>

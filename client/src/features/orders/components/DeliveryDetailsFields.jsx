@@ -1,4 +1,5 @@
 import { FIELD, LABEL, OPTIONAL, NOTE } from '@/features/orders/components/fieldStyles'
+import { money } from '@/utils/format'
 
 // deliveryCharge is a flat constant applied server-side (order.service.js)
 // — shown here as a preview only, matching whatever the server will
@@ -55,7 +56,7 @@ export function DeliveryDetailsFields({
       </div>
 
       <p className={NOTE}>
-        Delivery charge: ${deliveryChargePreview.toFixed(2)} — the restaurant will confirm your estimated delivery
+        Delivery charge: {money(deliveryChargePreview)} — the restaurant will confirm your estimated delivery
         time once the order is accepted.
       </p>
     </div>

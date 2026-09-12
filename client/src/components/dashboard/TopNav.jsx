@@ -27,15 +27,25 @@ export function TopNav({ onOpenMobileSidebar }) {
         <Breadcrumb />
       </div>
 
-      <div className="hidden items-center gap-2 rounded-md border border-border bg-surface px-3 py-1.5 md:flex">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          const q = e.currentTarget.elements.search?.value?.trim()
+          if (q) {
+            window.location.href = `/dashboard/orders?q=${encodeURIComponent(q)}`
+          }
+        }}
+        className="hidden items-center gap-2 rounded-md border border-border bg-surface px-3 py-1.5 md:flex"
+      >
         <Search className="h-4 w-4 text-ink-faint" />
         <input
+          name="search"
           type="search"
-          placeholder="Search…"
-          aria-label="Search"
+          placeholder="Search orders…"
+          aria-label="Search orders"
           className="w-40 bg-transparent text-sm text-ink placeholder:text-ink-faint focus:outline-none lg:w-56"
         />
-      </div>
+      </form>
 
       <NotificationDropdown />
       <ProfileDropdown />

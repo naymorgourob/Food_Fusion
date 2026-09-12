@@ -24,7 +24,9 @@ function greetingFor(date = new Date()) {
  * A fabricated "On Shift · 3h 12m" would be the kind of decorative-data
  * problem flagged throughout this project.
  */
-export function StaffTopBar({ onOpenMobileSidebar, notifications = [] }) {
+import { isChefPosition } from '@/utils/staffWorkspace'
+
+export function StaffTopBar({ onOpenMobileSidebar, notifications = [], workspace }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [notifOpen, setNotifOpen] = useState(false)
@@ -36,6 +38,10 @@ export function StaffTopBar({ onOpenMobileSidebar, notifications = [] }) {
   useClickOutside(notifRef, () => setNotifOpen(false))
   useClickOutside(profileRef, () => setProfileOpen(false))
 
+  const currentWorkspace = workspace || (isChefPosition(user?.position) ? 'chef' : 'waiter')
+  const searchBase = currentWorkspace === 'chef' ? ROUTES.CHEF_ORDERS : ROUTES.WAITER_ORDERS
+  const profileRoute = currentWorkspace === 'chef' ? ROUTES.CHEF_PROFILE : ROUTES.WAITER_PROFILE
+
   const firstName = user?.fullName?.split(' ')[0] ?? 'there'
   const initial = user?.fullName?.charAt(0)?.toUpperCase() ?? '?'
 
@@ -43,13 +49,13 @@ export function StaffTopBar({ onOpenMobileSidebar, notifications = [] }) {
     event.preventDefault()
     // Orders is where an order number or customer name actually resolves
     // to something — no separate search index exists.
-    navigate(`${ROUTES.STAFF_ORDERS}${query ? `?q=${encodeURIComponent(query)}` : ''}`)
+    navigate(`${searchBase}${query ? `?q=${encodeURIComponent(query)}` : ''}`)
   }
 
   function handleLogout() {
     setProfileOpen(false)
     logout()
-    navigate(ROUTES.LOGIN, { replace: true })
+    navigate(ROUTES.HOME, { replace: true })
   }
 
   return (
@@ -161,7 +167,7 @@ export function StaffTopBar({ onOpenMobileSidebar, notifications = [] }) {
                   <p className="truncate text-xs text-body-faint">{user?.email}</p>
                 </div>
                 <Link
-                  to={ROUTES.STAFF_PROFILE}
+                  to={profileRoute}
                   onClick={() => setProfileOpen(false)}
                   className="mt-1 flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-body-muted transition-colors hover:bg-canvas-2 hover:text-body"
                 >

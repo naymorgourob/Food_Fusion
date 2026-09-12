@@ -31,7 +31,8 @@ export async function postOrder(req, res) {
   const errors = validateOrder(req.body)
   if (errors.length > 0) throw new ApiError(400, 'Validation failed.', errors)
 
-  const order = await createOrder(req.user.id, req.body)
+  const customerId = req.user.role !== 'CUSTOMER' && req.body.customerId ? req.body.customerId : req.user.id
+  const order = await createOrder(customerId, req.body)
   sendSuccess(res, { statusCode: 201, message: 'Order placed successfully.', data: { order } })
 }
 

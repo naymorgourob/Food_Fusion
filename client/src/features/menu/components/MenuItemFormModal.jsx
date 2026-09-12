@@ -174,7 +174,7 @@ export function MenuItemFormModal({ isOpen, onClose, onSubmit, item, categories,
                     </label>
                     <div className="relative">
                       <span className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-sm text-body-faint">
-                        $
+                        ৳
                       </span>
                       <input
                         id="food-price"

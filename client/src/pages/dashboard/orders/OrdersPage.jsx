@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, SlidersHorizontal, ClipboardList, SearchX } from 'lucide-react'
 import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog'
@@ -38,10 +39,16 @@ import {
  */
 export default function OrdersPage() {
   const { orders, isLoading, error, refetch } = useOrders()
+  const [searchParams] = useSearchParams()
 
   const [assignableStaff, setAssignableStaff] = useState([])
 
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchTerm, setSearchTerm] = useState(() => searchParams.get('q') || '')
+
+  useEffect(() => {
+    const q = searchParams.get('q')
+    if (q !== null) setSearchTerm(q)
+  }, [searchParams])
   const [statusFilter, setStatusFilter] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
   const [paymentFilter, setPaymentFilter] = useState('')

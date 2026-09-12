@@ -56,6 +56,18 @@ export async function updateInventoryItem(id, { itemName, category, unit, quanti
   return withStatus(item)
 }
 
+export async function updateInventoryStock(id, { quantity }) {
+  await getInventoryItemOrThrow(id)
+
+  const item = await prisma.inventoryItem.update({
+    where: { id },
+    data: {
+      quantity,
+    },
+  })
+  return withStatus(item)
+}
+
 // A real hard delete — unlike Category/Food/Customer, nothing else in the
 // schema references InventoryItem (no recipe/BOM link exists in this
 // part's scope), so there's no history to protect and no onDelete guard

@@ -13,7 +13,8 @@ export function ProtectedRoute({ allowedRoles }) {
   const { user, isLoading } = useAuth()
   const location = useLocation()
 
-  if (isLoading) return null // brief — avoids a flash of the login page before hydration finishes
+  // Wait if auth state is hydrating or user is present but role is not yet initialized
+  if (isLoading || (user && !user.role)) return null
 
   if (!user) {
     return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />

@@ -54,6 +54,9 @@ export function CustomerShell({ children }) {
     })
   }
 
+  const activeOrder = orders.orders.find((order) => ACTIVE_STATUSES.has(order.status))
+  const activeOrderId = activeOrder?.id || orders.orders[0]?.id || null
+
   return (
     <div className="min-h-screen bg-canvas font-sans">
       <CustomerSidebar
@@ -61,6 +64,7 @@ export function CustomerShell({ children }) {
         onToggleCollapsed={toggleCollapsed}
         mobileOpen={mobileOpen}
         onCloseMobile={() => setMobileOpen(false)}
+        activeOrderId={activeOrderId}
       />
 
       <div

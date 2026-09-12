@@ -15,6 +15,11 @@ export async function updateInventoryItem(id, payload) {
   return data.data.item
 }
 
+export async function updateInventoryStock(id, quantity) {
+  const { data } = await api.patch(`/inventory/${id}/stock`, { quantity })
+  return data.data.item
+}
+
 export async function deleteInventoryItem(id) {
   await api.delete(`/inventory/${id}`)
 }

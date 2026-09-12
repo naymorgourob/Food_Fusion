@@ -205,7 +205,7 @@ export default function SettingsPage() {
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="flex flex-col gap-1.5">
             <label htmlFor="settings-loyalty-rate" className="text-sm font-medium text-ink">
-              Points per {form.currencySymbol || '$'}1
+              Points per {form.currencySymbol || '৳'}1
             </label>
             <input
               id="settings-loyalty-rate"

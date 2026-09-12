@@ -12,11 +12,9 @@ async function getReservationOrThrow(id) {
   return reservation
 }
 
-// Admin sees everything; a Customer only ever sees their own — enforced
-// here from req.user (set by authenticateUser from the JWT), never from a
-// client-supplied query param a customer could tamper with.
+// Admin and Staff (Waiters) see all floor reservations; Customer sees own
 export async function listReservations(user) {
-  const where = user.role === 'ADMIN' ? {} : { customerId: user.id }
+  const where = user.role === 'ADMIN' || user.role === 'STAFF' ? {} : { customerId: user.id }
   return prisma.reservation.findMany({
     where,
     include: { table: { select: TABLE_SELECT } },

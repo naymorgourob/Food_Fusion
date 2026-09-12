@@ -5,6 +5,8 @@ import { Heart, Plus, ArrowRight } from 'lucide-react'
 import { Container, Section, SectionHeading, Reveal, Rating, Button, Photo } from '@/components/landing/primitives'
 import { MENU_CATEGORIES, MENU_ITEMS } from '@/pages/landing/content'
 import { ROUTES } from '@/constants'
+import { money } from '@/utils/format'
+
 
 /**
  * Section 5 — Featured Menu.
@@ -113,7 +115,7 @@ export function MenuSection() {
                       {item.name}
                     </h3>
                     <span className="font-display text-lg font-semibold whitespace-nowrap text-brand-700 dark:text-brand-400">
-                      ${item.price}
+                      {money(item.price)}
                     </span>
                   </div>
                   <p className="flex-1 text-sm leading-relaxed text-body-muted">{item.description}</p>
