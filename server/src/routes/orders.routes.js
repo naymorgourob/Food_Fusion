@@ -10,6 +10,7 @@ import {
   patchEstimatedTime,
   removeOrder,
 } from '../controllers/order.controller.js'
+import { uploadPaymentProof } from '../config/multer.js'
 
 const router = Router()
 
@@ -21,7 +22,7 @@ router.get('/', authenticateUser, getOrders)
 router.get('/assignable-staff', authenticateUser, authorizeStaffOrAdmin, getAssignableStaff)
 router.get('/:id', authenticateUser, getOrder)
 // Customer places own order; Waiter/Staff places dining or takeaway order for guests
-router.post('/', authenticateUser, postOrder)
+router.post('/', authenticateUser, uploadPaymentProof, postOrder)
 router.put('/:id', authenticateUser, authorizeStaffOrAdmin, putOrderStatus)
 router.patch('/:id/assign-staff', authenticateUser, authorizeStaffOrAdmin, patchAssignStaff)
 router.patch('/:id/estimated-time', authenticateUser, authorizeStaffOrAdmin, patchEstimatedTime)

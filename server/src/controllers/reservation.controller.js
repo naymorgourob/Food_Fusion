@@ -14,10 +14,11 @@ export async function getReservations(req, res) {
 }
 
 export async function postReservation(req, res) {
-  const errors = validateReservation(req.body)
+  const input = { ...req.body, paymentProofImage: req.file?.filename }
+  const errors = validateReservation(input)
   if (errors.length > 0) throw new ApiError(400, 'Validation failed.', errors)
 
-  const reservation = await createReservation(req.user.id, req.body)
+  const reservation = await createReservation(req.user.id, input)
   sendSuccess(res, { statusCode: 201, message: 'Reservation created successfully.', data: { reservation } })
 }
 

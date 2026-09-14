@@ -156,18 +156,18 @@ async function seed() {
   // 4. DINING FLOOR TABLES
   console.log('Seeding dining tables...')
   const tablesData = [
-    { number: 1, capacity: 2, status: 'AVAILABLE', description: 'Window-side table for 2' },
-    { number: 2, capacity: 2, status: 'AVAILABLE', description: 'Cozy table for 2' },
-    { number: 3, capacity: 4, status: 'AVAILABLE', description: 'Dining table for 4' },
-    { number: 4, capacity: 4, status: 'AVAILABLE', description: 'Booth for family of 4' },
-    { number: 5, capacity: 6, status: 'AVAILABLE', description: 'Large dining table for 6' },
-    { number: 6, capacity: 8, status: 'AVAILABLE', description: 'Banquet table for 8' },
-    { number: 7, capacity: 2, status: 'AVAILABLE', description: 'Romantic Garden Corner for 2' },
-    { number: 8, capacity: 4, status: 'OCCUPIED', description: 'Garden View Booth for 4' },
-    { number: 9, capacity: 4, status: 'RESERVED', description: 'Center Dining Table for 4' },
-    { number: 10, capacity: 6, status: 'OCCUPIED', description: 'Family Dining Table for 6' },
-    { number: 11, capacity: 8, status: 'AVAILABLE', description: 'Private Dining Alcove for 8' },
-    { number: 12, capacity: 10, status: 'RESERVED', description: 'Executive VIP Banquet for 10' },
+    { number: 1, capacity: 2, status: 'AVAILABLE', windowSidePosition: 'Window A', reservationCost: 1200, description: 'Window-side table for 2' },
+    { number: 2, capacity: 2, status: 'AVAILABLE', windowSidePosition: 'Window B', reservationCost: 1100, description: 'Cozy table for 2' },
+    { number: 3, capacity: 4, status: 'AVAILABLE', windowSidePosition: 'Window C', reservationCost: 1800, description: 'Dining table for 4' },
+    { number: 4, capacity: 4, status: 'AVAILABLE', windowSidePosition: 'Interior A', reservationCost: 1500, description: 'Booth for family of 4' },
+    { number: 5, capacity: 6, status: 'AVAILABLE', windowSidePosition: 'Interior B', reservationCost: 2200, description: 'Large dining table for 6' },
+    { number: 6, capacity: 8, status: 'AVAILABLE', windowSidePosition: 'Interior C', reservationCost: 2800, description: 'Banquet table for 8' },
+    { number: 7, capacity: 2, status: 'AVAILABLE', windowSidePosition: 'Garden A', reservationCost: 1300, description: 'Romantic Garden Corner for 2' },
+    { number: 8, capacity: 4, status: 'OCCUPIED', windowSidePosition: 'Garden B', reservationCost: 1700, description: 'Garden View Booth for 4' },
+    { number: 9, capacity: 4, status: 'RESERVED', windowSidePosition: 'Interior D', reservationCost: 1600, description: 'Center Dining Table for 4' },
+    { number: 10, capacity: 6, status: 'OCCUPIED', windowSidePosition: 'Interior E', reservationCost: 2100, description: 'Family Dining Table for 6' },
+    { number: 11, capacity: 8, status: 'AVAILABLE', windowSidePosition: 'Private A', reservationCost: 3200, description: 'Private Dining Alcove for 8' },
+    { number: 12, capacity: 10, status: 'RESERVED', windowSidePosition: 'Private B', reservationCost: 4000, description: 'Executive VIP Banquet for 10' },
   ]
 
   const tableMap = {}
@@ -178,6 +178,8 @@ async function seed() {
         capacity: t.capacity,
         description: t.description,
         status: t.status,
+        windowSidePosition: t.windowSidePosition,
+        reservationCost: t.reservationCost,
       },
       create: t,
     })

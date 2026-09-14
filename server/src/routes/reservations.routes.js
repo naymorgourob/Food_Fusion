@@ -6,6 +6,7 @@ import {
   putReservationStatus,
   removeReservation,
 } from '../controllers/reservation.controller.js'
+import { uploadPaymentProof } from '../config/multer.js'
 
 const router = Router()
 
@@ -13,7 +14,7 @@ const router = Router()
 // — not gated by authorizeAdmin/authorizeCustomer, since both roles call
 // the same endpoint and get different, correctly-scoped results.
 router.get('/', authenticateUser, getReservations)
-router.post('/', authenticateUser, authorizeCustomer, postReservation)
+router.post('/', authenticateUser, authorizeCustomer, uploadPaymentProof, postReservation)
 router.put('/:id', authenticateUser, authorizeAdmin, putReservationStatus)
 // Not authorizeAdmin: a Customer may cancel their OWN booking, which the
 // service enforces (with the 404-not-403 privacy rule). Admin can still

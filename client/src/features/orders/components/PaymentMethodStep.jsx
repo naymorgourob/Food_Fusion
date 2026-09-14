@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Check, Banknote, CreditCard, Smartphone, Wallet, Info, Sparkles } from 'lucide-react'
+import { Check, Banknote, CreditCard, Smartphone, Wallet, Info, Sparkles, Upload } from 'lucide-react'
 import { money } from '@/utils/format'
 
 /**
@@ -51,6 +51,12 @@ export function PaymentMethodStep({
   onPointsChange,
   appliedPoints,
   loyaltyDiscount,
+  advanceAmount,
+  paymentReference,
+  onPaymentReferenceChange,
+  paymentProof,
+  onPaymentProofChange,
+  paymentContact,
 }) {
   const pointValue = loyaltySummary?.pointValue ?? 0
   const currentPoints = loyaltySummary?.currentPoints ?? 0
@@ -64,9 +70,16 @@ export function PaymentMethodStep({
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
         <h2 className="font-display text-lg font-semibold text-body">How would you like to pay?</h2>
-        <p className="text-sm text-body-muted">
-          Choose your preferred method — you&rsquo;ll settle up at the restaurant.
-        </p>
+        <p className="text-sm text-body-muted">Submit proof of the required 20% advance to place this order.</p>
+      </div>
+
+      <div className="flex flex-col gap-2 rounded-2xl border border-gold-300 bg-gold-100/60 p-5 dark:border-gold-700 dark:bg-gold-100/10">
+        <span className="text-xs font-semibold tracking-wide text-body-muted uppercase">Advance payment required</span>
+        <strong className="font-display text-2xl text-body">{money(advanceAmount)}</strong>
+        <span className="text-xs text-body-muted">20% of your order total.</span>
+        <span className="text-sm font-semibold text-body">
+          Pay to {paymentContact?.restaurantName || 'FoodFusion'}: {paymentContact?.restaurantPhone || 'Contact the restaurant'}
+        </span>
       </div>
 
       {/* --- Method cards --------------------------------------------- */}
@@ -121,14 +134,19 @@ export function PaymentMethodStep({
         </div>
       </fieldset>
 
-      {/* The honesty notice. Deliberately not fine print. */}
-      <p className="flex items-start gap-2.5 rounded-xl border border-gold-300 bg-gold-100/60 px-4 py-3 text-sm text-charcoal dark:border-gold-700 dark:bg-gold-100/10 dark:text-body">
-        <Info className="mt-0.5 h-4 w-4 flex-none text-gold-700 dark:text-gold-300" />
-        <span>
-          No payment is taken online. Your order is sent to the kitchen now, and you pay by your
-          chosen method at the restaurant or on delivery.
-        </span>
-      </p>
+      <div className="flex flex-col gap-4 rounded-2xl border border-rule bg-canvas p-5">
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs font-semibold text-body-muted">Transaction ID / Reference ID</span>
+          <input value={paymentReference} onChange={(event) => onPaymentReferenceChange(event.target.value)} className="rounded-xl border border-rule bg-card px-3 py-2.5 text-sm text-body" placeholder="e.g. TXN123456" />
+        </label>
+        <div className="text-center text-xs text-body-faint">or</div>
+        <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-rule bg-card px-4 py-3 text-sm text-body-muted">
+          <Upload className="h-4 w-4 flex-none" />
+          <span>{paymentProof ? paymentProof.name : 'Upload payment screenshot or photo'}</span>
+          <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => onPaymentProofChange(event.target.files?.[0] ?? null)} className="sr-only" />
+        </label>
+        <p className="flex items-start gap-2 text-xs text-body-faint"><Info className="mt-0.5 h-3.5 w-3.5 flex-none" />Your proof is sent to the restaurant for verification before the order is accepted.</p>
+      </div>
 
       {/* --- Loyalty redemption --------------------------------------- */}
       {currentPoints > 0 && maxRedeemable > 0 && (

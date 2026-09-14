@@ -15,7 +15,17 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 export const app = express()
 
 app.use(helmet())
-app.use(cors({ origin: env.clientUrl, credentials: true }))
+const localClientOrigins = new Set([env.clientUrl, 'http://localhost:5173', 'http://127.0.0.1:5173'])
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (env.nodeEnv === 'development') return callback(null, true)
+      if (!origin || localClientOrigins.has(origin)) return callback(null, true)
+      return callback(new Error('Origin is not allowed by CORS.'))
+    },
+    credentials: true,
+  }),
+)
 app.use(morgan(env.nodeEnv === 'development' ? 'dev' : 'combined'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))

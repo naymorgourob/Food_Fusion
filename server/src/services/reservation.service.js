@@ -1,7 +1,8 @@
 import { prisma } from '../config/prisma.js'
+import { Prisma } from '../generated/prisma/client.ts'
 import { ApiError } from '../utils/ApiError.js'
 
-const TABLE_SELECT = { id: true, number: true, capacity: true }
+const TABLE_SELECT = { id: true, number: true, capacity: true, windowSidePosition: true, reservationCost: true }
 
 async function getReservationOrThrow(id) {
   const reservation = await prisma.reservation.findUnique({
@@ -33,6 +34,8 @@ export async function createReservation(customerId, input) {
     specialRequest,
     occasion,
     occasionNote,
+    paymentReference,
+    paymentProofImage,
   } = input
 
   const table = await prisma.table.findUnique({ where: { id: tableId } })
@@ -41,6 +44,9 @@ export async function createReservation(customerId, input) {
   if (Number(guestCount) > table.capacity) {
     throw new ApiError(400, `Table ${table.number} only seats ${table.capacity} guests.`)
   }
+
+  const amount = new Prisma.Decimal(table.reservationCost)
+  const advanceAmount = amount.mul(new Prisma.Decimal('0.20')).toDecimalPlaces(2)
 
   return prisma.reservation.create({
     data: {
@@ -56,13 +62,25 @@ export async function createReservation(customerId, input) {
       // Only meaningful alongside OTHER — stored as null for the named
       // occasions so a stale note can't linger after switching away.
       occasionNote: occasion === 'OTHER' ? occasionNote?.trim() || null : null,
+      totalAmount: amount,
+      advanceAmount,
+      paymentReference: paymentReference?.trim() || null,
+      paymentProofImage: paymentProofImage || null,
+      paymentSubmittedAt: new Date(),
     },
     include: { table: { select: TABLE_SELECT } },
   })
 }
 
 export async function updateReservationStatus(id, status) {
-  await getReservationOrThrow(id)
+  const reservation = await getReservationOrThrow(id)
+  if (
+    status === 'CONFIRMED' &&
+    !reservation.paymentReference &&
+    !reservation.paymentProofImage
+  ) {
+    throw new ApiError(400, 'Payment proof must be submitted before confirming this reservation.')
+  }
   return prisma.reservation.update({
     where: { id },
     data: { status },

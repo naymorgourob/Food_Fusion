@@ -129,12 +129,12 @@ export const MENU_ITEMS = [
 export const TESTIMONIALS = [
   {
     id: 't1',
-    name: 'Priya Nair',
+    name: 'Tahrima Jahan Raha',
     role: 'Regular guest',
     rating: 5,
     quote:
       'The tasting menu was the best meal I have had all year. Booking a table took about ten seconds, and the kitchen remembered my allergy without being asked twice.',
-    avatar: unsplash('1494790108377-be9c29b29330', 160),
+    avatar: unsplash('null', 160),
   },
   {
     id: 't2',

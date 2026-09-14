@@ -82,7 +82,7 @@ export default function Register() {
             autoComplete="name"
             value={form.fullName}
             onChange={updateField('fullName')}
-            placeholder="Priya Nair"
+            placeholder="Full Name"
             className={FIELD}
           />
         </div>
@@ -98,7 +98,7 @@ export default function Register() {
             autoComplete="email"
             value={form.email}
             onChange={updateField('email')}
-            placeholder="you@example.com"
+            placeholder="name@gmail.com"
             className={FIELD}
           />
         </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Check, AlertCircle, CalendarDays, Users, Armchair, MessageSquare, UtensilsCrossed } from 'lucide-react'
+import { Check, AlertCircle, CalendarDays, Users, Armchair, MessageSquare, UtensilsCrossed, Upload } from 'lucide-react'
 import { fetchTables } from '@/features/tables/services/tableService'
 import { createReservation } from '@/features/reservations/services/reservationService'
 import { RESERVATION_OCCASIONS } from '@/features/reservations/constants'
@@ -8,6 +8,8 @@ import { TablePicker } from '@/features/reservations/components/TablePicker'
 import { ReservationSummary } from '@/features/reservations/components/ReservationSummary'
 import { FIELD, LABEL, OPTIONAL } from '@/features/orders/components/fieldStyles'
 import { useAuth } from '@/hooks/useAuth'
+import { money } from '@/utils/format'
+import { fetchPaymentContact } from '@/features/settings/services/settingsService'
 
 /**
  * The booking flow (UI-06): when → who → where → anything else.
@@ -40,6 +42,8 @@ const EMPTY_FORM = {
   specialRequest: '',
   occasion: '',
   occasionNote: '',
+  paymentReference: '',
+  paymentProof: null,
 }
 
 // Service windows the restaurant actually runs, offered as chips so the
@@ -130,6 +134,7 @@ export function ReservationWizard({ onCreated }) {
   const [tablesLoading, setTablesLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState([])
+  const [paymentContact, setPaymentContact] = useState(null)
 
   useEffect(() => {
     // Reuses the Part 10 table service as-is — this reservation form is
@@ -139,6 +144,10 @@ export function ReservationWizard({ onCreated }) {
       .then((data) => setTables(data.filter((table) => table.status !== 'INACTIVE')))
       .catch(() => setTables([]))
       .finally(() => setTablesLoading(false))
+  }, [])
+
+  useEffect(() => {
+    fetchPaymentContact().then(setPaymentContact).catch(() => setPaymentContact(null))
   }, [])
 
   function update(field, value) {
@@ -152,6 +161,8 @@ export function ReservationWizard({ onCreated }) {
   }
 
   const selectedTable = tables.find((table) => table.id === form.tableId) ?? null
+  const reservationCost = Number(selectedTable?.reservationCost ?? 0)
+  const advanceAmount = reservationCost * 0.2
 
   const canAdvance =
     step === 0
@@ -160,7 +171,12 @@ export function ReservationWizard({ onCreated }) {
         ? Boolean(form.guestCount) && Number(form.guestCount) > 0
         : step === 2
           ? Boolean(form.tableId)
-          : true
+          : Boolean(
+              form.customerName &&
+                form.customerPhone &&
+                selectedTable &&
+                (form.paymentReference.trim() || form.paymentProof),
+            )
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -178,7 +194,12 @@ export function ReservationWizard({ onCreated }) {
       // Exactly the payload the previous form sent — the extra `preOrder`
       // toggle is a UI affordance that routes to the ordering flow after
       // booking; there is no column for it, so it is never submitted.
-      const reservation = await createReservation(form)
+      const payload = new FormData()
+      Object.entries(form).forEach(([key, value]) => {
+        if (key !== 'paymentProof' && value !== '') payload.append(key, value)
+      })
+      if (form.paymentProof) payload.append('paymentProof', form.paymentProof)
+      const reservation = await createReservation(payload)
       onCreated(reservation, { preOrder })
     } catch (error) {
       const details = error.response?.data?.details
@@ -462,6 +483,34 @@ export function ReservationWizard({ onCreated }) {
                       className={FIELD}
                     />
                   </div>
+                </div>
+
+                <div className="flex flex-col gap-4 rounded-2xl border border-gold-300 bg-gold-100/60 p-5 dark:border-gold-700 dark:bg-gold-100/10">
+                  <div>
+                    <span className={LABEL}>Table reservation cost</span>
+                    <p className="mt-1 text-sm font-semibold text-body">{selectedTable ? money(reservationCost) : 'Select a table first'}</p>
+                    <p className="mt-1 text-xs text-body-muted">Required 20% advance: {selectedTable ? money(advanceAmount) : 'Select a table first'}.</p>
+                    <p className="mt-2 text-sm font-semibold text-body">
+                      Pay to {paymentContact?.restaurantName || 'FoodFusion'}: {paymentContact?.restaurantPhone || 'Contact the restaurant'}
+                    </p>
+                  </div>
+                  <input
+                    value={form.paymentReference}
+                    onChange={(event) => update('paymentReference', event.target.value)}
+                    className={FIELD}
+                    placeholder="Transaction ID / Reference ID"
+                  />
+                  <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-rule bg-card px-4 py-3 text-sm text-body-muted">
+                    <Upload className="h-4 w-4" />
+                    <span>{form.paymentProof ? form.paymentProof.name : 'Upload payment screenshot or photo'}</span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={(event) => update('paymentProof', event.target.files?.[0] ?? null)}
+                      className="sr-only"
+                    />
+                  </label>
+                  <p className="text-xs text-body-faint">Your proof is sent to the restaurant for verification before the reservation is confirmed.</p>
                 </div>
 
                 <div className="flex flex-col gap-1.5">

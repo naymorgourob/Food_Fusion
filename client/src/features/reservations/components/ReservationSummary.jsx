@@ -1,5 +1,6 @@
 import { CalendarDays, Clock, Users, Sparkles, Armchair, UtensilsCrossed } from 'lucide-react'
 import { OCCASION_LABELS } from '@/features/reservations/constants'
+import { money } from '@/utils/format'
 
 /**
  * Sticky booking summary (UI-06).
@@ -71,8 +72,10 @@ export function ReservationSummary({ form, table, preOrder, className = '' }) {
         <Row
           icon={Armchair}
           label="Table"
-          value={table ? `Table ${table.number} · seats ${table.capacity}` : null}
+          value={table ? `Table ${table.number} · ${table.windowSidePosition}` : null}
         />
+        <Row icon={Armchair} label="Reservation cost" value={table ? money(table.reservationCost) : null} />
+        <Row icon={Sparkles} label="20% advance" value={table ? money(Number(table.reservationCost ?? 0) * 0.2) : null} />
         <Row
           icon={UtensilsCrossed}
           label="Dining"

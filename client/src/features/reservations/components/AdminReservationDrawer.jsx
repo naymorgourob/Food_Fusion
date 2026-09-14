@@ -1,9 +1,10 @@
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, UserRound, Phone, CalendarDays, Clock, Users, Armchair, Sparkles, ScrollText, History } from 'lucide-react'
+import { X, UserRound, Phone, CalendarDays, Clock, Users, Armchair, Sparkles, ScrollText, History, Receipt } from 'lucide-react'
 import { StatusBadge } from '@/features/reservations/components/StatusBadge'
 import { OCCASION_LABELS } from '@/features/reservations/constants'
-import { orderNo } from '@/utils/format'
+import { orderNo, money } from '@/utils/format'
+import { getImageUrl } from '@/constants'
 
 const STATUS_OPTIONS = ['PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED']
 
@@ -148,6 +149,18 @@ export function AdminReservationDrawer({ reservation, isOpen, onClose, onStatusC
                     </div>
                   </section>
                 )}
+
+                <section className="flex flex-col gap-3 rounded-2xl border border-gold-300 bg-gold-100/40 p-4 dark:border-gold-700 dark:bg-gold-100/5">
+                  <span className="text-xs font-semibold tracking-wide text-gold-700 uppercase dark:text-gold-300">Advance payment proof</span>
+                  <Row icon={Receipt} label="Advance amount">{money(reservation.advanceAmount ?? 0)}</Row>
+                  <Row icon={Receipt} label="Transaction / Reference ID">{reservation.paymentReference}</Row>
+                  {reservation.paymentProofImage && (
+                    <a href={getImageUrl(`/uploads/payment/${reservation.paymentProofImage}`)} target="_blank" rel="noreferrer" className="text-sm font-semibold text-brand-700 underline dark:text-brand-400">
+                      View uploaded payment screenshot
+                    </a>
+                  )}
+                  {!reservation.paymentReference && !reservation.paymentProofImage && <span className="text-sm text-red-600">No payment proof submitted</span>}
+                </section>
 
                 {reservation.specialRequest && (
                   <section className="flex items-start gap-2.5 rounded-2xl border border-rule bg-card p-4">

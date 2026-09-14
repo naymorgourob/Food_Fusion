@@ -4,7 +4,7 @@ import { ApiError } from '../utils/ApiError.js'
 import { getSettings } from './settings.service.js'
 import { getLoyaltySummary, recordTransaction, awardPointsForCompletedOrder } from './loyalty.service.js'
 
-const CUSTOMER_SELECT = { id: true, fullName: true, email: true }
+const CUSTOMER_SELECT = { id: true, fullName: true, email: true, role: true }
 const TABLE_SELECT = { id: true, number: true, capacity: true }
 const MENU_ITEM_SELECT = { id: true, name: true, imageUrl: true }
 const STAFF_SELECT = { id: true, fullName: true, position: true, phone: true }
@@ -102,6 +102,8 @@ export async function createOrder(customerId, input) {
     guestCount,
     specialInstructions,
     pointsToRedeem,
+    paymentReference,
+    paymentProofImage,
   } = input
 
   // A table only means something for Dine-In — Delivery/Takeaway orders
@@ -161,6 +163,8 @@ export async function createOrder(customerId, input) {
     totalAmount = totalAmount.sub(loyaltyDiscount)
   }
 
+  const advanceAmount = totalAmount.mul(new Prisma.Decimal('0.20')).toDecimalPlaces(2)
+
   // A transaction so the order and its REDEEMED ledger row are written
   // together — a crash between them would otherwise either charge points
   // for no order or give a discount without deducting points.
@@ -173,6 +177,10 @@ export async function createOrder(customerId, input) {
       orderType,
       pointsRedeemed,
       loyaltyDiscount,
+      advanceAmount,
+      paymentReference: paymentReference?.trim() || null,
+      paymentProofImage: paymentProofImage || null,
+      paymentSubmittedAt: new Date(),
       items: { create: orderItemsData },
       specialInstructions: specialInstructions?.trim() || null,
       // Delivery-only
@@ -220,6 +228,15 @@ export async function createOrder(customerId, input) {
 
 export async function updateOrderStatus(id, status) {
   const order = await getOrderOrThrow(id)
+
+  if (
+    status === 'ACCEPTED' &&
+    order.customer.role === 'CUSTOMER' &&
+    !order.paymentReference &&
+    !order.paymentProofImage
+  ) {
+    throw new ApiError(400, 'Payment proof must be submitted before accepting this order.')
+  }
 
   // The branch after READY depends on order type — a delivery order is
   // never "Ready to Serve" (there's no table to serve it to) and a

@@ -98,13 +98,15 @@ enum TableStatus {
 }
 
 model Table {
-  id           String        @id @default(cuid())
-  number       Int           @unique
-  capacity     Int
-  status       TableStatus   @default(AVAILABLE)
-  description  String?
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
+  id                 String        @id @default(cuid())
+  number             Int           @unique
+  capacity           Int
+  status             TableStatus   @default(AVAILABLE)
+  description        String?
+  windowSidePosition String        @default("Interior") @map("window_side_position")
+  reservationCost    Decimal       @default(0) @db.Decimal(10, 2) @map("reservation_cost")
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
   reservations Reservation[]
   orders       Order[]
 
@@ -149,6 +151,11 @@ model Reservation {
   // occasion is OTHER, but isn't constrained to it at the DB level.
   occasion        ReservationOccasion? @map("occasion")
   occasionNote    String?              @map("occasion_note")
+  totalAmount     Decimal              @default(0) @db.Decimal(10, 2) @map("total_amount")
+  advanceAmount   Decimal              @default(0) @db.Decimal(10, 2) @map("advance_amount")
+  paymentReference String?             @map("payment_reference")
+  paymentProofImage String?            @map("payment_proof_image")
+  paymentSubmittedAt DateTime?         @map("payment_submitted_at")
   status          ReservationStatus @default(PENDING)
   createdAt       DateTime          @default(now()) @map("created_at")
   updatedAt       DateTime          @updatedAt @map("updated_at")
@@ -236,6 +243,10 @@ model Order {
   // amount those points were worth at the time.
   pointsRedeemed  Int     @default(0) @map("points_redeemed")
   loyaltyDiscount Decimal @default(0) @db.Decimal(10, 2) @map("loyalty_discount")
+  advanceAmount   Decimal @default(0) @db.Decimal(10, 2) @map("advance_amount")
+  paymentReference String? @map("payment_reference")
+  paymentProofImage String? @map("payment_proof_image")
+  paymentSubmittedAt DateTime? @map("payment_submitted_at")
 
   // --- Order Timeline (Part 18) ---
   // Each set exactly once, the first time the order transitions into that

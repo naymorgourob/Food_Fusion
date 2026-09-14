@@ -12,7 +12,7 @@ import { AUTH_TOKEN_KEY } from '@/constants/auth'
 // overridden per-request; leaving it unset lets axios infer it correctly
 // every time, matching whatever `data` actually is.
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api/v1',
   timeout: 10000,
 })
 

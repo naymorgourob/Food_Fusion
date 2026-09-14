@@ -41,3 +41,4 @@ function createImageUploader(subfolder) {
 
 export const uploadMenuImage = createImageUploader('menu').single('image')
 export const uploadProfileImage = createImageUploader('profile').single('image')
+export const uploadPaymentProof = createImageUploader('payment').single('paymentProof')

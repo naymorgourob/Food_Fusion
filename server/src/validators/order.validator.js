@@ -14,8 +14,15 @@ export function validateOrder({
   deliveryPhone,
   scheduledArrivalTime,
   guestCount,
+  paymentReference,
+  paymentProofImage,
+  requirePaymentProof = true,
 }) {
   const errors = []
+
+  if (requirePaymentProof && (!paymentReference || !String(paymentReference).trim()) && !paymentProofImage) {
+    errors.push('Submit a transaction/reference ID or upload payment proof.')
+  }
 
   if (!Array.isArray(items) || items.length === 0) {
     errors.push('Order must contain at least one menu item.')

@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { authenticateUser, authorizeAdmin } from '../middlewares/auth.middleware.js'
-import { getSettingsHandler, putSettingsHandler } from '../controllers/settings.controller.js'
+import { getSettingsHandler, getPaymentContactHandler, putSettingsHandler } from '../controllers/settings.controller.js'
 
 const router = Router()
 
@@ -8,6 +8,7 @@ const router = Router()
 // since nothing outside this app currently needs to read these values
 // (Billing's VAT default reads settings.service.js directly, server-side).
 router.get('/', authenticateUser, authorizeAdmin, getSettingsHandler)
+router.get('/payment-contact', getPaymentContactHandler)
 router.put('/', authenticateUser, authorizeAdmin, putSettingsHandler)
 
 export default router

@@ -11,8 +11,14 @@ export function validateReservation({
   reservationDate,
   reservationTime,
   occasion,
+  paymentReference,
+  paymentProofImage,
 }) {
   const errors = []
+
+  if ((!paymentReference || !String(paymentReference).trim()) && !paymentProofImage) {
+    errors.push('Submit a transaction/reference ID or upload payment proof.')
+  }
 
   if (!customerName || !customerName.trim()) errors.push('Customer name is required.')
 

@@ -6,6 +6,7 @@ import { PaymentStatusBadge } from '@/features/orders/components/PaymentStatusBa
 import { AdminOrderTimeline } from '@/features/orders/components/AdminOrderTimeline'
 import { ORDER_STATUS_LABELS, orderGrandTotal, getScheduledDineInTimes } from '@/features/orders/constants'
 import { ORDER_TYPE_ICONS } from '@/features/orders/staffOrderHelpers'
+import { getImageUrl } from '@/constants'
 import { orderNo, money } from '@/utils/format'
 
 // Matches order.service.js's updateOrderStatus branch guard exactly — a
@@ -169,6 +170,18 @@ export function AdminOrderDrawer({
                       {order.bill ? `Invoice ${orderNo(order.bill.billNumber)}` : 'No invoice generated yet'}
                     </Row>
                     <PaymentStatusBadge bill={order.bill} />
+                  </section>
+
+                  <section className="flex flex-col gap-3 rounded-2xl border border-gold-300 bg-gold-100/40 p-4 dark:border-gold-700 dark:bg-gold-100/5">
+                    <span className="text-xs font-semibold tracking-wide text-gold-700 uppercase dark:text-gold-300">Advance payment proof</span>
+                    <Row icon={Receipt} label="Advance amount">{money(order.advanceAmount ?? 0)}</Row>
+                    <Row icon={Receipt} label="Transaction / Reference ID">{order.paymentReference}</Row>
+                    {order.paymentProofImage && (
+                      <a href={getImageUrl(`/uploads/payment/${order.paymentProofImage}`)} target="_blank" rel="noreferrer" className="text-sm font-semibold text-brand-700 underline dark:text-brand-400">
+                        View uploaded payment screenshot
+                      </a>
+                    )}
+                    {!order.paymentReference && !order.paymentProofImage && <span className="text-sm text-red-600">No payment proof submitted</span>}
                   </section>
 
                   {order.orderType === 'DELIVERY' && (

@@ -8,6 +8,14 @@ export async function getSettingsHandler(req, res) {
   sendSuccess(res, { message: 'Settings fetched successfully.', data: { settings } })
 }
 
+export async function getPaymentContactHandler(req, res) {
+  const settings = await getSettings()
+  sendSuccess(res, {
+    message: 'Payment contact fetched successfully.',
+    data: { restaurantName: settings.restaurantName, restaurantPhone: settings.restaurantPhone },
+  })
+}
+
 export async function putSettingsHandler(req, res) {
   const errors = validateSettings(req.body)
   if (errors.length > 0) throw new ApiError(400, 'Validation failed.', errors)

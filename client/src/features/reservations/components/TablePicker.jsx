@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Users, Check, Armchair, Sparkles } from 'lucide-react'
+import { money } from '@/utils/format'
 
 /**
  * Table selection (UI-06).
@@ -84,6 +85,11 @@ export function TablePicker({ tables, selectedId, onSelect, guestCount, isLoadin
               <span className="flex items-center gap-1.5 text-xs text-body-muted">
                 <Armchair className="h-3.5 w-3.5" />
                 Seats {table.capacity}
+              </span>
+
+              <span className="text-xs font-semibold text-body">{table.windowSidePosition}</span>
+              <span className="text-xs text-body-muted">
+                Cost {money(table.reservationCost)} · Advance {money(Number(table.reservationCost ?? 0) * 0.2)}
               </span>
 
               {badge && !disabled && (

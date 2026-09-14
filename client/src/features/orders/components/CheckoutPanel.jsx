@@ -97,6 +97,12 @@ export function CheckoutPanel({
   grandTotal,
   paymentMethod,
   onPaymentMethodChange,
+  advanceAmount,
+  paymentReference,
+  onPaymentReferenceChange,
+  paymentProof,
+  onPaymentProofChange,
+  paymentContact,
   errors,
   isSubmitting,
   onSubmit,
@@ -113,7 +119,13 @@ export function CheckoutPanel({
 
   // Each step decides for itself whether the customer may advance.
   const canAdvance =
-    step === 0 ? !isEmpty : step === 1 ? Boolean(orderType) && canLeaveDetails : step === 2 ? Boolean(paymentMethod) : true
+    step === 0
+      ? !isEmpty
+      : step === 1
+        ? Boolean(orderType) && canLeaveDetails
+        : step === 2
+          ? Boolean(paymentMethod) && Boolean(paymentReference.trim() || paymentProof)
+          : true
 
   const etaLabel =
     orderType === 'DELIVERY'
@@ -236,6 +248,12 @@ export function CheckoutPanel({
                   onPointsChange={onPointsChange}
                   appliedPoints={appliedPoints}
                   loyaltyDiscount={loyaltyDiscount}
+                  advanceAmount={advanceAmount}
+                  paymentReference={paymentReference}
+                  onPaymentReferenceChange={onPaymentReferenceChange}
+                  paymentProof={paymentProof}
+                  onPaymentProofChange={onPaymentProofChange}
+                  paymentContact={paymentContact}
                 />
               )}
 

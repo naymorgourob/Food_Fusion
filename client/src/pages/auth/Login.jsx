@@ -38,7 +38,10 @@ export default function Login() {
         : getHomeRouteForRole(user?.role, user)
       navigate(redirectTo, { replace: true })
     } catch (error) {
-      setErrorMessage(error.response?.data?.message ?? 'Something went wrong. Please try again.')
+      setErrorMessage(
+        error.response?.data?.message ??
+          (error.request ? 'Cannot reach the server. Make sure the FoodFusion backend is running.' : 'Something went wrong. Please try again.'),
+      )
     } finally {
       setIsSubmitting(false)
     }

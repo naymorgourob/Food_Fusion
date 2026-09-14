@@ -15,6 +15,7 @@ import { useLoyalty } from '@/features/loyalty/hooks/useLoyalty'
 import { fetchTables } from '@/features/tables/services/tableService'
 import { createOrder, fetchOrderById } from '@/features/orders/services/orderService'
 import { money } from '@/utils/format'
+import { fetchPaymentContact } from '@/features/settings/services/settingsService'
 
 // Must match DELIVERY_CHARGE in server/src/services/order.service.js —
 // this is a display-only preview, the server applies the real charge.
@@ -79,6 +80,9 @@ export default function NewOrderPage() {
   const [furthestReached, setFurthestReached] = useState(0)
   const [orderType, setOrderType] = useState(null)
   const [paymentMethod, setPaymentMethod] = useState('CASH')
+  const [paymentReference, setPaymentReference] = useState('')
+  const [paymentProof, setPaymentProof] = useState(null)
+  const [paymentContact, setPaymentContact] = useState(null)
 
   const [dineInMode, setDineInMode] = useState('now')
   const [tableId, setTableId] = useState('')
@@ -100,6 +104,10 @@ export default function NewOrderPage() {
     fetchTables()
       .then((data) => setTables(data.filter((table) => table.status !== 'INACTIVE')))
       .catch(() => setTables([]))
+  }, [])
+
+  useEffect(() => {
+    fetchPaymentContact().then(setPaymentContact).catch(() => setPaymentContact(null))
   }, [])
 
   // "Order Again" needs an effect because the previous order must be
@@ -142,6 +150,7 @@ export default function NewOrderPage() {
   )
   const loyaltyDiscount = Math.min(appliedPoints * pointValue, itemsTotal)
   const grandTotal = itemsTotal + deliveryChargePreview - loyaltyDiscount
+  const advanceAmount = grandTotal * 0.2
 
   function canLeaveDetailsStep() {
     if (orderType === 'DELIVERY') return Boolean(deliveryAddress.trim() && deliveryPhone.trim())
@@ -188,26 +197,25 @@ export default function NewOrderPage() {
         .filter(Boolean)
         .join(' | ')
 
-      const payload = {
-        orderType,
-        items: cart.items.map(({ item, quantity }) => ({ menuItemId: item.id, quantity })),
-        specialInstructions: combinedInstructions || undefined,
-        // Sends the raw request, not the clamped preview — the server does
-        // its own capping against the live balance and order total.
-        pointsToRedeem: requestedPoints > 0 ? requestedPoints : undefined,
-      }
+      const payload = new FormData()
+      payload.append('orderType', orderType)
+      payload.append('items', JSON.stringify(cart.items.map(({ item, quantity }) => ({ menuItemId: item.id, quantity }))))
+      if (combinedInstructions) payload.append('specialInstructions', combinedInstructions)
+      if (requestedPoints > 0) payload.append('pointsToRedeem', String(requestedPoints))
+      if (paymentReference.trim()) payload.append('paymentReference', paymentReference.trim())
+      if (paymentProof) payload.append('paymentProof', paymentProof)
 
       if (orderType === 'DINE_IN') {
-        payload.tableId = tableId || undefined
+        if (tableId) payload.append('tableId', tableId)
         if (dineInMode === 'schedule') {
-          payload.scheduledArrivalTime = new Date(scheduledArrivalTime).toISOString()
-          payload.guestCount = guestCount
+          payload.append('scheduledArrivalTime', new Date(scheduledArrivalTime).toISOString())
+          payload.append('guestCount', guestCount)
         }
       } else if (orderType === 'DELIVERY') {
-        payload.deliveryAddress = deliveryAddress
-        payload.deliveryPhone = deliveryPhone
+        payload.append('deliveryAddress', deliveryAddress)
+        payload.append('deliveryPhone', deliveryPhone)
       } else if (orderType === 'TAKEAWAY') {
-        payload.scheduledPickupTime = new Date(scheduledPickupTime).toISOString()
+        payload.append('scheduledPickupTime', new Date(scheduledPickupTime).toISOString())
       }
 
       const order = await createOrder(payload)
@@ -292,6 +300,12 @@ export default function NewOrderPage() {
           grandTotal={grandTotal}
           paymentMethod={paymentMethod}
           onPaymentMethodChange={setPaymentMethod}
+          advanceAmount={advanceAmount}
+          paymentReference={paymentReference}
+          onPaymentReferenceChange={setPaymentReference}
+          paymentProof={paymentProof}
+          onPaymentProofChange={setPaymentProof}
+          paymentContact={paymentContact}
           errors={errors}
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}

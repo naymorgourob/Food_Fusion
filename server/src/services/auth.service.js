@@ -18,7 +18,8 @@ const PUBLIC_USER_FIELDS = {
 }
 
 export async function registerCustomer({ fullName, email, phone, password }) {
-  const existing = await prisma.user.findUnique({ where: { email } })
+  const normalizedEmail = email.trim().toLowerCase()
+  const existing = await prisma.user.findUnique({ where: { email: normalizedEmail } })
   if (existing) throw new ApiError(409, 'An account with this email already exists.')
 
   const hashedPassword = await hashPassword(password)
@@ -27,7 +28,7 @@ export async function registerCustomer({ fullName, email, phone, password }) {
   // only ever create a CUSTOMER. Admin/Staff accounts are created directly
   // in the database or by Admin-only functionality added in a later part.
   const user = await prisma.user.create({
-    data: { fullName, email, phone, password: hashedPassword, role: 'CUSTOMER' },
+    data: { fullName: fullName.trim(), email: normalizedEmail, phone: phone.trim(), password: hashedPassword, role: 'CUSTOMER' },
     select: PUBLIC_USER_FIELDS,
   })
 
@@ -36,7 +37,8 @@ export async function registerCustomer({ fullName, email, phone, password }) {
 }
 
 export async function loginUser({ email, password }) {
-  const user = await prisma.user.findUnique({ where: { email } })
+  const normalizedEmail = email.trim().toLowerCase()
+  const user = await prisma.user.findUnique({ where: { email: normalizedEmail } })
 
   // Same message whether the email doesn't exist or the password is wrong —
   // telling them apart would let an attacker discover which emails are

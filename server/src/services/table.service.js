@@ -20,7 +20,7 @@ export async function listTables() {
   return prisma.table.findMany({ orderBy: { number: 'asc' } })
 }
 
-export async function createTable({ number, capacity, status, description }) {
+export async function createTable({ number, capacity, status, description, windowSidePosition, reservationCost }) {
   await assertNumberIsAvailable(number)
   return prisma.table.create({
     data: {
@@ -28,12 +28,14 @@ export async function createTable({ number, capacity, status, description }) {
       capacity: Number(capacity),
       status: status || 'AVAILABLE',
       description: description?.trim() || null,
+      windowSidePosition: windowSidePosition?.trim() || 'Interior',
+      reservationCost: reservationCost ?? 0,
     },
   })
 }
 
-export async function updateTable(id, { number, capacity, status, description }) {
-  await getTableOrThrow(id)
+export async function updateTable(id, { number, capacity, status, description, windowSidePosition, reservationCost }) {
+  const existing = await getTableOrThrow(id)
   await assertNumberIsAvailable(number, id)
 
   return prisma.table.update({
@@ -43,6 +45,8 @@ export async function updateTable(id, { number, capacity, status, description })
       capacity: Number(capacity),
       status,
       description: description?.trim() || null,
+      windowSidePosition: windowSidePosition?.trim() || existing.windowSidePosition,
+      reservationCost: reservationCost ?? existing.reservationCost,
     },
   })
 }

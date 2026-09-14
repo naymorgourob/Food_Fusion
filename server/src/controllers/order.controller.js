@@ -28,11 +28,13 @@ export async function getAssignableStaff(req, res) {
 }
 
 export async function postOrder(req, res) {
-  const errors = validateOrder(req.body)
+  const input = { ...req.body, paymentProofImage: req.file?.filename }
+  if (typeof input.items === 'string') input.items = JSON.parse(input.items)
+  const errors = validateOrder({ ...input, requirePaymentProof: req.user.role === 'CUSTOMER' })
   if (errors.length > 0) throw new ApiError(400, 'Validation failed.', errors)
 
   const customerId = req.user.role !== 'CUSTOMER' && req.body.customerId ? req.body.customerId : req.user.id
-  const order = await createOrder(customerId, req.body)
+  const order = await createOrder(customerId, input)
   sendSuccess(res, { statusCode: 201, message: 'Order placed successfully.', data: { order } })
 }
 
