@@ -1,6 +1,8 @@
 import { Sparkles } from 'lucide-react'
 import { money } from '@/utils/format'
 
+const MAX_LOYALTY_DISCOUNT_PERCENT = 5
+
 /**
  * The checkout redemption control. Everything shown here is a preview —
  * order.service.js recomputes the discount and re-checks the balance
@@ -13,14 +15,16 @@ export function LoyaltyRedeemField({ summary, itemsTotal, pointsToRedeem, onChan
   if (!summary || summary.currentPoints <= 0) return null
 
   const { currentPoints, pointValue } = summary
-  const pointsNeededForFullDiscount = pointValue > 0 ? Math.ceil(itemsTotal / pointValue) : 0
+  const pointsNeededForFullDiscount = pointValue > 0
+    ? Math.floor((itemsTotal * (MAX_LOYALTY_DISCOUNT_PERCENT / 100)) / pointValue)
+    : 0
   const maxRedeemable = Math.min(currentPoints, pointsNeededForFullDiscount)
 
   const applied = Math.min(Math.max(0, Number(pointsToRedeem) || 0), maxRedeemable)
   // Capped at the order total for the same reason order.service.js caps it:
   // points can't buy more than the food costs. Without the cap this row
   // would show a bigger discount than the order summary right below it.
-  const discount = Math.min(applied * pointValue, itemsTotal)
+  const discount = Math.min(applied * pointValue, itemsTotal * (MAX_LOYALTY_DISCOUNT_PERCENT / 100))
   const remainingPoints = currentPoints - applied
 
   return (
@@ -29,6 +33,10 @@ export function LoyaltyRedeemField({ summary, itemsTotal, pointsToRedeem, onChan
         <Sparkles className="h-4 w-4 text-ember-600" />
         <span className="text-sm font-semibold text-ink">Use Loyalty Points</span>
       </div>
+
+      <p className="text-xs leading-relaxed text-ink-muted">
+        Redeem points for up to {MAX_LOYALTY_DISCOUNT_PERCENT}% off food. Points cannot cover the full order.
+      </p>
 
       <div className="flex flex-wrap items-end gap-3">
         <div className="flex flex-col gap-1.5">

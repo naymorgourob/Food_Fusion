@@ -1,6 +1,7 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Pencil, Trash2, Clock, Eye, UtensilsCrossed } from 'lucide-react'
-import { getImageUrl } from '@/constants'
+import { getMenuImageUrl } from '@/constants'
 import { money } from '@/utils/format'
 
 // A dish counts as "New" for the same window UI-03's customer-facing
@@ -26,7 +27,9 @@ function isNew(createdAt) {
  * requested and why it isn't shown).
  */
 export function AdminDishCard({ dish, onEdit, onDelete, onView }) {
-  const image = getImageUrl(dish.imageUrl)
+  const [imageFailed, setImageFailed] = useState(false)
+  const { primary, fallback } = getMenuImageUrl(dish)
+  const image = imageFailed ? fallback : primary || fallback
   const unavailable = !dish.isAvailable
 
   return (
@@ -52,6 +55,7 @@ export function AdminDishCard({ dish, onEdit, onDelete, onView }) {
             src={image}
             alt=""
             loading="lazy"
+            onError={() => setImageFailed(true)}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (

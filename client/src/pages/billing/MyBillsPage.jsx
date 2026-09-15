@@ -240,7 +240,7 @@ export default function MyBillsPage() {
                         order?.orderType === 'DINE_IN'
                           ? 'In-Restaurant'
                           : order?.orderType === 'DELIVERY'
-                          ? 'Cash/Card on Delivery'
+                          ? 'Online payment on delivery'
                           : 'Counter Collection'
 
                       return (
@@ -335,7 +335,7 @@ export default function MyBillsPage() {
                     order?.orderType === 'DINE_IN'
                       ? 'In-Restaurant'
                       : order?.orderType === 'DELIVERY'
-                      ? 'Cash/Card on Delivery'
+                      ? 'Online payment on delivery'
                       : 'Counter Collection'
 
                   return (

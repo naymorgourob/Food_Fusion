@@ -48,6 +48,7 @@ model User {
   // Part 18.1 — Customer-only in practice.
   loyaltyTransactions LoyaltyTransaction[]
   favorites           FavoriteMenuItem[]
+  inventoryUsages     InventoryUsage[]
 
   @@map("users")
 }
@@ -146,6 +147,7 @@ model Reservation {
   guestCount      Int               @map("guest_count")
   reservationDate DateTime          @db.Date @map("reservation_date")
   reservationTime String            @map("reservation_time")
+  durationMinutes Int               @default(120) @map("duration_minutes")
   specialRequest  String?           @map("special_request")
   // Part 18.1 — optional; occasionNote only carries meaning when
   // occasion is OTHER, but isn't constrained to it at the DB level.
@@ -359,8 +361,27 @@ model InventoryItem {
   minStockLevel  Decimal       @db.Decimal(10, 2) @map("min_stock_level")
   createdAt      DateTime      @default(now()) @map("created_at")
   updatedAt      DateTime      @updatedAt @map("updated_at")
+  usages         InventoryUsage[]
 
   @@map("inventory_items")
+}
+
+model InventoryUsage {
+  id                String        @id @default(cuid())
+  inventoryItemId   String        @map("inventory_item_id")
+  recordedById      String        @map("recorded_by_id")
+  quantityUsed      Decimal       @db.Decimal(10, 2) @map("quantity_used")
+  remainingQuantity Decimal       @db.Decimal(10, 2) @map("remaining_quantity")
+  usageDate         DateTime      @db.Date @map("usage_date")
+  note              String?
+  createdAt         DateTime      @default(now()) @map("created_at")
+
+  inventoryItem InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+  recordedBy   User          @relation(fields: [recordedById], references: [id], onDelete: Restrict)
+
+  @@index([inventoryItemId, usageDate])
+  @@index([recordedById])
+  @@map("inventory_usages")
 }
 
 // Singleton — `id` has a fixed literal default rather than cuid(), so

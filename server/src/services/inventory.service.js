@@ -23,8 +23,40 @@ async function getInventoryItemOrThrow(id) {
 }
 
 export async function listInventoryItems() {
-  const items = await prisma.inventoryItem.findMany({ orderBy: { itemName: 'asc' } })
+  const items = await prisma.inventoryItem.findMany({
+    orderBy: { itemName: 'asc' },
+    include: {
+      usages: { orderBy: { usageDate: 'desc' }, include: { recordedBy: { select: { id: true, fullName: true, position: true } } } },
+    },
+  })
   return items.map(withStatus)
+}
+
+export async function recordInventoryUsage(id, userId, { quantityUsed, usageDate, note }) {
+  const used = Number(quantityUsed)
+  if (!Number.isFinite(used) || used <= 0) throw new ApiError(400, 'Quantity used must be greater than zero.')
+  const date = usageDate ? new Date(usageDate) : new Date()
+  if (Number.isNaN(date.getTime())) throw new ApiError(400, 'Usage date is invalid.')
+
+  return prisma.$transaction(async (tx) => {
+    const item = await tx.inventoryItem.findUnique({ where: { id } })
+    if (!item) throw new ApiError(404, 'Inventory item not found.')
+    const remaining = Number(item.quantity) - used
+    if (remaining < 0) throw new ApiError(400, `Only ${item.quantity} ${item.unit} remains.`)
+
+    await tx.inventoryItem.update({ where: { id }, data: { quantity: remaining } })
+    return tx.inventoryUsage.create({
+      data: {
+        inventoryItemId: id,
+        recordedById: userId,
+        quantityUsed: used,
+        remainingQuantity: remaining,
+        usageDate: date,
+        note: note?.trim() || null,
+      },
+      include: { recordedBy: { select: { id: true, fullName: true, position: true } }, inventoryItem: true },
+    })
+  })
 }
 
 export async function createInventoryItem({ itemName, category, unit, quantity, minStockLevel }) {

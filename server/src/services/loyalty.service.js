@@ -14,6 +14,10 @@ const MEMBERSHIP_TIERS = [
   { level: 'BRONZE', minPoints: 0 },
 ]
 
+// Loyalty is a small reward, not a way to zero out an order. The cap is
+// applied again in order.service.js so client previews can never bypass it.
+export const MAX_LOYALTY_DISCOUNT_PERCENT = 5
+
 export function getMembershipLevel(currentPoints) {
   return MEMBERSHIP_TIERS.find((tier) => currentPoints >= tier.minPoints).level
 }
@@ -106,11 +110,11 @@ export async function awardPointsForCompletedOrder(order, settings, tx = prisma)
 
   const rate = new Prisma.Decimal(settings.loyaltyPointsPerCurrency)
 
-  // Points are earned on what the customer actually paid for food —
-  // delivery charge isn't a purchase, and the loyalty discount they
-  // already redeemed shouldn't earn them points a second time.
+  // `order.totalAmount` is already the final amount after any loyalty
+  // discount. Remove only delivery charge so points reflect the food the
+  // customer actually paid for, without subtracting the discount twice.
   const eligibleAmount = Prisma.Decimal.max(
-    new Prisma.Decimal(order.totalAmount).sub(order.loyaltyDiscount ?? 0),
+    new Prisma.Decimal(order.totalAmount).sub(order.deliveryCharge ?? 0),
     new Prisma.Decimal(0),
   )
   const points = eligibleAmount.mul(rate).floor().toNumber()

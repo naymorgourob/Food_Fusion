@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Clock, Minus, Plus, UtensilsCrossed, Heart, ShoppingBag } from 'lucide-react'
-import { getImageUrl } from '@/constants'
+import { getMenuImageUrl } from '@/constants'
 import { money } from '@/utils/format'
 
 /**
@@ -22,6 +22,7 @@ import { money } from '@/utils/format'
 export function DishDetailModal({ dish, isOpen, onClose, onAdd, isFavorite, isPending, onToggleFavorite }) {
   const [quantity, setQuantity] = useState(1)
   const [notes, setNotes] = useState('')
+  const [imageFailed, setImageFailed] = useState(false)
   const closeRef = useRef(null)
   const dialogRef = useRef(null)
 
@@ -69,7 +70,8 @@ export function DishDetailModal({ dish, isOpen, onClose, onAdd, isFavorite, isPe
 
   if (!dish) return null
 
-  const image = getImageUrl(dish.imageUrl)
+  const { primary, fallback } = getMenuImageUrl(dish)
+  const image = imageFailed ? fallback : primary || fallback
   const unavailable = !dish.isAvailable
   const lineTotal = Number(dish.price) * quantity
 
@@ -107,7 +109,13 @@ export function DishDetailModal({ dish, isOpen, onClose, onAdd, isFavorite, isPe
             {/* --- Image ------------------------------------------------- */}
             <div className="relative aspect-[16/10] flex-none overflow-hidden bg-canvas-2">
               {image ? (
-                <img src={image} alt={dish.name} className="h-full w-full object-cover" />
+                <img
+                  src={image}
+                  alt={`${dish.name} - ${dish.description || 'FoodFusion menu item'}`}
+                  title={dish.name}
+                  onError={() => setImageFailed(true)}
+                  className="h-full w-full object-cover"
+                />
               ) : (
                 <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-50 to-canvas-2 dark:from-brand-900/50 dark:to-canvas-2">
                   <UtensilsCrossed className="h-12 w-12 text-brand-200 dark:text-brand-400/50" strokeWidth={1.5} />

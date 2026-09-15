@@ -26,8 +26,7 @@ function buildIcs(reservation) {
   const [hours, minutes] = String(reservation.reservationTime).split(':').map(Number)
   const day = new Date(reservation.reservationDate)
   const start = new Date(day.getFullYear(), day.getMonth(), day.getDate(), hours || 19, minutes || 0)
-  // Restaurants seat for roughly two hours; enough for a useful calendar block.
-  const end = new Date(start.getTime() + 2 * 60 * 60 * 1000)
+  const end = new Date(start.getTime() + Number(reservation.durationMinutes || 120) * 60 * 1000)
 
   return [
     'BEGIN:VCALENDAR',

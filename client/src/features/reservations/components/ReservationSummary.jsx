@@ -29,6 +29,20 @@ function formatTime(value) {
   return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 }
 
+function formatEndTime(value, durationMinutes) {
+  if (!value) return null
+  const [hours, minutes] = value.split(':').map(Number)
+  const date = new Date()
+  date.setHours(hours, minutes + Number(durationMinutes || 120), 0, 0)
+  return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+}
+
+function durationLabel(value) {
+  const minutes = Number(value)
+  if (minutes < 60) return `${minutes} minutes`
+  return `${minutes / 60} ${minutes === 60 ? 'hour' : 'hours'}`
+}
+
 function Row({ icon: Icon, label, value }) {
   return (
     <div className="flex items-start gap-3">
@@ -62,7 +76,12 @@ export function ReservationSummary({ form, table, preOrder, className = '' }) {
 
       <div className="flex flex-col gap-3.5">
         <Row icon={CalendarDays} label="Date" value={formatDate(form.reservationDate)} />
-        <Row icon={Clock} label="Arrival time" value={formatTime(form.reservationTime)} />
+        <Row
+          icon={Clock}
+          label="Reserved time"
+          value={form.reservationTime ? `${formatTime(form.reservationTime)}–${formatEndTime(form.reservationTime, form.durationMinutes)}` : null}
+        />
+        <Row icon={Clock} label="Duration" value={form.durationMinutes ? durationLabel(form.durationMinutes) : null} />
         <Row
           icon={Users}
           label="Guests"
@@ -74,8 +93,16 @@ export function ReservationSummary({ form, table, preOrder, className = '' }) {
           label="Table"
           value={table ? `Table ${table.number} · ${table.windowSidePosition}` : null}
         />
-        <Row icon={Armchair} label="Reservation cost" value={table ? money(table.reservationCost) : null} />
-        <Row icon={Sparkles} label="20% advance" value={table ? money(Number(table.reservationCost ?? 0) * 0.2) : null} />
+        <Row
+          icon={Armchair}
+          label="Reservation cost"
+          value={table ? money(Number(table.reservationCost ?? 0) * (Number(form.durationMinutes || 120) / 120)) : null}
+        />
+        <Row
+          icon={Sparkles}
+          label="20% advance"
+          value={table ? money(Number(table.reservationCost ?? 0) * (Number(form.durationMinutes || 120) / 120) * 0.2) : null}
+        />
         <Row
           icon={UtensilsCrossed}
           label="Dining"

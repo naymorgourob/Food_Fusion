@@ -39,6 +39,7 @@ const EMPTY_FORM = {
   guestCount: '',
   reservationDate: '',
   reservationTime: '',
+  durationMinutes: '120',
   specialRequest: '',
   occasion: '',
   occasionNote: '',
@@ -52,6 +53,12 @@ const EMPTY_FORM = {
 const SUGGESTED_TIMES = ['12:00', '12:30', '13:00', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00']
 
 const GUEST_CHIPS = [1, 2, 3, 4, 5, 6, 8]
+const DURATION_OPTIONS = [30, 60, 90, 120, 180, 240]
+
+function durationLabel(minutes) {
+  if (minutes < 60) return `${minutes} minutes`
+  return `${minutes / 60} ${minutes === 60 ? 'hour' : 'hours'}`
+}
 
 function todayIsoDate() {
   const now = new Date()
@@ -140,11 +147,28 @@ export function ReservationWizard({ onCreated }) {
     // Reuses the Part 10 table service as-is — this reservation form is
     // the concrete reason GET /tables was loosened to any authenticated
     // role (see server/src/routes/tables.routes.js).
-    fetchTables()
-      .then((data) => setTables(data.filter((table) => table.status !== 'INACTIVE')))
-      .catch(() => setTables([]))
-      .finally(() => setTablesLoading(false))
-  }, [])
+    let cancelled = false
+    setTablesLoading(true)
+
+    fetchTables({
+      reservationDate: form.reservationDate || undefined,
+      reservationTime: form.reservationTime || undefined,
+      durationMinutes: form.durationMinutes,
+    })
+      .then((data) => {
+        if (!cancelled) setTables(data.filter((table) => table.status !== 'INACTIVE'))
+      })
+      .catch(() => {
+        if (!cancelled) setTables([])
+      })
+      .finally(() => {
+        if (!cancelled) setTablesLoading(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [form.reservationDate, form.reservationTime, form.durationMinutes])
 
   useEffect(() => {
     fetchPaymentContact().then(setPaymentContact).catch(() => setPaymentContact(null))
@@ -161,7 +185,8 @@ export function ReservationWizard({ onCreated }) {
   }
 
   const selectedTable = tables.find((table) => table.id === form.tableId) ?? null
-  const reservationCost = Number(selectedTable?.reservationCost ?? 0)
+  const durationMinutes = Number(form.durationMinutes) || 120
+  const reservationCost = Number(selectedTable?.reservationCost ?? 0) * (durationMinutes / 120)
   const advanceAmount = reservationCost * 0.2
 
   const canAdvance =
@@ -170,7 +195,7 @@ export function ReservationWizard({ onCreated }) {
       : step === 1
         ? Boolean(form.guestCount) && Number(form.guestCount) > 0
         : step === 2
-          ? Boolean(form.tableId)
+          ? Boolean(form.tableId && selectedTable && selectedTable.reservationAvailable !== false)
           : Boolean(
               form.customerName &&
                 form.customerPhone &&
@@ -291,6 +316,7 @@ export function ReservationWizard({ onCreated }) {
                     onChange={(event) => update('reservationDate', event.target.value)}
                     className={FIELD}
                   />
+                  <p className="text-xs text-body-faint">Choose your total table time below; the price updates automatically.</p>
                 </div>
 
                 <div className="flex flex-col gap-2.5">
@@ -327,6 +353,31 @@ export function ReservationWizard({ onCreated }) {
                     onChange={(event) => update('reservationTime', event.target.value)}
                     className={FIELD}
                   />
+                </div>
+
+                <div className="flex flex-col gap-2.5">
+                  <span className={LABEL}>How long will you stay?</span>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {DURATION_OPTIONS.map((minutes) => {
+                      const active = Number(form.durationMinutes) === minutes
+                      return (
+                        <button
+                          key={minutes}
+                          type="button"
+                          aria-pressed={active}
+                          onClick={() => update('durationMinutes', String(minutes))}
+                          className={`rounded-xl border px-3 py-2.5 text-sm font-semibold transition-all ${
+                            active
+                              ? 'border-brand-700 bg-brand-700 text-white'
+                              : 'border-rule bg-card text-body-muted hover:-translate-y-0.5 hover:border-brand-200'
+                          }`}
+                        >
+                          {durationLabel(minutes)}
+                        </button>
+                      )
+                    })}
+                  </div>
+                  <p className="text-xs text-body-faint">Pricing is calculated in Bangladeshi Taka based on your selected table and time.</p>
                 </div>
               </>
             )}
@@ -443,6 +494,7 @@ export function ReservationWizard({ onCreated }) {
                   selectedId={form.tableId}
                   onSelect={(id) => update('tableId', id)}
                   guestCount={form.guestCount}
+                  durationMinutes={form.durationMinutes}
                   isLoading={tablesLoading}
                 />
               </>
@@ -487,7 +539,7 @@ export function ReservationWizard({ onCreated }) {
 
                 <div className="flex flex-col gap-4 rounded-2xl border border-gold-300 bg-gold-100/60 p-5 dark:border-gold-700 dark:bg-gold-100/10">
                   <div>
-                    <span className={LABEL}>Table reservation cost</span>
+                    <span className={LABEL}>Table reservation cost ({durationLabel(durationMinutes)})</span>
                     <p className="mt-1 text-sm font-semibold text-body">{selectedTable ? money(reservationCost) : 'Select a table first'}</p>
                     <p className="mt-1 text-xs text-body-muted">Required 20% advance: {selectedTable ? money(advanceAmount) : 'Select a table first'}.</p>
                     <p className="mt-2 text-sm font-semibold text-body">

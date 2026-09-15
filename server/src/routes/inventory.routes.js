@@ -5,6 +5,7 @@ import {
   postInventoryItem,
   putInventoryItem,
   patchInventoryStock,
+  postInventoryUsage,
   removeInventoryItem,
 } from '../controllers/inventory.controller.js'
 
@@ -13,6 +14,7 @@ const router = Router()
 // Kitchen Staff & Admin can view inventory and update stock levels
 router.get('/', authenticateUser, authorizeStaffOrAdmin, getInventoryItems)
 router.patch('/:id/stock', authenticateUser, authorizeStaffOrAdmin, patchInventoryStock)
+router.post('/:id/usage', authenticateUser, authorizeStaffOrAdmin, postInventoryUsage)
 
 // Admin-only item creation, full schema update, and deletion
 router.post('/', authenticateUser, authorizeAdmin, postInventoryItem)

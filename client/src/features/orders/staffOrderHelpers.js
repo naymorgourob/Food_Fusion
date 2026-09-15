@@ -64,16 +64,12 @@ export function minutesFromNow(iso) {
 }
 
 /** Next actionable status in the kitchen flow, or null if there isn't one. */
-export function nextKitchenAction(status, orderType = 'DINE_IN') {
+export function nextKitchenAction(status) {
   if (status === 'PENDING') return { status: 'ACCEPTED', label: 'Accept Order' }
   if (status === 'ACCEPTED') return { status: 'PREPARING', label: 'Start Cooking' }
   if (status === 'PREPARING') return { status: 'READY', label: 'Mark Ready' }
-  if (status === 'READY') {
-    if (orderType === 'DELIVERY') return { status: 'ON_THE_WAY', label: 'Dispatch Delivery' }
-    return { status: 'SERVED', label: 'Mark Served' }
-  }
-  if (status === 'SERVED' || status === 'ON_THE_WAY') {
-    return { status: 'COMPLETED', label: 'Complete Order' }
-  }
+  // READY is handed to the service floor. Only the Waiter workspace may
+  // move it onward, so Chef must not render a misleading action here.
+  if (status === 'READY') return null
   return null
 }

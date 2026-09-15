@@ -14,8 +14,8 @@ import { NewsletterSection } from '@/pages/landing/sections/NewsletterSection'
 
 /**
  * The public restaurant site. Section order follows a diner's questions:
- * what is this place (hero) → how do I get the food (services) → why here
- * (why choose) → what's on (menu) → who are you (experience) → book it
+ * what is this place (hero) → how do I get the food (services) → what's on
+ * (menu) → why here (why choose) → who are you (experience) → book it
  * (reservation) → what happens next (how it works) → why come back
  * (loyalty) → do others rate it (reviews, gallery, stats) → stay in touch
  * (newsletter, then the footer from LandingLayout).
@@ -30,8 +30,8 @@ export default function Home() {
     <MotionConfig reducedMotion="user">
       <HeroSection />
       <ServicesSection />
-      <WhyChooseSection />
       <MenuSection />
+      <WhyChooseSection />
       <ExperienceSection />
       <ReservationSection />
       <HowItWorksSection />

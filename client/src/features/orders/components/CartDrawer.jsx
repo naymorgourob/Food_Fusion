@@ -64,23 +64,25 @@ export function CartDrawer({
             role="dialog"
             aria-modal="true"
             aria-label="Your order"
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', stiffness: 320, damping: 34 }}
-            className="absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-canvas shadow-2xl"
+            initial={{ opacity: 0, y: 18, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 18, scale: 0.97 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 30 }}
+            className="absolute top-1/2 left-1/2 flex max-h-[min(44rem,calc(100vh-2rem))] w-[calc(100%-2rem)] max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-3xl border border-rule bg-canvas shadow-2xl sm:w-[calc(100%-3rem)]"
           >
             {/* --- Header ------------------------------------------------ */}
-            <header className="flex flex-none items-center justify-between border-b border-rule px-5 py-4">
-              <h2 className="flex items-center gap-2.5 font-display text-lg font-semibold text-body">
-                <ShoppingBag className="h-5 w-5 text-brand-700 dark:text-brand-400" />
-                Your order
-                {count > 0 && (
-                  <span className="rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-bold text-brand-700 dark:bg-brand-900/40 dark:text-brand-400">
-                    {count}
+            <header className="flex flex-none items-center justify-between border-b border-rule bg-card px-5 py-4 sm:px-6">
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-400">
+                  <ShoppingBag className="h-5 w-5" />
+                </span>
+                <div className="flex flex-col gap-0.5">
+                  <h2 className="font-display text-lg font-semibold text-body">Your order</h2>
+                  <span className="text-xs text-body-muted">
+                    {count > 0 ? `${count} ${count === 1 ? 'item' : 'items'} selected` : 'Nothing selected yet'}
                   </span>
-                )}
-              </h2>
+                </div>
+              </div>
               <button
                 type="button"
                 onClick={onClose}
@@ -113,9 +115,14 @@ export function CartDrawer({
                   </button>
                 </div>
               ) : (
-                <ul className="flex flex-col gap-3">
-                  <AnimatePresence initial={false}>
-                    {items.map(({ item, quantity, notes }) => {
+                <>
+                  <div className="mb-4 flex items-center justify-between">
+                    <span className="text-xs font-bold tracking-[0.12em] text-body-faint uppercase">Selected dishes</span>
+                    <span className="text-xs text-body-muted">Adjust quantities before checkout</span>
+                  </div>
+                  <ul className="flex flex-col gap-3">
+                    <AnimatePresence initial={false}>
+                      {items.map(({ item, quantity, notes }) => {
                       const image = getImageUrl(item.imageUrl)
                       return (
                         <motion.li
@@ -125,9 +132,9 @@ export function CartDrawer({
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, x: 40 }}
                           transition={{ duration: 0.2 }}
-                          className="flex gap-3 rounded-2xl border border-rule bg-card p-3"
+                          className="flex gap-3 rounded-2xl border border-rule bg-card p-3.5 shadow-xs"
                         >
-                          <div className="h-16 w-16 flex-none overflow-hidden rounded-xl bg-canvas-2">
+                          <div className="h-[4.5rem] w-[4.5rem] flex-none overflow-hidden rounded-xl bg-canvas-2">
                             {image ? (
                               <img src={image} alt="" className="h-full w-full object-cover" />
                             ) : (
@@ -138,9 +145,9 @@ export function CartDrawer({
                           </div>
 
                           <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                            <div className="flex items-start justify-between gap-2">
-                              <span className="truncate text-sm font-semibold text-body">{item.name}</span>
-                              <span className="flex-none text-sm font-semibold text-body">
+                            <div className="flex items-start justify-between gap-3">
+                              <span className="line-clamp-2 text-sm font-semibold leading-snug text-body">{item.name}</span>
+                              <span className="flex-none font-display text-sm font-semibold text-brand-700 dark:text-brand-400">
                                 {money(Number(item.price) * quantity)}
                               </span>
                             </div>
@@ -150,21 +157,21 @@ export function CartDrawer({
                             )}
 
                             <div className="mt-auto flex items-center justify-between">
-                              <div className="flex items-center gap-0.5 rounded-full border border-rule">
+                              <div className="flex items-center gap-1 rounded-xl border border-rule bg-canvas-2 p-0.5">
                                 <button
                                   type="button"
                                   onClick={() => onSetQuantity(item.id, quantity - 1, item)}
                                   aria-label={`Decrease ${item.name} quantity`}
-                                  className="flex h-7 w-7 items-center justify-center rounded-full text-body-muted transition-colors hover:bg-canvas-2"
+                                  className="flex h-7 w-7 items-center justify-center rounded-lg text-body-muted transition-colors hover:bg-card hover:text-body"
                                 >
                                   <Minus className="h-3.5 w-3.5" />
                                 </button>
-                                <span className="w-6 text-center text-sm font-semibold text-body">{quantity}</span>
+                                <span className="w-7 text-center text-sm font-bold text-body">{quantity}</span>
                                 <button
                                   type="button"
                                   onClick={() => onSetQuantity(item.id, quantity + 1, item)}
                                   aria-label={`Increase ${item.name} quantity`}
-                                  className="flex h-7 w-7 items-center justify-center rounded-full text-body-muted transition-colors hover:bg-canvas-2"
+                                  className="flex h-7 w-7 items-center justify-center rounded-lg text-body-muted transition-colors hover:bg-card hover:text-body"
                                 >
                                   <Plus className="h-3.5 w-3.5" />
                                 </button>
@@ -182,15 +189,20 @@ export function CartDrawer({
                           </div>
                         </motion.li>
                       )
-                    })}
-                  </AnimatePresence>
-                </ul>
+                      })}
+                    </AnimatePresence>
+                  </ul>
+                </>
               )}
             </div>
 
             {/* --- Summary ----------------------------------------------- */}
             {items.length > 0 && (
-              <footer className="flex-none border-t border-rule bg-card px-5 py-4">
+              <footer className="flex-none border-t border-rule bg-card px-5 py-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:px-6">
+                <div className="mb-4 flex items-center justify-between">
+                  <span className="text-xs font-bold tracking-[0.12em] text-body-faint uppercase">Order total</span>
+                  <span className="rounded-full bg-brand-50 px-2 py-1 text-[0.65rem] font-semibold text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">Ready for checkout</span>
+                </div>
                 <dl className="flex flex-col gap-2 text-sm">
                   <div className="flex justify-between text-body-muted">
                     <dt>Subtotal</dt>
@@ -211,14 +223,14 @@ export function CartDrawer({
                       <dd>−{money(loyaltyDiscount)}</dd>
                     </div>
                   )}
-                  <div className="mt-1 flex justify-between border-t border-rule pt-3 font-display text-base font-semibold text-body">
+                  <div className="mt-2 flex items-baseline justify-between border-t border-rule pt-4 font-display text-base font-semibold text-body">
                     <dt>Total</dt>
-                    <dd>{money(total)}</dd>
+                    <dd className="text-xl text-brand-700 dark:text-brand-400">{money(total)}</dd>
                   </div>
                 </dl>
 
-                <p className="mt-2 text-xs text-body-faint">
-                  Redeem loyalty points at the review step.
+                <p className="mt-3 rounded-xl bg-canvas-2 px-3 py-2.5 text-xs leading-relaxed text-body-muted">
+                  Loyalty points can be applied on the review step before payment.
                 </p>
 
                 <button

@@ -24,7 +24,7 @@ export function OrderReviewStep({ items, onSetQuantity, onSetNotes, onRemove, on
         title="Your cart is empty"
         description="Add a dish from the menu and it will show up here, ready to check out."
         actionLabel="Browse the menu"
-        to="#"
+        onAction={onBrowseMenu}
       />
     )
   }

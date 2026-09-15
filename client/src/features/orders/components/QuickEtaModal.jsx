@@ -1,14 +1,21 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Clock, Check, X, ChefHat, Sparkles } from 'lucide-react'
 import { orderNo } from '@/utils/format'
 
 const PRESET_MINUTES = [10, 15, 20, 30, 45]
 
-export function QuickEtaModal({ order, isOpen, onClose, onSave, isSaving }) {
+export function QuickEtaModal({ order, isOpen, onClose, onSave, isSaving, error = '' }) {
   const [selectedMinutes, setSelectedMinutes] = useState(15)
   const [customMinutes, setCustomMinutes] = useState('')
   const [isCustom, setIsCustom] = useState(false)
+
+  useEffect(() => {
+    if (!isOpen) return
+    setSelectedMinutes(15)
+    setCustomMinutes('')
+    setIsCustom(false)
+  }, [isOpen, order?.id])
 
   if (!order || !isOpen) return null
 
@@ -22,6 +29,8 @@ export function QuickEtaModal({ order, isOpen, onClose, onSave, isSaving }) {
   }
 
   const isDelivery = order.orderType === 'DELIVERY'
+  const customValue = Number(customMinutes)
+  const customIsValid = Number.isInteger(customValue) && customValue >= 1 && customValue <= 180
 
   return (
     <AnimatePresence>
@@ -138,6 +147,18 @@ export function QuickEtaModal({ order, isOpen, onClose, onSave, isSaving }) {
               )}
             </div>
 
+            {isCustom && customMinutes && !customIsValid && (
+              <p className="text-xs font-medium text-red-600 dark:text-red-300">
+                Enter a whole number between 1 and 180 minutes.
+              </p>
+            )}
+
+            {error && (
+              <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-300">
+                {error}
+              </p>
+            )}
+
             {/* Action Buttons */}
             <div className="mt-2 flex items-center justify-end gap-2 border-t border-rule pt-4">
               <button
@@ -151,7 +172,7 @@ export function QuickEtaModal({ order, isOpen, onClose, onSave, isSaving }) {
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={isSaving || (isCustom && !customMinutes)}
+                disabled={isSaving || (isCustom && !customIsValid)}
                 className="flex items-center gap-2 rounded-xl bg-brand-700 px-5 py-2.5 text-xs font-bold text-white transition hover:bg-brand-800 disabled:opacity-50"
               >
                 <Check className="h-4 w-4" />

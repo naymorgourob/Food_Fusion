@@ -2,7 +2,12 @@ import { prisma } from '../config/prisma.js'
 import { Prisma } from '../generated/prisma/client.ts'
 import { ApiError } from '../utils/ApiError.js'
 import { getSettings } from './settings.service.js'
-import { getLoyaltySummary, recordTransaction, awardPointsForCompletedOrder } from './loyalty.service.js'
+import {
+  getLoyaltySummary,
+  recordTransaction,
+  awardPointsForCompletedOrder,
+  MAX_LOYALTY_DISCOUNT_PERCENT,
+} from './loyalty.service.js'
 
 const CUSTOMER_SELECT = { id: true, fullName: true, email: true, role: true }
 const TABLE_SELECT = { id: true, number: true, capacity: true }
@@ -109,10 +114,6 @@ export async function createOrder(customerId, input) {
   // A table only means something for Dine-In — Delivery/Takeaway orders
   // never have one, regardless of what the client sends.
   const resolvedTableId = orderType === 'DINE_IN' ? tableId || null : null
-  if (resolvedTableId) {
-    const table = await prisma.table.findUnique({ where: { id: resolvedTableId } })
-    if (!table) throw new ApiError(400, 'Selected table does not exist.')
-  }
 
   const menuItemIds = [...new Set(items.map((item) => item.menuItemId))]
   const menuItems = await prisma.food.findMany({ where: { id: { in: menuItemIds } } })
@@ -151,9 +152,10 @@ export async function createOrder(customerId, input) {
 
     const settings = await getSettings()
     const rawDiscount = new Prisma.Decimal(requestedPoints).mul(settings.loyaltyPointValue)
-    // A discount can never exceed the food total — otherwise the customer
-    // would be burning points for nothing (or worse, a negative total).
-    loyaltyDiscount = Prisma.Decimal.min(rawDiscount, totalAmount)
+    const maximumDiscount = totalAmount.mul(new Prisma.Decimal(MAX_LOYALTY_DISCOUNT_PERCENT)).div(100)
+    // Loyalty covers only a small part of the food subtotal, so customers
+    // must earn a meaningful balance and can never make the order free.
+    loyaltyDiscount = Prisma.Decimal.min(rawDiscount, maximumDiscount)
     // Only charge for the points actually used. If the discount was capped
     // by the order total, refund the surplus points by recording fewer.
     pointsRedeemed = loyaltyDiscount.equals(rawDiscount)
@@ -163,12 +165,26 @@ export async function createOrder(customerId, input) {
     totalAmount = totalAmount.sub(loyaltyDiscount)
   }
 
+  const deliveryCharge = orderType === 'DELIVERY' ? DELIVERY_CHARGE : new Prisma.Decimal(0)
+  totalAmount = totalAmount.add(deliveryCharge)
+
   const advanceAmount = totalAmount.mul(new Prisma.Decimal('0.20')).toDecimalPlaces(2)
 
   // A transaction so the order and its REDEEMED ledger row are written
   // together — a crash between them would otherwise either charge points
   // for no order or give a discount without deducting points.
   return prisma.$transaction(async (tx) => {
+    if (resolvedTableId) {
+      const table = await tx.table.findUnique({ where: { id: resolvedTableId } })
+      if (!table) throw new ApiError(400, 'Selected table does not exist.')
+      if (table.status !== 'AVAILABLE') {
+        throw new ApiError(400, `Table ${table.number} is not available for dine-in.`)
+      }
+      if (guestCount && Number(guestCount) > table.capacity) {
+        throw new ApiError(400, `Table ${table.number} only seats ${table.capacity} guests.`)
+      }
+    }
+
     const order = await tx.order.create({
     data: {
       customerId,
@@ -188,7 +204,7 @@ export async function createOrder(customerId, input) {
         ? {
             deliveryAddress: deliveryAddress.trim(),
             deliveryPhone: deliveryPhone.trim(),
-            deliveryCharge: DELIVERY_CHARGE,
+            deliveryCharge,
           }
         : {}),
       // Takeaway-only
@@ -216,18 +232,45 @@ export async function createOrder(customerId, input) {
 
     // When dine-in order is placed, mark table as OCCUPIED
     if (resolvedTableId) {
-      await tx.table.update({
-        where: { id: resolvedTableId },
+      const occupiedTable = await tx.table.updateMany({
+        where: { id: resolvedTableId, status: 'AVAILABLE' },
         data: { status: 'OCCUPIED' },
       })
+      if (occupiedTable.count !== 1) {
+        throw new ApiError(409, 'The selected table is no longer available.')
+      }
     }
 
     return order
   })
 }
 
-export async function updateOrderStatus(id, status) {
+function isChef(user) {
+  const position = String(user?.position || '').toLowerCase()
+  return ['chef', 'cook', 'kitchen', 'baker', 'pastry', 'culinary'].some((term) => position.includes(term))
+}
+
+export async function updateOrderStatus(id, status, user) {
   const order = await getOrderOrThrow(id)
+
+  if (user?.role === 'STAFF') {
+    const staff = await prisma.user.findUnique({ where: { id: user.id }, select: { position: true } })
+    const staffUser = { ...user, position: staff?.position }
+    const chefStatuses = new Set(['ACCEPTED', 'PREPARING', 'READY'])
+    const waiterStatuses = new Set(['SERVED', 'ON_THE_WAY', 'COMPLETED'])
+    if (isChef(staffUser) && !chefStatuses.has(status)) {
+      throw new ApiError(403, 'Chefs can only move orders through kitchen statuses.')
+    }
+    if (!isChef(staffUser) && !waiterStatuses.has(status)) {
+      throw new ApiError(403, 'Waiters can only serve or complete ready orders.')
+    }
+    if (status === 'SERVED' && order.status !== 'READY') {
+      throw new ApiError(400, 'Only ready orders can be marked served.')
+    }
+    if (status === 'COMPLETED' && !['SERVED', 'ON_THE_WAY'].includes(order.status)) {
+      throw new ApiError(400, 'Only served orders can be completed.')
+    }
+  }
 
   if (
     status === 'ACCEPTED' &&

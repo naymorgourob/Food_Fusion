@@ -24,7 +24,14 @@ function capacityBadge(capacity) {
   return null
 }
 
-export function TablePicker({ tables, selectedId, onSelect, guestCount, isLoading }) {
+function formatTime(value) {
+  const [hours, minutes] = String(value).split(':').map(Number)
+  const date = new Date()
+  date.setHours(hours, minutes, 0, 0)
+  return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+}
+
+export function TablePicker({ tables, selectedId, onSelect, guestCount, durationMinutes = 120, isLoading }) {
   if (isLoading) {
     return (
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -47,10 +54,16 @@ export function TablePicker({ tables, selectedId, onSelect, guestCount, isLoadin
           // Mirrors the server's guards exactly, so a table is never
           // offered that the API would then reject.
           const tooSmall = guests > 0 && guests > table.capacity
-          const unavailable = table.status === 'OCCUPIED' || table.status === 'RESERVED'
+          const hasAvailabilityResult = typeof table.reservationAvailable === 'boolean'
+          const unavailable = hasAvailabilityResult
+            ? !table.reservationAvailable
+            : table.status === 'OCCUPIED' || table.status === 'RESERVED'
           const disabled = tooSmall || unavailable
           const active = selectedId === table.id
           const badge = capacityBadge(table.capacity)
+          const bookingWindow = table.bookingWindow
+          const reservationCost = Number(table.reservationCost ?? 0) * (Number(durationMinutes) / 120)
+          const reservationConflict = table.reservationAvailable === false
 
           return (
             <motion.button
@@ -63,11 +76,21 @@ export function TablePicker({ tables, selectedId, onSelect, guestCount, isLoadin
               transition={{ type: 'spring', stiffness: 320, damping: 24 }}
               onClick={() => onSelect(table.id)}
               aria-label={`Table ${table.number}, seats ${table.capacity}${
-                tooSmall ? `, too small for ${guests} guests` : unavailable ? ', currently unavailable' : ''
+                tooSmall
+                  ? `, too small for ${guests} guests`
+                  : reservationConflict && bookingWindow
+                    ? `, reserved from ${formatTime(bookingWindow.startTime)} to ${formatTime(bookingWindow.endTime)}`
+                    : unavailable
+                      ? ', currently unavailable'
+                      : ''
               }`}
-              className={`relative flex flex-col items-start gap-1.5 rounded-2xl border p-4 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${
+              className={`relative flex flex-col items-start gap-1.5 rounded-2xl border p-4 text-left transition-colors disabled:cursor-not-allowed ${
                 active
                   ? 'border-brand-700 bg-brand-50 ring-2 ring-brand-100 dark:border-brand-400 dark:bg-brand-900/30 dark:ring-brand-900'
+                  : reservationConflict
+                    ? 'border-amber-300 bg-amber-50/60 opacity-80 dark:border-amber-800/60 dark:bg-amber-950/20'
+                    : unavailable
+                      ? 'border-rule bg-canvas-2 opacity-65'
                   : 'border-rule bg-card hover:border-brand-200'
               }`}
             >
@@ -89,7 +112,7 @@ export function TablePicker({ tables, selectedId, onSelect, guestCount, isLoadin
 
               <span className="text-xs font-semibold text-body">{table.windowSidePosition}</span>
               <span className="text-xs text-body-muted">
-                Cost {money(table.reservationCost)} · Advance {money(Number(table.reservationCost ?? 0) * 0.2)}
+                Cost {money(reservationCost)} · Advance {money(reservationCost * 0.2)}
               </span>
 
               {badge && !disabled && (
@@ -110,8 +133,19 @@ export function TablePicker({ tables, selectedId, onSelect, guestCount, isLoadin
                 </span>
               )}
               {unavailable && !tooSmall && (
-                <span className="text-[0.7rem] font-medium text-body-faint">
-                  {table.status === 'OCCUPIED' ? 'Occupied' : 'Reserved'}
+                <span className={`text-[0.7rem] font-semibold ${reservationConflict ? 'text-amber-700 dark:text-amber-300' : 'text-body-faint'}`}>
+                  {reservationConflict && bookingWindow
+                    ? `Reserved ${formatTime(bookingWindow.startTime)}–${formatTime(bookingWindow.endTime)}`
+                    : reservationConflict
+                      ? 'Reserved for this time'
+                      : table.status === 'OCCUPIED'
+                        ? 'Occupied'
+                        : 'Reserved'}
+                </span>
+              )}
+              {!unavailable && bookingWindow && (
+                <span className="text-[0.7rem] text-body-faint">
+                  Next booking: {formatTime(bookingWindow.startTime)}–{formatTime(bookingWindow.endTime)}
                 </span>
               )}
             </motion.button>

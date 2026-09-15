@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, UserRound, Clock, MapPin, Phone, ScrollText, CalendarClock, ChefHat } from 'lucide-react'
+import { X, UserRound, Clock, MapPin, Phone, ScrollText, CalendarClock, ChefHat, Receipt } from 'lucide-react'
 import { OrderStatusBadge } from '@/features/orders/components/OrderStatusBadge'
 import { ORDER_STATUS_LABELS, orderGrandTotal, getScheduledDineInTimes } from '@/features/orders/constants'
 import { ORDER_TYPE_ICONS } from '@/features/orders/staffOrderHelpers'
 import { orderNo, money } from '@/utils/format'
+import { getImageUrl } from '@/constants'
 
 // Matches order.service.js's updateOrderStatus branch guard exactly —
 // same list OrderDetailsModal (the Admin equivalent) uses, so Staff is
@@ -166,6 +167,43 @@ export function StaffOrderDrawer({
                     </Row>
                   </section>
                 )}
+
+                <section className={`flex flex-col gap-3 rounded-2xl border p-4 ${
+                  order.bill?.paymentStatus === 'PAID' || order.paymentReference || order.paymentProofImage
+                    ? 'border-emerald-200 bg-emerald-50/60 dark:border-emerald-900/50 dark:bg-emerald-950/20'
+                    : 'border-red-200 bg-red-50/60 dark:border-red-900/50 dark:bg-red-950/20'
+                }`}>
+                  <span className="flex items-center gap-2 text-xs font-semibold tracking-wide uppercase">
+                    <Receipt className="h-4 w-4" /> Payment verification
+                  </span>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Row icon={Receipt} label="Advance payment">
+                      {order.paymentReference || order.paymentProofImage
+                        ? order.paymentReference
+                          ? `Submitted · ${order.paymentReference}`
+                          : 'Screenshot submitted'
+                        : 'Not submitted'}
+                    </Row>
+                    <Row icon={Receipt} label="Bill status">
+                      {order.bill?.paymentStatus === 'PAID' ? 'Paid' : order.bill ? 'Unpaid' : 'Bill not generated'}
+                    </Row>
+                  </div>
+                  {order.paymentProofImage && (
+                    <a
+                      href={getImageUrl(`/uploads/payment/${order.paymentProofImage}`)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm font-semibold text-brand-700 underline dark:text-brand-400"
+                    >
+                      View payment screenshot
+                    </a>
+                  )}
+                  {!order.paymentReference && !order.paymentProofImage && (
+                    <p className="text-xs font-medium text-red-700 dark:text-red-300">
+                      Payment evidence is required before accepting this order.
+                    </p>
+                  )}
+                </section>
 
                 {order.orderType === 'TAKEAWAY' && order.scheduledPickupTime && (
                   <section className="rounded-2xl border border-rule bg-card p-4">

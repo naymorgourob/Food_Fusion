@@ -107,12 +107,11 @@ export default function WaiterOrdersPage() {
       )
     }
 
-    // Sort: READY first (needs waiter pickup), then PENDING, then oldest
+    // Keep the list anchored to booking time. A status change should update
+    // the existing card, not move it because its status rank changed.
     return [...list].sort((a, b) => {
-      const statusRank = { READY: 0, PENDING: 1, PREPARING: 2, ACCEPTED: 3, SERVED: 4, COMPLETED: 5, CANCELLED: 6 }
-      const diff = (statusRank[a.status] ?? 9) - (statusRank[b.status] ?? 9)
-      if (diff !== 0) return diff
-      return new Date(b.createdAt) - new Date(a.createdAt)
+      const createdDiff = new Date(b.createdAt) - new Date(a.createdAt)
+      return createdDiff || String(b.id).localeCompare(String(a.id))
     })
   }, [allOrdersList, currentTab, query])
 

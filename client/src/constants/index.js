@@ -6,7 +6,57 @@ export const APP_NAME = 'FoodFusion'
 export const API_ORIGIN = new URL(import.meta.env?.VITE_API_BASE_URL || 'http://localhost:5001/api/v1').origin
 
 export function getImageUrl(imagePath) {
-  return imagePath ? `${API_ORIGIN}${imagePath}` : null
+  if (!imagePath) return null
+  if (/^https?:\/\//i.test(imagePath)) return imagePath
+  return `${API_ORIGIN}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`
+}
+
+const MENU_IMAGE_FALLBACKS = {
+  biryani: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?auto=format&fit=crop&w=900&q=80',
+  beef: 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?auto=format&fit=crop&w=900&q=80',
+  fish: 'https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=900&q=80',
+  prawn: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=900&q=80',
+  chicken: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=900&q=80',
+  dessert: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=900&q=80',
+  beverage: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=900&q=80',
+  default: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80',
+}
+
+const BENGALI_DISH_IMAGES = {
+  'dhaka kacchi biryani': 'https://commons.wikimedia.org/wiki/Special:FilePath/Kacchi%20Biryani.jpg?width=900',
+  'beef tehari': 'https://commons.wikimedia.org/wiki/Special:FilePath/Tehari.jpg?width=900',
+  'ilish bhapa': 'https://commons.wikimedia.org/wiki/Special:FilePath/Ilish%20Bhapa.jpg?width=900',
+  'chingri malai curry': 'https://commons.wikimedia.org/wiki/Special:FilePath/Chingri%20Malai%20Curry.jpg?width=900',
+  'chicken bhuna khichuri': 'https://commons.wikimedia.org/wiki/Special:FilePath/Bhuna%20Khichuri.jpg?width=900',
+  'shorshe ilish platter': 'https://commons.wikimedia.org/wiki/Special:FilePath/Shorshe%20Ilish.jpg?width=900',
+  'begun bhaja': 'https://commons.wikimedia.org/wiki/Special:FilePath/Begun%20Bhaja.jpg?width=900',
+  'mishti doi': 'https://commons.wikimedia.org/wiki/Special:FilePath/Mishti%20Doi.jpg?width=900',
+}
+
+export function getMenuImageUrl(dish) {
+  const dishName = String(dish?.name || '').toLowerCase().trim()
+  const name = `${dishName} ${dish?.category?.name || ''}`.toLowerCase()
+  const fallbackKey =
+    name.includes('biryani') || name.includes('tehari') || name.includes('rice') || name.includes('khichuri')
+      ? 'biryani'
+      : name.includes('beef') || name.includes('steak') || name.includes('lamb')
+        ? 'beef'
+        : name.includes('fish') || name.includes('ilish') || name.includes('salmon')
+          ? 'fish'
+          : name.includes('prawn') || name.includes('chingri') || name.includes('calamari')
+            ? 'prawn'
+            : name.includes('chicken') || name.includes('kebab') || name.includes('wing')
+              ? 'chicken'
+              : name.includes('dessert') || name.includes('cake') || name.includes('doi') || name.includes('tiramisu')
+                ? 'dessert'
+                : name.includes('drink') || name.includes('lemonade') || name.includes('lassi') || name.includes('latte') || name.includes('mocktail')
+                  ? 'beverage'
+                  : 'default'
+
+  return {
+    primary: BENGALI_DISH_IMAGES[dishName] || getImageUrl(dish?.imageUrl),
+    fallback: MENU_IMAGE_FALLBACKS[fallbackKey],
+  }
 }
 
 // Mirrors the UserRole enum in server/prisma/schema.prisma. Kept here as the

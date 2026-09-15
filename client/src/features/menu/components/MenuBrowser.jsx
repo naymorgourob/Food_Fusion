@@ -13,7 +13,7 @@ import { RecommendedRail } from '@/features/menu/components/RecommendedRail'
 import { EmptyState } from '@/components/customer/ui'
 
 const PAGE_SIZE = 12
-const PRICE_CEILING = 100
+const PRICE_CEILING = 2000
 const SEARCH_DEBOUNCE_MS = 300
 
 const DEFAULT_FILTERS = {

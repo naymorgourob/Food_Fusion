@@ -2,11 +2,10 @@
  * Client-side search/filter/sort for Admin Reservation Management
  * (UI-08.5).
  *
- * GET /reservations takes no query parameters — listReservations in
- * reservation.service.js returns every reservation for Admin, in
- * whatever order Prisma's default returns them, full stop. Every filter
- * the spec asks for is therefore applied here, against the one full
- * result set useReservations already fetches.
+ * GET /reservations takes no query parameters — listReservations returns
+ * the complete role-scoped result set, with Admin/Staff requests newest-first.
+ * Every filter the spec asks for is therefore applied here, against the one
+ * full result set useReservations already fetches.
  */
 
 export const RESERVATION_STATUS_FILTERS = [
@@ -33,7 +32,7 @@ export const GUEST_FILTERS = [
 
 export const SORT_OPTIONS = [
   { value: 'upcoming', label: 'Date (soonest first)' },
-  { value: 'newest-booked', label: 'Newest booked' },
+  { value: 'newest-booked', label: 'Recent booking requests' },
   { value: 'oldest-booked', label: 'Oldest booked' },
   { value: 'guests-desc', label: 'Guests (most first)' },
 ]

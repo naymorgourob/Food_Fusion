@@ -1,6 +1,7 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Heart, Plus, Clock, Eye, Check, UtensilsCrossed } from 'lucide-react'
-import { getImageUrl } from '@/constants'
+import { getMenuImageUrl } from '@/constants'
 import { money } from '@/utils/format'
 
 /**
@@ -36,7 +37,9 @@ export function MenuDishCard({
   onQuickView,
   onAdd,
 }) {
-  const image = getImageUrl(dish.imageUrl)
+  const [imageFailed, setImageFailed] = useState(false)
+  const { primary, fallback } = getMenuImageUrl(dish)
+  const image = imageFailed ? fallback : primary || fallback
   const unavailable = !dish.isAvailable
   const inCart = quantity > 0
 
@@ -54,7 +57,9 @@ export function MenuDishCard({
         {image ? (
           <img
             src={image}
-            alt={dish.name}
+            alt={`${dish.name} - ${dish.description || 'FoodFusion menu item'}`}
+            title={dish.name}
+            onError={() => setImageFailed(true)}
             loading="lazy"
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
           />

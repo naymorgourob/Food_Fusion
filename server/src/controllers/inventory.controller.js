@@ -5,6 +5,7 @@ import {
   updateInventoryItem,
   updateInventoryStock,
   deleteInventoryItem,
+  recordInventoryUsage,
 } from '../services/inventory.service.js'
 import { sendSuccess } from '../utils/ApiResponse.js'
 import { ApiError } from '../utils/ApiError.js'
@@ -38,6 +39,11 @@ export async function patchInventoryStock(req, res) {
 
   const item = await updateInventoryStock(req.params.id, { quantity: Number(quantity) })
   sendSuccess(res, { message: 'Stock quantity updated successfully.', data: { item } })
+}
+
+export async function postInventoryUsage(req, res) {
+  const usage = await recordInventoryUsage(req.params.id, req.user.id, req.body)
+  sendSuccess(res, { statusCode: 201, message: 'Inventory usage recorded successfully.', data: { usage } })
 }
 
 export async function removeInventoryItem(req, res) {

@@ -174,7 +174,7 @@ export default function DashboardHome() {
   }
 
   return (
-    <div className="flex flex-col gap-7 pb-8">
+    <div className="flex flex-col gap-9 pb-10">
       {/* ── 1. Hero Header ────────────────────────────────────────── */}
       <DashboardHeader
         user={user}
@@ -208,40 +208,51 @@ export default function DashboardHome() {
       </AnimatePresence>
 
       {/* ── 3. Executive KPI Cards ────────────────────────────────── */}
-      <DashboardKpiCards
-        stats={stats}
-        todaySales={todaySales}
-        todayOrdersCount={todayOrdersCount}
-        upcomingReservationsCount={upcomingReservationsCount}
-        totalGuestsCount={reservationsSummary?.totalGuests ?? 0}
-        pendingOrdersCount={pendingOrdersCount}
-        prepOrdersCount={prepOrdersCount}
-        isLoading={isLoading}
-      />
+      <section className="flex flex-col gap-3" aria-labelledby="dashboard-overview-heading">
+        <SectionLabel
+          id="dashboard-overview-heading"
+          title="Today's overview"
+          description="The numbers that need your attention first"
+        />
+        <DashboardKpiCards
+          stats={stats}
+          todaySales={todaySales}
+          todayOrdersCount={todayOrdersCount}
+          upcomingReservationsCount={upcomingReservationsCount}
+          totalGuestsCount={reservationsSummary?.totalGuests ?? 0}
+          pendingOrdersCount={pendingOrdersCount}
+          prepOrdersCount={prepOrdersCount}
+          isLoading={isLoading}
+        />
+      </section>
 
       {/* ── 4. Live Floor & Kitchen Operations Pulse ──────────────── */}
-      <LiveOperationsPulse
-        pendingOrdersCount={pendingOrdersCount}
-        prepOrdersCount={prepOrdersCount}
-        readyOrdersCount={readyOrdersCount}
-        tables={tables}
-        inventoryItems={inventoryItems}
-        isLoading={isLoading}
-      />
+      <section className="flex flex-col gap-3" aria-labelledby="dashboard-operations-heading">
+        <SectionLabel
+          id="dashboard-operations-heading"
+          title="Live operations"
+          description="Kitchen, floor, and stock status at a glance"
+        />
+        <LiveOperationsPulse
+          pendingOrdersCount={pendingOrdersCount}
+          prepOrdersCount={prepOrdersCount}
+          readyOrdersCount={readyOrdersCount}
+          tables={tables}
+          inventoryItems={inventoryItems}
+          isLoading={isLoading}
+        />
+      </section>
 
       {/* ── 5. Operations Launchpad / Quick Actions ───────────────── */}
       <DashboardQuickActions />
 
       {/* ── 6. Analytics Visualizations Grid ──────────────────────── */}
-      <div className="flex flex-col gap-3.5">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-bold uppercase tracking-wider text-body-faint">
-            Business Performance & Analytics
-          </span>
-          <span className="text-[11px] text-body-muted hidden sm:inline">
-            Aggregated metrics based on confirmed transactions and bookings
-          </span>
-        </div>
+      <section className="flex flex-col gap-3.5" aria-labelledby="dashboard-analytics-heading">
+        <SectionLabel
+          id="dashboard-analytics-heading"
+          title="Business performance"
+          description="Revenue, order volume, and reservation trends"
+        />
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Revenue Performance Chart */}
@@ -264,18 +275,15 @@ export default function DashboardHome() {
             isLoading={isLoading}
           />
         </div>
-      </div>
+      </section>
 
       {/* ── 7. Live Activity Audit Feeds ──────────────────────────── */}
-      <div className="flex flex-col gap-3.5">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-bold uppercase tracking-wider text-body-faint">
-            Live Activity Feeds
-          </span>
-          <span className="text-[11px] text-body-muted hidden sm:inline">
-            Real-time chronological events across dining, reservations, and customer registrations
-          </span>
-        </div>
+      <section className="flex flex-col gap-3.5" aria-labelledby="dashboard-activity-heading">
+        <SectionLabel
+          id="dashboard-activity-heading"
+          title="Recent activity"
+          description="The latest orders, bookings, and diner registrations"
+        />
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Recent Orders */}
@@ -290,7 +298,18 @@ export default function DashboardHome() {
           {/* Recent Diners */}
           <RecentCustomersCard customers={allCustomers} isLoading={isLoading} />
         </div>
-      </div>
+      </section>
+    </div>
+  )
+}
+
+function SectionLabel({ id, title, description }) {
+  return (
+    <div className="flex flex-col gap-1 border-l-2 border-brand-600 pl-3 dark:border-brand-400 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+      <h2 id={id} className="font-display text-sm font-bold tracking-wide text-body">
+        {title}
+      </h2>
+      <p className="text-xs text-body-muted">{description}</p>
     </div>
   )
 }

@@ -64,7 +64,7 @@ export function SkeletonCard({ lines = 3 }) {
  * built from the design tokens rather than an image file — it themes
  * correctly in dark mode and adds nothing to the bundle.
  */
-export function EmptyState({ icon: Icon, title, description, actionLabel, to, compact = false }) {
+export function EmptyState({ icon: Icon, title, description, actionLabel, to, onAction, compact = false }) {
   return (
     <div
       className={`flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-rule bg-card/50 text-center ${
@@ -80,15 +80,25 @@ export function EmptyState({ icon: Icon, title, description, actionLabel, to, co
         <p className="font-display text-base font-semibold text-body">{title}</p>
         {description && <p className="max-w-xs text-sm text-body-muted">{description}</p>}
       </div>
-      {actionLabel && to && (
-        <Link
-          to={to}
-          className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-brand-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-800"
-        >
-          {actionLabel}
-          <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
-      )}
+      {actionLabel && (to || onAction) &&
+        (onAction ? (
+          <button
+            type="button"
+            onClick={onAction}
+            className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-brand-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-800"
+          >
+            {actionLabel}
+            <ArrowRight className="h-3.5 w-3.5" />
+          </button>
+        ) : (
+          <Link
+            to={to}
+            className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-brand-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-800"
+          >
+            {actionLabel}
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        ))}
     </div>
   )
 }

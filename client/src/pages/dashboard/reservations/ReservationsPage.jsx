@@ -45,7 +45,7 @@ export default function ReservationsPage() {
   const [statusFilter, setStatusFilter] = useState('')
   const [dateFilter, setDateFilter] = useState('')
   const [guestFilter, setGuestFilter] = useState('')
-  const [sortBy, setSortBy] = useState('upcoming')
+  const [sortBy, setSortBy] = useState('newest-booked')
   const [filtersOpen, setFiltersOpen] = useState(false)
 
   const [viewingReservation, setViewingReservation] = useState(null)
@@ -96,7 +96,7 @@ export default function ReservationsPage() {
   }
 
   const activeFilterCount =
-    (statusFilter ? 1 : 0) + (dateFilter ? 1 : 0) + (guestFilter ? 1 : 0) + (sortBy !== 'upcoming' ? 1 : 0)
+    (statusFilter ? 1 : 0) + (dateFilter ? 1 : 0) + (guestFilter ? 1 : 0) + (sortBy !== 'newest-booked' ? 1 : 0)
   const isFiltered = Boolean(searchTerm) || activeFilterCount > 0
 
   function resetFilters() {
@@ -104,7 +104,7 @@ export default function ReservationsPage() {
     setStatusFilter('')
     setDateFilter('')
     setGuestFilter('')
-    setSortBy('upcoming')
+    setSortBy('newest-booked')
     setFiltersOpen(false)
   }
 

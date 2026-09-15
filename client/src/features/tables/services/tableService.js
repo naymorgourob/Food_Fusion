@@ -1,7 +1,7 @@
 import { api } from '@/services/api'
 
-export async function fetchTables() {
-  const { data } = await api.get('/tables')
+export async function fetchTables(params) {
+  const { data } = await api.get('/tables', { params })
   return data.data.tables
 }
 

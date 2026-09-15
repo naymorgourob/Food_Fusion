@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Check, Banknote, CreditCard, Smartphone, Wallet, Info, Sparkles, Upload } from 'lucide-react'
+import { Check, CreditCard, Smartphone, Wallet, Info, Sparkles, Upload } from 'lucide-react'
 import { money } from '@/utils/format'
 
 /**
@@ -22,13 +22,6 @@ import { money } from '@/utils/format'
 
 const METHODS = [
   {
-    id: 'CASH',
-    label: 'Cash',
-    hint: 'Pay when your order arrives',
-    icon: Banknote,
-    availableFor: ['DINE_IN', 'DELIVERY', 'TAKEAWAY'],
-  },
-  {
     id: 'CARD',
     label: 'Card',
     hint: 'Visa, Mastercard, Amex at the table',
@@ -40,6 +33,7 @@ const METHODS = [
   { id: 'NAGAD', label: 'Nagad', hint: 'Mobile financial service', icon: Smartphone },
   { id: 'ROCKET', label: 'Rocket', hint: 'Mobile financial service', icon: Smartphone },
 ]
+const MAX_LOYALTY_DISCOUNT_PERCENT = 5
 
 export function PaymentMethodStep({
   selected,
@@ -62,7 +56,9 @@ export function PaymentMethodStep({
   const currentPoints = loyaltySummary?.currentPoints ?? 0
   const maxRedeemable = Math.min(
     currentPoints,
-    pointValue > 0 ? Math.ceil(itemsTotal / pointValue) : 0,
+    pointValue > 0
+      ? Math.floor((itemsTotal * (MAX_LOYALTY_DISCOUNT_PERCENT / 100)) / pointValue)
+      : 0,
   )
   const redeeming = Number(pointsToRedeem) > 0
 
@@ -149,8 +145,8 @@ export function PaymentMethodStep({
       </div>
 
       {/* --- Loyalty redemption --------------------------------------- */}
-      {currentPoints > 0 && maxRedeemable > 0 && (
-        <div className="flex flex-col gap-3 rounded-2xl border border-rule bg-canvas p-5">
+      {loyaltySummary && (
+        <div className="flex flex-col gap-3 rounded-2xl border border-gold-300/70 bg-gold-100/40 p-5 dark:border-gold-700/60 dark:bg-gold-100/10">
           <div className="flex items-center justify-between gap-3">
             <span className="flex items-center gap-2 font-display text-sm font-semibold text-body">
               <Sparkles className="h-4 w-4 text-gold-500" />
@@ -161,7 +157,12 @@ export function PaymentMethodStep({
             </span>
           </div>
 
-          <div className="flex flex-wrap items-end gap-3">
+          <p className="text-xs leading-relaxed text-body-muted">
+            Use points for a small discount of up to {MAX_LOYALTY_DISCOUNT_PERCENT}% of your food subtotal.
+            {currentPoints === 0 ? ' Complete orders to start earning points.' : ''}
+          </p>
+
+          {currentPoints > 0 && maxRedeemable > 0 && <div className="flex flex-wrap items-end gap-3">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="checkout-redeem-points" className="text-xs font-medium text-body-muted">
                 Points to redeem
@@ -193,7 +194,7 @@ export function PaymentMethodStep({
                 Clear
               </button>
             )}
-          </div>
+          </div>}
 
           {loyaltyDiscount > 0 && (
             <p
@@ -202,6 +203,9 @@ export function PaymentMethodStep({
             >
               You save {money(loyaltyDiscount)} with {appliedPoints} points.
             </p>
+          )}
+          {currentPoints > 0 && maxRedeemable === 0 && (
+            <p className="text-xs text-body-faint">This order is too small to apply a loyalty discount.</p>
           )}
         </div>
       )}

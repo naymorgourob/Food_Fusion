@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import {
   UtensilsCrossed,
   ClipboardList,
@@ -9,7 +8,6 @@ import {
   Receipt,
   UserCheck,
   TrendingUp,
-  Sparkles,
 } from 'lucide-react'
 
 const ACTIONS = [
@@ -74,36 +72,32 @@ const ACTIONS = [
 export function DashboardQuickActions() {
   return (
     <div className="flex flex-col gap-3.5">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-body-faint">
-            Operations Launchpad
-          </span>
-        </div>
-        <span className="text-[11px] text-body-muted hidden sm:inline">
-          Direct access to core restaurant modules
-        </span>
+      <div className="flex flex-col gap-1 border-l-2 border-brand-600 pl-3 dark:border-brand-400 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+        <h2 className="font-display text-sm font-bold tracking-wide text-body">
+          Operations launchpad
+        </h2>
+        <p className="text-xs text-body-muted">Jump straight into a restaurant workspace</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {ACTIONS.map((action, index) => {
           const Icon = action.icon
           return (
             <Link
               key={action.label}
               to={action.to}
-              className="group flex flex-col items-center justify-center gap-2 rounded-2xl border border-rule bg-card p-3.5 text-center shadow-xs transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md active:scale-95"
+              className="group flex items-center gap-3 rounded-2xl border border-rule bg-card p-4 text-left shadow-xs transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md active:scale-[0.99]"
             >
               <span
-                className={`flex h-10 w-10 items-center justify-center rounded-xl border border-rule/50 ${action.color} transition-transform group-hover:scale-110`}
+                className={`flex h-10 w-10 flex-none items-center justify-center rounded-xl border border-rule/50 ${action.color} transition-transform group-hover:scale-110`}
               >
                 <Icon className="h-4 w-4" />
               </span>
-              <div className="flex flex-col">
+              <div className="flex min-w-0 flex-col">
                 <span className="text-xs font-bold text-body group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
                   {action.label}
                 </span>
-                <span className="text-[10px] text-body-faint leading-tight hidden sm:block truncate max-w-[100px]">
+                <span className="truncate text-[11px] leading-tight text-body-faint">
                   {action.description}
                 </span>
               </div>

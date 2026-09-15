@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Pencil, Trash2, Layers, AlertCircle } from 'lucide-react'
+import { Pencil, Trash2, Layers } from 'lucide-react'
 import { InventoryStatusBadge } from '@/features/inventory/components/InventoryStatusBadge'
 import { UNIT_LABELS } from '@/features/inventory/inventoryHelpers'
 
@@ -58,6 +58,19 @@ export function AdminInventoryRow({ item, onEdit, onDelete }) {
           </div>
         </div>
       </div>
+
+      {item.usages?.length > 0 && (
+        <div className="border-t border-rule pt-3 text-xs text-body-muted">
+          <p className="mb-1 font-semibold text-body">Usage history</p>
+          <div className="flex flex-col gap-1">
+            {item.usages.map((usage) => (
+              <p key={usage.id}>
+                {new Date(usage.usageDate).toLocaleDateString()} · used {Number(usage.quantityUsed)} {unitLabel} · remaining {Number(usage.remainingQuantity)} {unitLabel} · {usage.recordedBy?.fullName || 'Staff'}
+              </p>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Stock level & Controls */}
       <div className="flex items-center justify-between gap-5 border-t border-rule pt-3 sm:border-t-0 sm:pt-0">

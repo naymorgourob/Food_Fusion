@@ -29,7 +29,13 @@ export async function getAssignableStaff(req, res) {
 
 export async function postOrder(req, res) {
   const input = { ...req.body, paymentProofImage: req.file?.filename }
-  if (typeof input.items === 'string') input.items = JSON.parse(input.items)
+  if (typeof input.items === 'string') {
+    try {
+      input.items = JSON.parse(input.items)
+    } catch {
+      throw new ApiError(400, 'Order items must be valid JSON.')
+    }
+  }
   const errors = validateOrder({ ...input, requirePaymentProof: req.user.role === 'CUSTOMER' })
   if (errors.length > 0) throw new ApiError(400, 'Validation failed.', errors)
 
@@ -42,7 +48,7 @@ export async function putOrderStatus(req, res) {
   const errors = validateStatus(req.body.status)
   if (errors.length > 0) throw new ApiError(400, 'Validation failed.', errors)
 
-  const order = await updateOrderStatus(req.params.id, req.body.status)
+  const order = await updateOrderStatus(req.params.id, req.body.status, req.user)
   sendSuccess(res, { message: 'Order status updated successfully.', data: { order } })
 }
 

@@ -20,6 +20,11 @@ export async function updateInventoryStock(id, quantity) {
   return data.data.item
 }
 
+export async function recordInventoryUsage(id, payload) {
+  const { data } = await api.post(`/inventory/${id}/usage`, payload)
+  return data.data.usage
+}
+
 export async function deleteInventoryItem(id) {
   await api.delete(`/inventory/${id}`)
 }

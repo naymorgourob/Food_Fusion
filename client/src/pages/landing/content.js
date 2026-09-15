@@ -134,7 +134,7 @@ export const TESTIMONIALS = [
     rating: 5,
     quote:
       'The tasting menu was the best meal I have had all year. Booking a table took about ten seconds, and the kitchen remembered my allergy without being asked twice.',
-    avatar: unsplash('null', 160),
+    avatar: unsplash('1507003211169-0a1dd7228f2d', 160),
   },
   {
     id: 't2',

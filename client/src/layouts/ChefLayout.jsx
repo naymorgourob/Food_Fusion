@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { ChefSidebar } from '@/components/staff/ChefSidebar'
 import { StaffTopBar } from '@/components/staff/StaffTopBar'
 import { useOrders } from '@/features/orders/hooks/useOrders'
@@ -52,14 +51,9 @@ export function ChefShell({ children }) {
           workspace="chef"
         />
 
-        <motion.main
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8"
-        >
+        <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
           {typeof children === 'function' ? children(context) : children}
-        </motion.main>
+        </main>
       </div>
     </div>
   )

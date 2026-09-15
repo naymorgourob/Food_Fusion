@@ -5,6 +5,11 @@ export async function fetchMenuItems(params) {
   return data.data // { items, pagination }
 }
 
+export async function fetchMenuItemById(id) {
+  const { data } = await api.get(`/menu/items/${id}`)
+  return data.data.food
+}
+
 // Always sent as multipart/form-data — matches the multer.single('image')
 // middleware on the server regardless of whether a new photo is attached
 // (editing without changing the photo just omits the `image` field).

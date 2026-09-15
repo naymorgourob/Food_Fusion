@@ -21,7 +21,7 @@ export function DashboardKpiCards({
 }) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
@@ -88,7 +88,7 @@ export function DashboardKpiCards({
   ]
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
       {cards.map((card, idx) => {
         const Icon = card.icon
         return (
@@ -97,7 +97,11 @@ export function DashboardKpiCards({
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, delay: idx * 0.04 }}
-            className="group flex flex-col justify-between rounded-2xl border border-rule bg-card p-4 shadow-xs hover:border-brand-300 hover:shadow-md transition-all"
+            className={`group flex min-h-36 flex-col justify-between rounded-2xl border bg-card p-4 shadow-xs transition-all hover:-translate-y-0.5 hover:shadow-md lg:col-span-1 ${
+              idx === 0
+                ? 'border-brand-200 bg-brand-50/40 dark:border-brand-900/60 dark:bg-brand-950/20 lg:col-span-2'
+                : 'border-rule hover:border-brand-300'
+            }`}
           >
             {/* Top row: Label & Icon */}
             <div className="flex items-center justify-between">

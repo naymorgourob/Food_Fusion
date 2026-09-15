@@ -14,7 +14,7 @@ import {
   RotateCcw,
   Info,
 } from 'lucide-react'
-import { updateInventoryStock } from '@/features/inventory/services/inventoryService'
+import { updateInventoryStock, recordInventoryUsage } from '@/features/inventory/services/inventoryService'
 import {
   INVENTORY_STATUS_CONFIG,
   UNIT_LABELS,
@@ -35,6 +35,7 @@ export default function ChefInventoryPage() {
   const [updatingId, setUpdatingId] = useState(null)
   const [successMessage, setSuccessMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+  const [usageQuantities, setUsageQuantities] = useState({})
 
   const items = inventory?.items || []
   const isLoading = inventory?.isLoading
@@ -141,6 +142,26 @@ export default function ChefInventoryPage() {
       setTimeout(() => setSuccessMessage(''), 3500)
     } catch (err) {
       setErrorMessage(err.response?.data?.message || 'Failed to mark refill request.')
+    } finally {
+      setUpdatingId(null)
+    }
+  }
+
+  async function handleRecordUsage(item) {
+    const quantityUsed = Number(usageQuantities[item.id])
+    if (!Number.isFinite(quantityUsed) || quantityUsed <= 0) {
+      setErrorMessage('Enter a usage quantity greater than zero.')
+      return
+    }
+    setUpdatingId(item.id)
+    setErrorMessage('')
+    try {
+      await recordInventoryUsage(item.id, { quantityUsed, usageDate: new Date().toISOString().slice(0, 10) })
+      setUsageQuantities((current) => ({ ...current, [item.id]: '' }))
+      inventory.refetch()
+      setSuccessMessage(`Recorded ${quantityUsed} ${UNIT_LABELS[item.unit] || item.unit} used for ${item.itemName}.`)
+    } catch (err) {
+      setErrorMessage(err.response?.data?.message || 'Failed to record inventory usage.')
     } finally {
       setUpdatingId(null)
     }
@@ -372,6 +393,31 @@ export default function ChefInventoryPage() {
 
                 {/* Chef Quick Controls */}
                 <div className="mt-4 border-t border-rule pt-3">
+                  <div className="mb-3 flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="0"
+                      step="any"
+                      value={usageQuantities[item.id] ?? ''}
+                      onChange={(event) => setUsageQuantities((current) => ({ ...current, [item.id]: event.target.value }))}
+                      placeholder="Used"
+                      aria-label={`Quantity used for ${item.itemName}`}
+                      className="w-24 rounded-lg border border-rule bg-canvas px-2 py-1.5 text-xs text-body"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRecordUsage(item)}
+                      disabled={isItemUpdating}
+                      className="rounded-lg bg-brand-700 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+                    >
+                      Record usage
+                    </button>
+                  </div>
+                  {item.usages?.[0] && (
+                    <p className="mb-3 text-[0.7rem] text-body-faint">
+                      Last used {Number(item.usages[0].quantityUsed)} {unitLabel} on {new Date(item.usages[0].usageDate).toLocaleDateString()} by {item.usages[0].recordedBy?.fullName || 'staff'}; remaining {Number(item.usages[0].remainingQuantity)} {unitLabel}.
+                    </p>
+                  )}
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-medium text-body-faint">Quick Adjust:</span>
 

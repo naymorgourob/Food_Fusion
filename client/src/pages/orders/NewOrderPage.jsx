@@ -16,10 +16,12 @@ import { fetchTables } from '@/features/tables/services/tableService'
 import { createOrder, fetchOrderById } from '@/features/orders/services/orderService'
 import { money } from '@/utils/format'
 import { fetchPaymentContact } from '@/features/settings/services/settingsService'
+import { fetchMenuItemById } from '@/features/menu/services/menuItemService'
 
 // Must match DELIVERY_CHARGE in server/src/services/order.service.js —
 // this is a display-only preview, the server applies the real charge.
 const DELIVERY_CHARGE_PREVIEW = 3.0
+const MAX_LOYALTY_DISCOUNT_PERCENT = 5
 
 function computeSuggestedReadyTime(arrivalLocal) {
   if (!arrivalLocal) return null
@@ -79,7 +81,7 @@ export default function NewOrderPage() {
   // backward jumps without letting anyone skip ahead past required fields.
   const [furthestReached, setFurthestReached] = useState(0)
   const [orderType, setOrderType] = useState(null)
-  const [paymentMethod, setPaymentMethod] = useState('CASH')
+  const [paymentMethod, setPaymentMethod] = useState('SSLCOMMERZ')
   const [paymentReference, setPaymentReference] = useState('')
   const [paymentProof, setPaymentProof] = useState(null)
   const [paymentContact, setPaymentContact] = useState(null)
@@ -120,8 +122,18 @@ export default function NewOrderPage() {
       try {
         const order = await fetchOrderById(repeatOrderId)
         if (cancelled) return
-        for (const item of order.items) {
-          cart.setQuantity(item.menuItemId, item.quantity)
+        const hydratedItems = await Promise.all(
+          order.items.map(async (item) => {
+            try {
+              return { item: await fetchMenuItemById(item.menuItemId), quantity: item.quantity }
+            } catch {
+              return null
+            }
+          }),
+        )
+        if (cancelled) return
+        for (const entry of hydratedItems.filter(Boolean)) {
+          cart.setQuantity(entry.item.id, entry.quantity, entry.item)
         }
       } catch {
         // A missing or inaccessible order just means no seeding.
@@ -135,6 +147,21 @@ export default function NewOrderPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- seed once per id; cart identity changes every render
   }, [repeatOrderId])
 
+  useEffect(() => {
+    if (!favoriteIds?.length) return undefined
+    let cancelled = false
+
+    Promise.all(favoriteIds.map((id) => fetchMenuItemById(id).catch(() => null))).then((items) => {
+      if (cancelled) return
+      items.filter(Boolean).forEach((item) => cart.setQuantity(item.id, 1, item))
+    })
+
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- hydrate once per query param; cart identity changes every render
+  }, [favoritesParam])
+
   const itemsTotal = cart.subtotal
   const deliveryChargePreview = orderType === 'DELIVERY' ? DELIVERY_CHARGE_PREVIEW : 0
 
@@ -146,9 +173,14 @@ export default function NewOrderPage() {
   const appliedPoints = Math.min(
     requestedPoints,
     loyaltySummary?.currentPoints ?? 0,
-    pointValue > 0 ? Math.ceil(itemsTotal / pointValue) : 0,
+    pointValue > 0
+      ? Math.floor((itemsTotal * (MAX_LOYALTY_DISCOUNT_PERCENT / 100)) / pointValue)
+      : 0,
   )
-  const loyaltyDiscount = Math.min(appliedPoints * pointValue, itemsTotal)
+  const loyaltyDiscount = Math.min(
+    appliedPoints * pointValue,
+    itemsTotal * (MAX_LOYALTY_DISCOUNT_PERCENT / 100),
+  )
   const grandTotal = itemsTotal + deliveryChargePreview - loyaltyDiscount
   const advanceAmount = grandTotal * 0.2
 

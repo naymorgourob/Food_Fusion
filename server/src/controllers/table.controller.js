@@ -4,7 +4,7 @@ import { sendSuccess } from '../utils/ApiResponse.js'
 import { ApiError } from '../utils/ApiError.js'
 
 export async function getTables(req, res) {
-  const tables = await listTables()
+  const tables = await listTables(req.query)
   sendSuccess(res, { message: 'Tables fetched successfully.', data: { tables } })
 }
 

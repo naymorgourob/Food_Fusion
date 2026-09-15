@@ -42,7 +42,7 @@ export function CustomerBillDrawer({ bill, isOpen, onClose, onViewReceipt }) {
     order?.orderType === 'DINE_IN'
       ? 'Pay at Table / Counter'
       : order?.orderType === 'DELIVERY'
-      ? 'Cash / Card on Delivery'
+      ? 'Online payment on delivery'
       : 'Pay at Collection Counter'
 
   return (

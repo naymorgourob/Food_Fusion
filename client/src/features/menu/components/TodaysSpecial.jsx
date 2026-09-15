@@ -1,6 +1,7 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Clock, ArrowRight, Sparkles, UtensilsCrossed } from 'lucide-react'
-import { getImageUrl } from '@/constants'
+import { getMenuImageUrl } from '@/constants'
 import { money } from '@/utils/format'
 
 /**
@@ -14,9 +15,12 @@ import { money } from '@/utils/format'
  */
 
 export function TodaysSpecial({ dish, onView, onAdd }) {
+  const [imageFailed, setImageFailed] = useState(false)
+
   if (!dish) return null
 
-  const image = getImageUrl(dish.imageUrl)
+  const { primary, fallback } = getMenuImageUrl(dish)
+  const image = imageFailed ? fallback : primary || fallback
 
   return (
     <motion.section
@@ -76,7 +80,13 @@ export function TodaysSpecial({ dish, onView, onAdd }) {
         {/* --- Image -------------------------------------------------- */}
         <div className="relative min-h-[15rem] overflow-hidden md:min-h-full">
           {image ? (
-            <img src={image} alt={dish.name} className="h-full w-full object-cover" />
+              <img
+                src={image}
+                alt={`${dish.name} - ${dish.description || 'FoodFusion menu item'}`}
+                title={dish.name}
+                onError={() => setImageFailed(true)}
+                className="h-full w-full object-cover"
+              />
           ) : (
             <span className="flex h-full w-full items-center justify-center bg-brand-900">
               <UtensilsCrossed className="h-14 w-14 text-white/15" strokeWidth={1.25} />

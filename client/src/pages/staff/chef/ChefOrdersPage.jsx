@@ -12,6 +12,7 @@ import {
   CalendarClock,
   AlertTriangle,
   ScrollText,
+  Receipt,
 } from 'lucide-react'
 import { StaffOrderDrawer } from '@/features/orders/components/StaffOrderDrawer'
 import { OrderStatusBadge } from '@/features/orders/components/OrderStatusBadge'
@@ -28,6 +29,7 @@ import {
   nextKitchenAction,
 } from '@/features/orders/staffOrderHelpers'
 import { orderNo, money } from '@/utils/format'
+import { getImageUrl } from '@/constants'
 
 const TABS = [
   { id: 'all', label: 'All Orders' },
@@ -45,6 +47,7 @@ export default function ChefOrdersPage() {
   const [viewingOrder, setViewingOrder] = useState(null)
   const [etaOrder, setEtaOrder] = useState(null)
   const [isUpdatingEta, setIsUpdatingEta] = useState(false)
+  const [etaError, setEtaError] = useState('')
   const [updatingOrderId, setUpdatingOrderId] = useState(null)
   const [isAssigningStaff, setIsAssigningStaff] = useState(false)
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false)
@@ -114,12 +117,11 @@ export default function ChefOrdersPage() {
       )
     }
 
-    // Sort: Urgent & oldest waiting orders first
+    // Keep one stable order across status changes: newest orders stay at the
+    // top instead of jumping when their priority or status changes.
     return [...list].sort((a, b) => {
-      const pRank = { high: 0, medium: 1, normal: 2 }
-      const diff = (pRank[priorityFor(a)] ?? 2) - (pRank[priorityFor(b)] ?? 2)
-      if (diff !== 0) return diff
-      return minutesWaiting(b) - minutesWaiting(a)
+      const createdDiff = new Date(b.createdAt) - new Date(a.createdAt)
+      return createdDiff || String(b.id).localeCompare(String(a.id))
     })
   }, [allOrdersList, currentTab, query])
 
@@ -147,6 +149,7 @@ export default function ChefOrdersPage() {
 
   async function handleSaveEta(order, targetIso) {
     setIsUpdatingEta(true)
+    setEtaError('')
     try {
       const payload = {}
       if (order.orderType === 'DELIVERY') {
@@ -163,6 +166,8 @@ export default function ChefOrdersPage() {
 
       setEtaOrder(null)
       orders.refetch()
+    } catch (error) {
+      setEtaError(error.response?.data?.message ?? 'Unable to save the ETA. Please try again.')
     } finally {
       setIsUpdatingEta(false)
     }
@@ -279,6 +284,9 @@ export default function ChefOrdersPage() {
             const etaIso =
               order.orderType === 'DELIVERY' ? order.estimatedDeliveryTime : order.estimatedReadyTime
             const etaDiffMin = minutesFromNow(etaIso)
+            const hasPaymentEvidence = Boolean(order.paymentReference || order.paymentProofImage)
+            const billPaid = order.bill?.paymentStatus === 'PAID'
+            const canAccept = hasPaymentEvidence || billPaid
 
             return (
               <motion.div
@@ -352,6 +360,38 @@ export default function ChefOrdersPage() {
                       </div>
                     </div>
                   )}
+
+                  <div className={`mt-3 flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5 text-xs ${
+                    billPaid || hasPaymentEvidence
+                      ? 'border-emerald-200 bg-emerald-50/70 text-emerald-800 dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:text-emerald-300'
+                      : 'border-red-200 bg-red-50/70 text-red-800 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-300'
+                  }`}>
+                    <span className="flex min-w-0 items-center gap-2">
+                      <Receipt className="h-4 w-4 flex-none" />
+                      <span className="flex min-w-0 flex-col">
+                        <strong>{billPaid ? 'Bill paid' : hasPaymentEvidence ? 'Payment submitted' : 'Payment required'}</strong>
+                        <span className="truncate text-[0.68rem] opacity-80">
+                          {billPaid
+                            ? 'Verified in billing'
+                            : hasPaymentEvidence
+                              ? order.paymentReference
+                                ? `Reference: ${order.paymentReference}`
+                                : 'Payment screenshot uploaded'
+                              : 'Chef must verify payment before accepting'}
+                        </span>
+                      </span>
+                    </span>
+                    {order.paymentProofImage && (
+                      <a
+                        href={getImageUrl(`/uploads/payment/${order.paymentProofImage}`)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex-none font-bold underline"
+                      >
+                        View proof
+                      </a>
+                    )}
+                  </div>
 
                   {/* Items List */}
                   <div className="mt-3 border-t border-rule pt-3">
@@ -441,7 +481,8 @@ export default function ChefOrdersPage() {
                           <button
                             type="button"
                             onClick={() => handleAdvanceStatus(order, 'ACCEPTED')}
-                            disabled={isUpdatingThis}
+                            disabled={isUpdatingThis || !canAccept}
+                            title={!canAccept ? 'Payment evidence is required before accepting this order' : undefined}
                             className="flex items-center justify-center gap-1.5 rounded-xl border border-rule bg-canvas-2 py-2 text-xs font-semibold text-body hover:bg-canvas disabled:opacity-50"
                           >
                             <Check className="h-3.5 w-3.5" /> Quick Accept
@@ -449,7 +490,8 @@ export default function ChefOrdersPage() {
                           <button
                             type="button"
                             onClick={() => setEtaOrder(order)}
-                            disabled={isUpdatingThis}
+                            disabled={isUpdatingThis || !canAccept}
+                            title={!canAccept ? 'Payment evidence is required before accepting this order' : undefined}
                             className="flex items-center justify-center gap-1.5 rounded-xl bg-brand-700 py-2 text-xs font-bold text-white transition hover:bg-brand-800 shadow-sm disabled:opacity-50"
                           >
                             <ChefHat className="h-3.5 w-3.5" /> Accept + ETA
@@ -479,9 +521,13 @@ export default function ChefOrdersPage() {
       <QuickEtaModal
         order={etaOrder}
         isOpen={Boolean(etaOrder)}
-        onClose={() => setEtaOrder(null)}
+        onClose={() => {
+          setEtaError('')
+          setEtaOrder(null)
+        }}
         onSave={handleSaveEta}
         isSaving={isUpdatingEta}
+        error={etaError}
       />
 
       {/* Full Order Drawer */}
