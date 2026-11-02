@@ -113,7 +113,7 @@ export function OverviewKpiGrid({
                 <span className="font-display text-2xl font-bold text-body tracking-tight">
                   {card.value}
                 </span>
-                <span className="mt-1 text-[11px] font-medium text-body-faint">
+                <span className="mt-1 text-[0.8rem] font-medium text-body-faint">
                   {card.subtext}
                 </span>
               </div>

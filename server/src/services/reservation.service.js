@@ -1,15 +1,23 @@
 import { prisma } from '../config/prisma.js'
 import { Prisma } from '../generated/prisma/client.ts'
+import { ADVANCE_RATE } from '../config/payments.js'
 import { ApiError } from '../utils/ApiError.js'
 
-const TABLE_SELECT = { id: true, number: true, capacity: true, windowSidePosition: true, reservationCost: true }
+const TABLE_SELECT = {
+  id: true,
+  number: true,
+  capacity: true,
+  windowSidePosition: true,
+  reservationCost: true,
+}
+const ORDER_SELECT = { id: true, orderNumber: true, status: true }
 export const RESERVATION_DURATION_MINUTES = 120
 export const MAX_RESERVATION_DURATION_MINUTES = 240
 
 async function getReservationOrThrow(id) {
   const reservation = await prisma.reservation.findUnique({
     where: { id },
-    include: { table: { select: TABLE_SELECT } },
+    include: { table: { select: TABLE_SELECT }, order: { select: ORDER_SELECT } },
   })
   if (!reservation) throw new ApiError(404, 'Reservation not found.')
   return reservation
@@ -21,7 +29,7 @@ export async function listReservations(user) {
   const where = isStaffView ? {} : { customerId: user.id }
   return prisma.reservation.findMany({
     where,
-    include: { table: { select: TABLE_SELECT } },
+    include: { table: { select: TABLE_SELECT }, order: { select: ORDER_SELECT } },
     orderBy: isStaffView
       ? [{ createdAt: 'desc' }]
       : [{ reservationDate: 'asc' }, { reservationTime: 'asc' }],
@@ -46,7 +54,8 @@ export async function createReservation(customerId, input) {
 
   const table = await prisma.table.findUnique({ where: { id: tableId } })
   if (!table) throw new ApiError(400, 'Selected table does not exist.')
-  if (table.status === 'INACTIVE') throw new ApiError(400, 'Selected table is not available for booking.')
+  if (table.status === 'INACTIVE')
+    throw new ApiError(400, 'Selected table is not available for booking.')
   if (Number(guestCount) > table.capacity) {
     throw new ApiError(400, `Table ${table.number} only seats ${table.capacity} guests.`)
   }
@@ -64,7 +73,7 @@ export async function createReservation(customerId, input) {
     .mul(new Prisma.Decimal(duration))
     .div(new Prisma.Decimal(RESERVATION_DURATION_MINUTES))
     .toDecimalPlaces(2)
-  const advanceAmount = amount.mul(new Prisma.Decimal('0.20')).toDecimalPlaces(2)
+  const advanceAmount = amount.mul(ADVANCE_RATE).toDecimalPlaces(2)
 
   return prisma.$transaction(
     async (tx) => {
@@ -110,7 +119,7 @@ export async function createReservation(customerId, input) {
           paymentProofImage: paymentProofImage || null,
           paymentSubmittedAt: new Date(),
         },
-        include: { table: { select: TABLE_SELECT } },
+        include: { table: { select: TABLE_SELECT }, order: { select: ORDER_SELECT } },
       })
     },
     { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
@@ -119,8 +128,10 @@ export async function createReservation(customerId, input) {
 
 export async function updateReservationStatus(id, status) {
   const reservation = await getReservationOrThrow(id)
+  // A booking made with a dine-in order is paid for through that order.
   if (
     status === 'CONFIRMED' &&
+    !reservation.orderId &&
     !reservation.paymentReference &&
     !reservation.paymentProofImage
   ) {
@@ -129,7 +140,7 @@ export async function updateReservationStatus(id, status) {
   return prisma.reservation.update({
     where: { id },
     data: { status },
-    include: { table: { select: TABLE_SELECT } },
+    include: { table: { select: TABLE_SELECT }, order: { select: ORDER_SELECT } },
   })
 }
 
@@ -158,6 +169,15 @@ export async function cancelReservation(user, id) {
 
   if (!CANCELLABLE_STATUSES.has(reservation.status)) {
     throw new ApiError(400, 'Only pending or confirmed reservations can be cancelled.')
+  }
+
+  // Freeing the table would leave its dine-in order without a seat, so
+  // the customer cancels the order instead (which releases the table).
+  if (user.role === 'CUSTOMER' && reservation.orderId) {
+    throw new ApiError(
+      400,
+      `This table is booked with order #${String(reservation.order.orderNumber).padStart(6, '0')}. Cancel the order to release it.`,
+    )
   }
 
   return updateReservationStatus(id, 'CANCELLED')

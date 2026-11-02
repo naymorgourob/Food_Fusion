@@ -46,8 +46,11 @@ export function AdminReservationRow({ reservation, onView, onCancel }) {
           {orderNo(reservation.id.slice(-6).toUpperCase())}
         </span>
         <span className="text-xs text-body-faint">
-          {new Date(reservation.reservationDate).toLocaleDateString([], { day: 'numeric', month: 'short' })} ·{' '}
-          {formatTime(reservation.reservationTime)}
+          {new Date(reservation.reservationDate).toLocaleDateString([], {
+            day: 'numeric',
+            month: 'short',
+          })}{' '}
+          · {formatTime(reservation.reservationTime)}
         </span>
       </div>
 
@@ -79,7 +82,10 @@ export function AdminReservationRow({ reservation, onView, onCancel }) {
       <StatusBadge status={reservation.status} />
 
       {reservation.specialRequest && (
-        <span className="max-w-[10rem] truncate text-xs text-body-faint italic" title={reservation.specialRequest}>
+        <span
+          className="max-w-[10rem] truncate text-xs text-body-faint italic"
+          title={reservation.specialRequest}
+        >
           “{reservation.specialRequest}”
         </span>
       )}

@@ -76,7 +76,10 @@ const CUSTOMER_DETAIL_SELECT = {
 // lookups below — this endpoint must never be able to fetch or toggle a
 // Staff/Admin row just because the id happens to match.
 async function getCustomerOrThrow(id) {
-  const customer = await prisma.user.findFirst({ where: { id, role: 'CUSTOMER' }, select: CUSTOMER_LIST_SELECT })
+  const customer = await prisma.user.findFirst({
+    where: { id, role: 'CUSTOMER' },
+    select: CUSTOMER_LIST_SELECT,
+  })
   if (!customer) throw new ApiError(404, 'Customer not found.')
   return customer
 }

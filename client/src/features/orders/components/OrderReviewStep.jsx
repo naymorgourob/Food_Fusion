@@ -58,7 +58,7 @@ export function OrderReviewStep({ items, onSetQuantity, onSetNotes, onRemove, on
                 <div className="flex gap-4">
                   <div className="h-20 w-20 flex-none overflow-hidden rounded-xl bg-canvas-2">
                     {image ? (
-                      <img src={image} alt="" className="h-full w-full object-cover" />
+                      <img src={image} alt="" className="h-full w-full object-contain" />
                     ) : (
                       <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-50 to-canvas-2 dark:from-brand-900/50 dark:to-canvas-2">
                         <UtensilsCrossed

@@ -8,7 +8,7 @@ import { CartDrawer } from '@/features/orders/components/CartDrawer'
 import { AddedToCartToast } from '@/features/orders/components/AddedToCartToast'
 import { CheckoutPanel } from '@/features/orders/components/CheckoutPanel'
 import { OrderSuccess } from '@/features/orders/components/OrderSuccess'
-import { PAYMENT_METHODS } from '@/features/orders/components/PaymentMethodStep'
+import { PAYMENT_METHODS, PAY_AT_RESTAURANT } from '@/features/orders/components/PaymentMethodStep'
 import { useCart } from '@/features/orders/hooks/useCart'
 import { useFavorites } from '@/features/favorites/hooks/useFavorites'
 import { useLoyalty } from '@/features/loyalty/hooks/useLoyalty'
@@ -16,6 +16,8 @@ import { fetchTables } from '@/features/tables/services/tableService'
 import { createOrder, fetchOrderById } from '@/features/orders/services/orderService'
 import { money } from '@/utils/format'
 import { fetchPaymentContact } from '@/features/settings/services/settingsService'
+import { ADVANCE_RATE } from '@/constants/payments'
+import { startAdvancePayment } from '@/features/payments/services/paymentService'
 import { fetchMenuItemById } from '@/features/menu/services/menuItemService'
 
 // Must match DELIVERY_CHARGE in server/src/services/order.service.js —
@@ -29,6 +31,20 @@ function computeSuggestedReadyTime(arrivalLocal) {
   if (Number.isNaN(arrival.getTime())) return null
   const suggested = new Date(arrival.getTime() - 5 * 60000)
   return suggested.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+}
+
+// The date + time a dine-in table is booked for, in the same local
+// "YYYY-MM-DD" / "HH:MM" shape the Reservations page sends. Dine-In Now
+// books from this minute; Schedule Dine-In from the chosen arrival.
+function bookingSlot(dineInMode, arrivalLocal) {
+  let local = arrivalLocal
+  if (dineInMode === 'now') {
+    const now = new Date()
+    local = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString()
+  }
+  if (!local) return null
+  const [reservationDate, time] = local.split('T')
+  return { reservationDate, reservationTime: time.slice(0, 5) }
 }
 
 /**
@@ -81,7 +97,7 @@ export default function NewOrderPage() {
   // backward jumps without letting anyone skip ahead past required fields.
   const [furthestReached, setFurthestReached] = useState(0)
   const [orderType, setOrderType] = useState(null)
-  const [paymentMethod, setPaymentMethod] = useState('SSLCOMMERZ')
+  const [paymentMethod, setPaymentMethod] = useState('ONLINE')
   const [paymentReference, setPaymentReference] = useState('')
   const [paymentProof, setPaymentProof] = useState(null)
   const [paymentContact, setPaymentContact] = useState(null)
@@ -102,14 +118,47 @@ export default function NewOrderPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState([])
 
+  // Tables come with reservation availability for the slot being booked,
+  // so a table already reserved on the Reservations page can't be picked.
   useEffect(() => {
-    fetchTables()
-      .then((data) => setTables(data.filter((table) => table.status !== 'INACTIVE')))
-      .catch(() => setTables([]))
-  }, [])
+    if (orderType !== 'DINE_IN') return undefined
+    let cancelled = false
+    const slot = bookingSlot(dineInMode, scheduledArrivalTime)
+
+    fetchTables(slot ? { ...slot, durationMinutes: 120 } : undefined)
+      .then((data) => {
+        if (cancelled) return
+        const bookable = data
+          .filter((table) => table.status !== 'INACTIVE')
+          // Dine-In Now also needs the table free on the floor right now;
+          // dropping the slot result lets the picker show it as Occupied.
+          .map((table) =>
+            dineInMode === 'now' && table.status !== 'AVAILABLE'
+              ? { ...table, reservationAvailable: undefined }
+              : table,
+          )
+        setTables(bookable)
+        setTableId((current) => {
+          const chosen = bookable.find((table) => table.id === current)
+          if (!chosen) return ''
+          const free =
+            typeof chosen.reservationAvailable === 'boolean'
+              ? chosen.reservationAvailable
+              : chosen.status === 'AVAILABLE'
+          return free ? current : ''
+        })
+      })
+      .catch(() => !cancelled && setTables([]))
+
+    return () => {
+      cancelled = true
+    }
+  }, [orderType, dineInMode, scheduledArrivalTime])
 
   useEffect(() => {
-    fetchPaymentContact().then(setPaymentContact).catch(() => setPaymentContact(null))
+    fetchPaymentContact()
+      .then(setPaymentContact)
+      .catch(() => setPaymentContact(null))
   }, [])
 
   // "Order Again" needs an effect because the previous order must be
@@ -182,12 +231,16 @@ export default function NewOrderPage() {
     itemsTotal * (MAX_LOYALTY_DISCOUNT_PERCENT / 100),
   )
   const grandTotal = itemsTotal + deliveryChargePreview - loyaltyDiscount
-  const advanceAmount = grandTotal * 0.2
+  const advanceAmount = grandTotal * ADVANCE_RATE
 
   function canLeaveDetailsStep() {
     if (orderType === 'DELIVERY') return Boolean(deliveryAddress.trim() && deliveryPhone.trim())
     if (orderType === 'TAKEAWAY') return Boolean(scheduledPickupTime)
-    if (orderType === 'DINE_IN') return dineInMode === 'now' || Boolean(scheduledArrivalTime && guestCount)
+    if (orderType === 'DINE_IN') {
+      // Booking a table needs to know how many it seats.
+      if (dineInMode === 'now') return !tableId || Number(guestCount) > 0
+      return Boolean(scheduledArrivalTime && guestCount)
+    }
     return false
   }
 
@@ -231,18 +284,35 @@ export default function NewOrderPage() {
 
       const payload = new FormData()
       payload.append('orderType', orderType)
-      payload.append('items', JSON.stringify(cart.items.map(({ item, quantity }) => ({ menuItemId: item.id, quantity }))))
+      payload.append(
+        'items',
+        JSON.stringify(cart.items.map(({ item, quantity }) => ({ menuItemId: item.id, quantity }))),
+      )
       if (combinedInstructions) payload.append('specialInstructions', combinedInstructions)
       if (requestedPoints > 0) payload.append('pointsToRedeem', String(requestedPoints))
-      if (paymentReference.trim()) payload.append('paymentReference', paymentReference.trim())
-      if (paymentProof) payload.append('paymentProof', paymentProof)
+      payload.append(
+        'paymentMethod',
+        paymentMethod === 'ONLINE' || paymentMethod === PAY_AT_RESTAURANT
+          ? paymentMethod
+          : 'MANUAL',
+      )
+      if (paymentMethod !== 'ONLINE' && paymentMethod !== PAY_AT_RESTAURANT) {
+        if (paymentReference.trim()) payload.append('paymentReference', paymentReference.trim())
+        if (paymentProof) payload.append('paymentProof', paymentProof)
+      }
 
       if (orderType === 'DINE_IN') {
-        if (tableId) payload.append('tableId', tableId)
+        if (tableId) {
+          // The server books the table as a reservation for this slot.
+          const slot = bookingSlot(dineInMode, scheduledArrivalTime)
+          payload.append('tableId', tableId)
+          payload.append('reservationDate', slot.reservationDate)
+          payload.append('reservationTime', slot.reservationTime)
+        }
         if (dineInMode === 'schedule') {
           payload.append('scheduledArrivalTime', new Date(scheduledArrivalTime).toISOString())
-          payload.append('guestCount', guestCount)
         }
+        if (dineInMode === 'schedule' || tableId) payload.append('guestCount', guestCount)
       } else if (orderType === 'DELIVERY') {
         payload.append('deliveryAddress', deliveryAddress)
         payload.append('deliveryPhone', deliveryPhone)
@@ -251,6 +321,16 @@ export default function NewOrderPage() {
       }
 
       const order = await createOrder(payload)
+
+      // Online: hand over to SSLCommerz to pay the advance. The order
+      // already exists, so if the customer abandons the payment page it
+      // simply waits unpaid and can be paid later from the result page.
+      if (paymentMethod === 'ONLINE') {
+        cart.clear()
+        const { gatewayUrl } = await startAdvancePayment('order', order.id)
+        window.location.assign(gatewayUrl)
+        return
+      }
       // Show the confirmation rather than jumping straight to tracking —
       // the order number and total used to flash past unread.
       setPlacedOrder(order)
@@ -282,7 +362,11 @@ export default function NewOrderPage() {
         <OrderSuccess
           order={placedOrder}
           total={placedTotal}
-          paymentLabel={PAYMENT_METHODS.find((m) => m.id === paymentMethod)?.label ?? 'At the restaurant'}
+          paymentLabel={
+            paymentMethod === 'ONLINE'
+              ? 'Pay online (SSLCommerz)'
+              : (PAYMENT_METHODS.find((m) => m.id === paymentMethod)?.label ?? 'At the restaurant')
+          }
         />
       ) : mode === 'browse' ? (
         <MenuBrowser

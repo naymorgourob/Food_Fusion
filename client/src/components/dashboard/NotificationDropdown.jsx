@@ -136,14 +136,16 @@ export function NotificationDropdown() {
                     onClick={() => setOpen(false)}
                     className="flex items-start gap-3 rounded-lg p-2.5 transition-colors hover:bg-surface-2"
                   >
-                    <span className={`mt-0.5 flex h-8 w-8 flex-none items-center justify-center rounded-lg ${notif.tone}`}>
+                    <span
+                      className={`mt-0.5 flex h-8 w-8 flex-none items-center justify-center rounded-lg ${notif.tone}`}
+                    >
                       <Icon className="h-4 w-4" />
                     </span>
                     <div className="flex min-w-0 flex-col gap-0.5">
                       <span className="text-xs font-semibold text-ink leading-tight">
                         {notif.title}
                       </span>
-                      <span className="text-[11px] text-ink-muted leading-tight">
+                      <span className="text-[0.8rem] text-ink-muted leading-tight">
                         {notif.description}
                       </span>
                     </div>

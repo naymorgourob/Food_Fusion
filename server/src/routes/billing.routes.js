@@ -1,6 +1,11 @@
 import { Router } from 'express'
 import { authenticateUser, authorizeStaffOrAdmin } from '../middlewares/auth.middleware.js'
-import { getBills, getBill, postBill, putBillPaymentStatus } from '../controllers/bill.controller.js'
+import {
+  getBills,
+  getBill,
+  postBill,
+  putBillPaymentStatus,
+} from '../controllers/bill.controller.js'
 
 const router = Router()
 

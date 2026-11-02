@@ -18,7 +18,11 @@ export async function postCategory(req, res) {
   if (errors.length > 0) throw new ApiError(400, 'Validation failed.', errors)
 
   const category = await createCategory(req.body)
-  sendSuccess(res, { statusCode: 201, message: 'Category created successfully.', data: { category } })
+  sendSuccess(res, {
+    statusCode: 201,
+    message: 'Category created successfully.',
+    data: { category },
+  })
 }
 
 export async function putCategory(req, res) {

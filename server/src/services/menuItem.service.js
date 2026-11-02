@@ -22,7 +22,10 @@ async function assertCategoryExists(categoryId) {
 }
 
 async function getFoodOrThrow(id) {
-  const food = await prisma.food.findUnique({ where: { id }, include: { category: { select: CATEGORY_SELECT } } })
+  const food = await prisma.food.findUnique({
+    where: { id },
+    include: { category: { select: CATEGORY_SELECT } },
+  })
   if (!food) throw new ApiError(404, 'Menu item not found.')
   return food
 }
@@ -34,7 +37,16 @@ function deleteImageFile(imageUrl) {
   fs.unlink(path.join(UPLOAD_DIR, path.basename(imageUrl)), () => {})
 }
 
-export async function listMenuItems({ search, categoryId, isAvailable, categoryStatus, sortBy, page, pageSize }) {
+export async function listMenuItems({
+  search,
+  categoryId,
+  isAvailable,
+  categoryStatus,
+  tag,
+  sortBy,
+  page,
+  pageSize,
+}) {
   const currentPage = Math.max(1, Number(page) || 1)
   const size = Math.min(50, Math.max(1, Number(pageSize) || 10))
 
@@ -53,8 +65,13 @@ export async function listMenuItems({ search, categoryId, isAvailable, categoryS
     // empty string, present but meaningless), which is NOT undefined and
     // was being coerced into `isAvailable: false`, silently filtering the
     // list down to only unavailable items.
-    ...(isAvailable === 'true' || isAvailable === 'false' ? { isAvailable: isAvailable === 'true' } : {}),
+    ...(isAvailable === 'true' || isAvailable === 'false'
+      ? { isAvailable: isAvailable === 'true' }
+      : {}),
     ...(categoryStatus ? { category: { isActive: categoryStatus === 'active' } } : {}),
+    // Menu-card markers; any other value is ignored rather than rejected.
+    ...(tag === 'spicy' ? { isSpicy: true } : {}),
+    ...(tag === 'chef' ? { isChefPick: true } : {}),
   }
 
   const [items, total] = await Promise.all([
@@ -83,8 +100,32 @@ export async function getMenuItemById(id) {
   return getFoodOrThrow(id)
 }
 
+// Multipart bodies arrive as strings; absent means "leave as is" on update.
+function parseFlag(value) {
+  if (value === undefined) return undefined
+  return value === 'true' || value === true
+}
+
+// '' clears the field; absent leaves it as is (update) or unset (create).
+function parseOptional(value, convert = (v) => v) {
+  if (value === undefined) return undefined
+  if (value === '' || value === null) return null
+  return convert(value)
+}
+
 export async function createMenuItem(input, file) {
-  const { name, description, price, prepTimeMinutes, isAvailable, categoryId } = input
+  const {
+    name,
+    description,
+    price,
+    prepTimeMinutes,
+    isAvailable,
+    isSpicy,
+    isChefPick,
+    coffeeStrength,
+    milkLevel,
+    categoryId,
+  } = input
   await assertCategoryExists(categoryId)
 
   return prisma.food.create({
@@ -94,7 +135,12 @@ export async function createMenuItem(input, file) {
       price, // kept as the original string — Prisma's Decimal accepts it
       // directly and this avoids ever round-tripping money through a JS float.
       prepTimeMinutes: prepTimeMinutes ? Number(prepTimeMinutes) : null,
-      isAvailable: isAvailable === undefined ? true : isAvailable === 'true' || isAvailable === true,
+      isAvailable:
+        isAvailable === undefined ? true : isAvailable === 'true' || isAvailable === true,
+      isSpicy: parseFlag(isSpicy) ?? false,
+      isChefPick: parseFlag(isChefPick) ?? false,
+      coffeeStrength: parseOptional(coffeeStrength, Number) ?? null,
+      milkLevel: parseOptional(milkLevel) ?? null,
       categoryId,
       imageUrl: file ? `/uploads/menu/${file.filename}` : null,
     },
@@ -103,7 +149,18 @@ export async function createMenuItem(input, file) {
 }
 
 export async function updateMenuItem(id, input, file) {
-  const { name, description, price, prepTimeMinutes, isAvailable, categoryId } = input
+  const {
+    name,
+    description,
+    price,
+    prepTimeMinutes,
+    isAvailable,
+    isSpicy,
+    isChefPick,
+    coffeeStrength,
+    milkLevel,
+    categoryId,
+  } = input
   const existing = await getFoodOrThrow(id)
   await assertCategoryExists(categoryId)
 
@@ -119,6 +176,10 @@ export async function updateMenuItem(id, input, file) {
       price,
       prepTimeMinutes: prepTimeMinutes ? Number(prepTimeMinutes) : null,
       isAvailable: isAvailable === 'true' || isAvailable === true,
+      isSpicy: parseFlag(isSpicy),
+      isChefPick: parseFlag(isChefPick),
+      coffeeStrength: parseOptional(coffeeStrength, Number),
+      milkLevel: parseOptional(milkLevel),
       categoryId,
       ...(file ? { imageUrl: `/uploads/menu/${file.filename}` } : {}),
     },

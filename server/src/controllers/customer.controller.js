@@ -1,5 +1,9 @@
 import { validateActiveStatus } from '../validators/user.validator.js'
-import { listCustomers, getCustomerById, setCustomerActiveStatus } from '../services/customer.service.js'
+import {
+  listCustomers,
+  getCustomerById,
+  setCustomerActiveStatus,
+} from '../services/customer.service.js'
 import { sendSuccess } from '../utils/ApiResponse.js'
 import { ApiError } from '../utils/ApiError.js'
 

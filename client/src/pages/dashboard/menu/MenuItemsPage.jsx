@@ -1,8 +1,16 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Search, SlidersHorizontal, UtensilsCrossed, SearchX, ChevronLeft, ChevronRight } from 'lucide-react'
+import {
+  Plus,
+  Search,
+  SlidersHorizontal,
+  UtensilsCrossed,
+  SearchX,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react'
 import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog'
-import { AdminDishCard } from '@/features/menu/components/AdminDishCard'
+import { DrinkCard } from '@/features/menu/components/DrinkCard'
 import { AdminDishDetailModal } from '@/features/menu/components/AdminDishDetailModal'
 import { MenuItemFormModal } from '@/features/menu/components/MenuItemFormModal'
 import { useCategories } from '@/features/menu/hooks/useCategories'
@@ -31,7 +39,7 @@ const PAGE_SIZE = 12
  * Every mutation is unchanged: useMenuItems/useCategories, and
  * createMenuItem/updateMenuItem/deleteMenuItem from menuItemService are
  * called exactly as before. No new endpoint, no new field — see the
- * design notes on AdminDishCard, ImageUploadField, MenuItemFormModal,
+ * design notes on DrinkCard (admin mode), ImageUploadField, MenuItemFormModal,
  * and AdminDishDetailModal for the two things the spec asked for that
  * don't exist on Food (a Featured flag, and true image removal) and how
  * each is honestly scoped instead of faked.
@@ -139,7 +147,10 @@ export default function MenuItemsPage() {
   }
 
   const activeFilterCount =
-    (categoryId ? 1 : 0) + (isAvailable ? 1 : 0) + (categoryStatus ? 1 : 0) + (sortBy !== 'newest' ? 1 : 0)
+    (categoryId ? 1 : 0) +
+    (isAvailable ? 1 : 0) +
+    (categoryStatus ? 1 : 0) +
+    (sortBy !== 'newest' ? 1 : 0)
   const isFiltered = Boolean(searchTerm) || activeFilterCount > 0
 
   function resetFilters() {
@@ -159,7 +170,9 @@ export default function MenuItemsPage() {
         <div className="flex flex-col gap-1">
           <h1 className="font-display text-2xl font-semibold text-body">Menu management</h1>
           <p className="text-sm text-body-muted">
-            {isLoading ? 'Loading…' : `${pagination.total} ${pagination.total === 1 ? 'dish' : 'dishes'} on the menu`}
+            {isLoading
+              ? 'Loading…'
+              : `${pagination.total} ${pagination.total === 1 ? 'dish' : 'dishes'} on the menu`}
           </p>
         </div>
 
@@ -196,7 +209,7 @@ export default function MenuItemsPage() {
           <SlidersHorizontal className="h-4 w-4" />
           Filters
           {activeFilterCount > 0 && (
-            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-700 px-1.5 text-[0.65rem] font-bold text-white">
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-700 px-1.5 text-[0.78rem] font-bold text-white">
               {activeFilterCount}
             </span>
           )}
@@ -281,17 +294,17 @@ export default function MenuItemsPage() {
           {error}
         </div>
       ) : isLoading ? (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <div key={index} className="overflow-hidden rounded-2xl border border-rule bg-card">
-              <div className="skeleton aspect-[4/3]" aria-hidden />
-              <div className="flex flex-col gap-2.5 p-4">
-                <div className="skeleton h-4 w-2/3 rounded" aria-hidden />
-                <div className="skeleton h-3 w-1/2 rounded" aria-hidden />
-              </div>
+        <div className="grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2 2xl:grid-cols-3">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div
+              key={index}
+              className="mt-32 flex flex-col items-center gap-3 rounded-[2rem] bg-[#4A3024]/30 px-6 pb-6"
+            >
+              <div className="skeleton -mt-32 aspect-square w-[80%] rounded-[1.6rem]" aria-hidden />
+              <div className="skeleton mt-2 h-6 w-1/2 rounded" aria-hidden />
+              <div className="skeleton h-4 w-3/4 rounded" aria-hidden />
             </div>
           ))}
-          <span className="sr-only">Loading menu items…</span>
         </div>
       ) : items.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-rule bg-card/50 px-6 py-16 text-center">
@@ -299,9 +312,15 @@ export default function MenuItemsPage() {
             <span className="absolute inset-0 rounded-full bg-brand-50 dark:bg-brand-900/40" />
             <span className="absolute inset-2 rounded-full bg-gold-100 dark:bg-gold-100/10" />
             {isFiltered ? (
-              <SearchX className="relative h-6 w-6 text-brand-700 dark:text-brand-400" strokeWidth={1.5} />
+              <SearchX
+                className="relative h-6 w-6 text-brand-700 dark:text-brand-400"
+                strokeWidth={1.5}
+              />
             ) : (
-              <UtensilsCrossed className="relative h-6 w-6 text-brand-700 dark:text-brand-400" strokeWidth={1.5} />
+              <UtensilsCrossed
+                className="relative h-6 w-6 text-brand-700 dark:text-brand-400"
+                strokeWidth={1.5}
+              />
             )}
           </span>
           <p className="font-display text-base font-semibold text-body">
@@ -333,16 +352,28 @@ export default function MenuItemsPage() {
         </div>
       ) : (
         <>
-          <motion.div layout className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <motion.div
+            layout
+            className="grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2 2xl:grid-cols-3"
+          >
             <AnimatePresence mode="popLayout">
               {items.map((dish) => (
-                <AdminDishCard
+                <motion.div
                   key={dish.id}
-                  dish={dish}
-                  onView={setViewingItem}
-                  onEdit={openEditModal}
-                  onDelete={openDeleteConfirm}
-                />
+                  layout
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.97 }}
+                  className="flex flex-col"
+                >
+                  {/* Same card customers see, in admin mode. */}
+                  <DrinkCard
+                    dish={dish}
+                    onQuickView={setViewingItem}
+                    onEdit={openEditModal}
+                    onDelete={openDeleteConfirm}
+                  />
+                </motion.div>
               ))}
             </AnimatePresence>
           </motion.div>

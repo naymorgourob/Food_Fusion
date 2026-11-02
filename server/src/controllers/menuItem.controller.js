@@ -10,8 +10,17 @@ import { sendSuccess } from '../utils/ApiResponse.js'
 import { ApiError } from '../utils/ApiError.js'
 
 export async function getMenuItems(req, res) {
-  const { search, categoryId, isAvailable, categoryStatus, sortBy, page, pageSize } = req.query
-  const result = await listMenuItems({ search, categoryId, isAvailable, categoryStatus, sortBy, page, pageSize })
+  const { search, categoryId, isAvailable, categoryStatus, tag, sortBy, page, pageSize } = req.query
+  const result = await listMenuItems({
+    search,
+    categoryId,
+    isAvailable,
+    categoryStatus,
+    tag,
+    sortBy,
+    page,
+    pageSize,
+  })
   sendSuccess(res, { message: 'Menu items fetched successfully.', data: result })
 }
 

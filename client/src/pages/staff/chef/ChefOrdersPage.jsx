@@ -215,7 +215,7 @@ export default function ChefOrdersPage() {
             >
               <span>{tab.label}</span>
               <span
-                className={`rounded-full px-1.5 py-0.2 text-[0.65rem] font-bold ${
+                className={`rounded-full px-1.5 py-0.2 text-[0.78rem] font-bold ${
                   isActive
                     ? 'bg-white/20 text-white'
                     : tab.id === 'urgent' && count > 0
@@ -310,7 +310,7 @@ export default function ChefOrdersPage() {
                       </div>
                       <span className="text-xs text-body-muted">{order.customer?.fullName || 'Walk-in'}</span>
                       {order.table?.tableNumber && (
-                        <span className="text-[0.7rem] font-semibold text-brand-700 dark:text-brand-400">
+                        <span className="text-[0.82rem] font-semibold text-brand-700 dark:text-brand-400">
                           Table #{order.table.tableNumber}
                         </span>
                       )}
@@ -319,7 +319,7 @@ export default function ChefOrdersPage() {
                     <div className="flex flex-col items-end gap-1">
                       <OrderStatusBadge status={order.status} />
                       {isUrgent && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[0.65rem] font-bold text-red-700 dark:bg-red-950/40 dark:text-red-300">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[0.78rem] font-bold text-red-700 dark:bg-red-950/40 dark:text-red-300">
                           <AlertTriangle className="h-3 w-3" /> Urgent ({waited}m)
                         </span>
                       )}
@@ -343,7 +343,7 @@ export default function ChefOrdersPage() {
                         </strong>
                       </span>
                       {prepDue && (
-                        <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[0.65rem] font-bold text-charcoal">
+                        <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[0.78rem] font-bold text-charcoal">
                           Prep due now
                         </span>
                       )}
@@ -433,7 +433,7 @@ export default function ChefOrdersPage() {
                     <button
                       type="button"
                       onClick={() => setEtaOrder(order)}
-                      className="text-[0.7rem] font-bold text-brand-700 hover:underline dark:text-brand-400"
+                      className="text-[0.82rem] font-bold text-brand-700 hover:underline dark:text-brand-400"
                     >
                       {etaIso ? 'Change ETA' : 'Set ETA'}
                     </button>
@@ -443,7 +443,7 @@ export default function ChefOrdersPage() {
                 {/* Footer Controls & Next Action */}
                 <div className="mt-4 border-t border-rule pt-3">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[0.7rem] text-body-faint">
+                    <span className="text-[0.82rem] text-body-faint">
                       Placed {waited}m ago · {money(orderGrandTotal(order))}
                     </span>
 

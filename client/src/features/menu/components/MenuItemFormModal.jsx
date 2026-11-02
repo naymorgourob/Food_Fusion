@@ -11,6 +11,10 @@ const EMPTY_FORM = {
   price: '',
   prepTimeMinutes: '',
   isAvailable: true,
+  isSpicy: false,
+  isChefPick: false,
+  coffeeStrength: '',
+  milkLevel: '',
 }
 
 // The parent (MenuItemsPage) remounts this component with a fresh `key`
@@ -25,7 +29,27 @@ function getInitialForm(item) {
     price: item.price,
     prepTimeMinutes: item.prepTimeMinutes ?? '',
     isAvailable: item.isAvailable,
+    isSpicy: Boolean(item.isSpicy),
+    isChefPick: Boolean(item.isChefPick),
+    coffeeStrength: item.coffeeStrength ?? '',
+    milkLevel: item.milkLevel ?? '',
   }
+}
+
+function ToggleRow({ label, hint, checked, onChange }) {
+  return (
+    <label className="flex items-center justify-between gap-4 rounded-xl border border-rule bg-canvas-2 px-4 py-3">
+      <span className="flex flex-col gap-0.5">
+        <span className="text-sm font-medium text-body">{label}</span>
+        <span className="text-xs text-body-faint">{hint}</span>
+      </span>
+      <span className="relative inline-flex h-6 w-11 flex-none items-center">
+        <input type="checkbox" checked={checked} onChange={onChange} className="peer sr-only" />
+        <span className="absolute inset-0 rounded-full bg-canvas transition-colors peer-checked:bg-brand-700" />
+        <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
+      </span>
+    </label>
+  )
 }
 
 /**
@@ -42,7 +66,15 @@ function getInitialForm(item) {
  * There is no "Featured" field: Food has no isFeatured column (see the
  * design note on MenuItemsPage.jsx).
  */
-export function MenuItemFormModal({ isOpen, onClose, onSubmit, item, categories, isSubmitting, errors }) {
+export function MenuItemFormModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  item,
+  categories,
+  isSubmitting,
+  errors,
+}) {
   const [form, setForm] = useState(() => getInitialForm(item))
   const [imageFile, setImageFile] = useState(null)
   const isEditing = Boolean(item)
@@ -99,7 +131,10 @@ export function MenuItemFormModal({ isOpen, onClose, onSubmit, item, categories,
             className="relative flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl bg-card shadow-2xl sm:rounded-3xl"
           >
             <header className="flex flex-none items-center justify-between border-b border-rule px-6 py-4">
-              <h2 id="menu-item-form-title" className="flex items-center gap-2.5 font-display text-lg font-semibold text-body">
+              <h2
+                id="menu-item-form-title"
+                className="flex items-center gap-2.5 font-display text-lg font-semibold text-body"
+              >
                 <UtensilsCrossed className="h-4 w-4 text-brand-700 dark:text-brand-400" />
                 {isEditing ? 'Edit menu item' : 'Add menu item'}
               </h2>
@@ -113,7 +148,11 @@ export function MenuItemFormModal({ isOpen, onClose, onSubmit, item, categories,
               </button>
             </header>
 
-            <form id="menu-item-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-5">
+            <form
+              id="menu-item-form"
+              onSubmit={handleSubmit}
+              className="flex-1 overflow-y-auto px-6 py-5"
+            >
               <div className="flex flex-col gap-5">
                 {errors.length > 0 && (
                   <ul
@@ -207,6 +246,43 @@ export function MenuItemFormModal({ isOpen, onClose, onSubmit, item, categories,
                   </div>
                 </div>
 
+                {/* Drink guide from the coffee menu — leave blank for food. */}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="food-strength" className={LABEL}>
+                      Coffee strength <span className={OPTIONAL}>(drinks)</span>
+                    </label>
+                    <select
+                      id="food-strength"
+                      value={form.coffeeStrength}
+                      onChange={updateField('coffeeStrength')}
+                      className={FIELD}
+                    >
+                      <option value="">Not shown</option>
+                      <option value="1">Mild</option>
+                      <option value="2">Medium</option>
+                      <option value="3">Strong</option>
+                    </select>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="food-milk" className={LABEL}>
+                      Milk <span className={OPTIONAL}>(drinks)</span>
+                    </label>
+                    <select
+                      id="food-milk"
+                      value={form.milkLevel}
+                      onChange={updateField('milkLevel')}
+                      className={FIELD}
+                    >
+                      <option value="">Not shown</option>
+                      <option value="NONE">No milk</option>
+                      <option value="LITTLE">Little milk</option>
+                      <option value="MORE">More milk</option>
+                      <option value="FOAM">More foam</option>
+                    </select>
+                  </div>
+                </div>
+
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="food-description" className={LABEL}>
                     Description <span className={OPTIONAL}>(optional)</span>
@@ -221,22 +297,24 @@ export function MenuItemFormModal({ isOpen, onClose, onSubmit, item, categories,
                   />
                 </div>
 
-                <label className="flex items-center justify-between gap-4 rounded-xl border border-rule bg-canvas-2 px-4 py-3">
-                  <span className="flex flex-col gap-0.5">
-                    <span className="text-sm font-medium text-body">Available for order</span>
-                    <span className="text-xs text-body-faint">Customers can order this dish right now.</span>
-                  </span>
-                  <span className="relative inline-flex h-6 w-11 flex-none items-center">
-                    <input
-                      type="checkbox"
-                      checked={form.isAvailable}
-                      onChange={updateField('isAvailable')}
-                      className="peer sr-only"
-                    />
-                    <span className="absolute inset-0 rounded-full bg-canvas transition-colors peer-checked:bg-brand-700" />
-                    <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
-                  </span>
-                </label>
+                <ToggleRow
+                  label="Available for order"
+                  hint="Customers can order this dish right now."
+                  checked={form.isAvailable}
+                  onChange={updateField('isAvailable')}
+                />
+                <ToggleRow
+                  label="Spicy"
+                  hint="Shows a chili marker on the menu."
+                  checked={form.isSpicy}
+                  onChange={updateField('isSpicy')}
+                />
+                <ToggleRow
+                  label="Chef's pick"
+                  hint="Shows a star marker and features the dish."
+                  checked={form.isChefPick}
+                  onChange={updateField('isChefPick')}
+                />
               </div>
             </form>
 

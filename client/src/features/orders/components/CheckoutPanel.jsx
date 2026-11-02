@@ -5,7 +5,10 @@ import { DineInDetailsFields } from '@/features/orders/components/DineInDetailsF
 import { DeliveryDetailsFields } from '@/features/orders/components/DeliveryDetailsFields'
 import { TakeawayDetailsFields } from '@/features/orders/components/TakeawayDetailsFields'
 import { OrderReviewStep } from '@/features/orders/components/OrderReviewStep'
-import { PaymentMethodStep } from '@/features/orders/components/PaymentMethodStep'
+import {
+  PaymentMethodStep,
+  PAY_AT_RESTAURANT,
+} from '@/features/orders/components/PaymentMethodStep'
 import { ConfirmStep } from '@/features/orders/components/ConfirmStep'
 import { CheckoutSummary } from '@/features/orders/components/CheckoutSummary'
 import { CheckoutErrorPanel } from '@/features/orders/components/CheckoutErrorPanel'
@@ -124,7 +127,9 @@ export function CheckoutPanel({
       : step === 1
         ? Boolean(orderType) && canLeaveDetails
         : step === 2
-          ? Boolean(paymentMethod) && Boolean(paymentReference.trim() || paymentProof)
+          ? paymentMethod === 'ONLINE' ||
+            paymentMethod === PAY_AT_RESTAURANT ||
+            (Boolean(paymentMethod) && Boolean(paymentReference.trim() || paymentProof))
           : true
 
   const etaLabel =

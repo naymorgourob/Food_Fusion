@@ -21,7 +21,10 @@ export function QuickEtaModal({ order, isOpen, onClose, onSave, isSaving, error 
 
   const minutesToAdd = isCustom ? Number(customMinutes) || 15 : selectedMinutes
   const targetDate = new Date(Date.now() + minutesToAdd * 60000)
-  const formattedTargetTime = targetDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+  const formattedTargetTime = targetDate.toLocaleTimeString([], {
+    hour: 'numeric',
+    minute: '2-digit',
+  })
 
   function handleSubmit(e) {
     e?.preventDefault?.()
@@ -89,7 +92,7 @@ export function QuickEtaModal({ order, isOpen, onClose, onSave, isSaving, error 
                 <span className="font-display text-lg font-bold text-gold-900 dark:text-gold-100">
                   {formattedTargetTime}
                 </span>
-                <span className="block text-[0.7rem] text-gold-700 dark:text-gold-300">
+                <span className="block text-[0.82rem] text-gold-700 dark:text-gold-300">
                   (+{minutesToAdd} minutes)
                 </span>
               </div>
@@ -125,7 +128,9 @@ export function QuickEtaModal({ order, isOpen, onClose, onSave, isSaving, error 
                 type="button"
                 onClick={() => setIsCustom(true)}
                 className={`rounded-xl border px-3 py-2 text-xs font-semibold transition ${
-                  isCustom ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-rule text-body-muted'
+                  isCustom
+                    ? 'border-brand-500 bg-brand-50 text-brand-700'
+                    : 'border-rule text-body-muted'
                 }`}
               >
                 Custom
@@ -154,7 +159,10 @@ export function QuickEtaModal({ order, isOpen, onClose, onSave, isSaving, error 
             )}
 
             {error && (
-              <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-300">
+              <p
+                role="alert"
+                className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-300"
+              >
                 {error}
               </p>
             )}
@@ -179,8 +187,8 @@ export function QuickEtaModal({ order, isOpen, onClose, onSave, isSaving, error 
                 {isSaving
                   ? 'Saving…'
                   : order.status === 'PENDING'
-                  ? 'Accept & Set ETA'
-                  : 'Confirm ETA'}
+                    ? 'Accept & Set ETA'
+                    : 'Confirm ETA'}
               </button>
             </div>
           </div>
@@ -189,4 +197,3 @@ export function QuickEtaModal({ order, isOpen, onClose, onSave, isSaving, error 
     </AnimatePresence>
   )
 }
-

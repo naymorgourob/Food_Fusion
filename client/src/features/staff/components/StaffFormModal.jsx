@@ -211,7 +211,7 @@ export function StaffFormModal({
 
               {/* Quick suggestions for position */}
               <div className="flex flex-col gap-1.5">
-                <span className="flex items-center gap-1 text-[11px] font-medium text-body-muted">
+                <span className="flex items-center gap-1 text-[0.8rem] font-medium text-body-muted">
                   <Sparkles className="h-3 w-3 text-gold-500" /> Quick positions:
                 </span>
                 <div className="flex flex-wrap gap-1.5">
@@ -246,7 +246,7 @@ export function StaffFormModal({
                     autoComplete="new-password"
                     placeholder="Min. 8 characters with letter & number"
                   />
-                  <span className="text-[11px] text-body-faint">
+                  <span className="text-[0.8rem] text-body-faint">
                     Password must be at least 8 characters and include a letter and a number.
                   </span>
                 </div>

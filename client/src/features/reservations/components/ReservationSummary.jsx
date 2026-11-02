@@ -1,5 +1,6 @@
 import { CalendarDays, Clock, Users, Sparkles, Armchair, UtensilsCrossed } from 'lucide-react'
 import { OCCASION_LABELS } from '@/features/reservations/constants'
+import { ADVANCE_RATE, ADVANCE_PERCENT } from '@/constants/payments'
 import { money } from '@/utils/format'
 
 /**
@@ -79,13 +80,25 @@ export function ReservationSummary({ form, table, preOrder, className = '' }) {
         <Row
           icon={Clock}
           label="Reserved time"
-          value={form.reservationTime ? `${formatTime(form.reservationTime)}–${formatEndTime(form.reservationTime, form.durationMinutes)}` : null}
+          value={
+            form.reservationTime
+              ? `${formatTime(form.reservationTime)}–${formatEndTime(form.reservationTime, form.durationMinutes)}`
+              : null
+          }
         />
-        <Row icon={Clock} label="Duration" value={form.durationMinutes ? durationLabel(form.durationMinutes) : null} />
+        <Row
+          icon={Clock}
+          label="Duration"
+          value={form.durationMinutes ? durationLabel(form.durationMinutes) : null}
+        />
         <Row
           icon={Users}
           label="Guests"
-          value={form.guestCount ? `${form.guestCount} ${Number(form.guestCount) === 1 ? 'guest' : 'guests'}` : null}
+          value={
+            form.guestCount
+              ? `${form.guestCount} ${Number(form.guestCount) === 1 ? 'guest' : 'guests'}`
+              : null
+          }
         />
         <Row icon={Sparkles} label="Occasion" value={occasion} />
         <Row
@@ -96,12 +109,26 @@ export function ReservationSummary({ form, table, preOrder, className = '' }) {
         <Row
           icon={Armchair}
           label="Reservation cost"
-          value={table ? money(Number(table.reservationCost ?? 0) * (Number(form.durationMinutes || 120) / 120)) : null}
+          value={
+            table
+              ? money(
+                  Number(table.reservationCost ?? 0) * (Number(form.durationMinutes || 120) / 120),
+                )
+              : null
+          }
         />
         <Row
           icon={Sparkles}
-          label="20% advance"
-          value={table ? money(Number(table.reservationCost ?? 0) * (Number(form.durationMinutes || 120) / 120) * 0.2) : null}
+          label={`${ADVANCE_PERCENT}% advance`}
+          value={
+            table
+              ? money(
+                  Number(table.reservationCost ?? 0) *
+                    (Number(form.durationMinutes || 120) / 120) *
+                    ADVANCE_RATE,
+                )
+              : null
+          }
         />
         <Row
           icon={UtensilsCrossed}

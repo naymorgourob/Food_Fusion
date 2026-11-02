@@ -17,16 +17,16 @@ import {
 
 const router = Router()
 
-// Viewing the menu only requires being signed in (any role) — a future
-// customer-facing browse feature reuses these same GET endpoints.
-// Creating/editing/deleting is Admin-only.
-router.get('/categories', authenticateUser, getCategories)
+// Viewing the menu is public, like a menu in the window: the landing page
+// shows real dishes to visitors who haven't signed in. Creating, editing
+// and deleting stay Admin-only.
+router.get('/categories', getCategories)
 router.post('/categories', authenticateUser, authorizeAdmin, postCategory)
 router.put('/categories/:id', authenticateUser, authorizeAdmin, putCategory)
 router.delete('/categories/:id', authenticateUser, authorizeAdmin, removeCategory)
 
-router.get('/items', authenticateUser, getMenuItems)
-router.get('/items/:id', authenticateUser, getMenuItem)
+router.get('/items', getMenuItems)
+router.get('/items/:id', getMenuItem)
 router.post('/items', authenticateUser, authorizeAdmin, uploadMenuImage, postMenuItem)
 router.put('/items/:id', authenticateUser, authorizeAdmin, uploadMenuImage, putMenuItem)
 router.delete('/items/:id', authenticateUser, authorizeAdmin, removeMenuItem)

@@ -1,5 +1,9 @@
 import { Router } from 'express'
-import { authenticateUser, authorizeAdmin, authorizeCustomer } from '../middlewares/auth.middleware.js'
+import {
+  authenticateUser,
+  authorizeAdmin,
+  authorizeCustomer,
+} from '../middlewares/auth.middleware.js'
 import {
   getReservations,
   postReservation,

@@ -73,19 +73,19 @@ export function DashboardRevenueChart({ revenueSummary, isLoading }) {
       {/* Snapshot metrics bar */}
       <div className="my-4 grid grid-cols-2 gap-2 sm:grid-cols-4 rounded-xl border border-rule bg-canvas/60 p-3">
         <div className="flex flex-col">
-          <span className="text-[10px] uppercase font-bold text-body-faint">Gross Revenue</span>
+          <span className="text-[0.75rem] uppercase font-bold text-body-faint">Gross Revenue</span>
           <span className="font-mono text-sm font-bold text-body">{money(totalRevenue)}</span>
         </div>
         <div className="flex flex-col">
-          <span className="text-[10px] uppercase font-bold text-body-faint">Paid Bills</span>
+          <span className="text-[0.75rem] uppercase font-bold text-body-faint">Paid Bills</span>
           <span className="font-mono text-sm font-bold text-body">{totalBills} settled</span>
         </div>
         <div className="flex flex-col">
-          <span className="text-[10px] uppercase font-bold text-body-faint">Avg Ticket Size</span>
+          <span className="text-[0.75rem] uppercase font-bold text-body-faint">Avg Ticket Size</span>
           <span className="font-mono text-sm font-bold text-body">{money(avgBill)}</span>
         </div>
         <div className="flex flex-col">
-          <span className="text-[10px] uppercase font-bold text-body-faint">Collected VAT</span>
+          <span className="text-[0.75rem] uppercase font-bold text-body-faint">Collected VAT</span>
           <span className="font-mono text-sm font-bold text-body">{money(totalVat)}</span>
         </div>
       </div>

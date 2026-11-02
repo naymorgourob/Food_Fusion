@@ -37,7 +37,7 @@ export function Container({ children, className = '' }) {
 export function Section({ id, tone = 'canvas', className = '', children }) {
   const background = tone === 'alt' ? 'bg-canvas-2' : 'bg-canvas'
   return (
-    <section id={id} className={`scroll-mt-24 py-20 sm:py-28 ${background} ${className}`}>
+    <section id={id} className={`scroll-mt-28 py-20 sm:py-28 ${background} ${className}`}>
       {children}
     </section>
   )
@@ -47,7 +47,14 @@ export function Section({ id, tone = 'canvas', className = '', children }) {
  * Eyebrow + heading + optional lead. `light` inverts it for use over
  * photography, where body/muted tokens would be invisible.
  */
-export function SectionHeading({ eyebrow, title, lead, align = 'center', light = false, className = '' }) {
+export function SectionHeading({
+  eyebrow,
+  title,
+  lead,
+  align = 'center',
+  light = false,
+  className = '',
+}) {
   const isCentre = align === 'center'
   return (
     <Reveal
@@ -70,7 +77,9 @@ export function SectionHeading({ eyebrow, title, lead, align = 'center', light =
         {title}
       </h2>
       {lead && (
-        <p className={`text-base leading-relaxed sm:text-lg ${light ? 'text-white/75' : 'text-body-muted'}`}>
+        <p
+          className={`text-base leading-relaxed sm:text-lg ${light ? 'text-white/75' : 'text-body-muted'}`}
+        >
           {lead}
         </p>
       )}
@@ -89,13 +98,21 @@ const BUTTON_SIZES = {
 // gold-500 only ever appears as a FILL here, never as text on a light
 // surface — it measures 2.3:1 that way. Charcoal on gold is 7.1:1.
 const BUTTON_VARIANTS = {
-  primary: 'bg-brand-700 text-white shadow-lg shadow-brand-900/15 hover:-translate-y-0.5 hover:bg-brand-800',
+  primary:
+    'bg-brand-700 text-white shadow-lg shadow-brand-900/15 hover:-translate-y-0.5 hover:bg-brand-800',
   gold: 'bg-gold-500 text-charcoal shadow-lg shadow-gold-500/25 hover:-translate-y-0.5 hover:bg-gold-400',
-  outline: 'border border-rule bg-card text-body hover:border-brand-400 hover:text-brand-700 dark:hover:text-brand-400',
+  outline:
+    'border border-rule bg-card text-body hover:border-brand-400 hover:text-brand-700 dark:hover:text-brand-400',
   ghostLight: 'border border-white/30 text-white backdrop-blur hover:bg-white/10',
 }
 
-export function Button({ as: As = 'button', variant = 'primary', size = 'md', className = '', ...props }) {
+export function Button({
+  as: As = 'button',
+  variant = 'primary',
+  size = 'md',
+  className = '',
+  ...props
+}) {
   return (
     <As
       className={`${BUTTON_BASE} ${BUTTON_SIZES[size]} ${BUTTON_VARIANTS[variant]} ${className}`}
@@ -146,7 +163,9 @@ export function Rating({ value, showValue = true, size = 'sm' }) {
           />
         ))}
       </span>
-      {showValue && <span className="text-xs font-semibold text-body-muted">{value.toFixed(1)}</span>}
+      {showValue && (
+        <span className="text-xs font-semibold text-body-muted">{value.toFixed(1)}</span>
+      )}
       <span className="sr-only">{value.toFixed(1)} out of 5</span>
     </span>
   )
@@ -166,7 +185,9 @@ export function Counter({ value, decimals = 0, suffix = '', duration = 1800 }) {
   // a synchronous query, so starting at the final value skips the animation
   // entirely instead of setting state to correct it a moment later.
   const [reduceMotion] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    () =>
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   )
   const [display, setDisplay] = useState(() => (reduceMotion ? value : 0))
 

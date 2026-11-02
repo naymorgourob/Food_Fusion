@@ -44,7 +44,10 @@ export function NewsletterSection() {
               Thanks — we&apos;ll be in touch at {email}.
             </p>
           ) : (
-            <form onSubmit={handleSubmit} className="flex w-full max-w-md flex-col gap-3 sm:flex-row">
+            <form
+              onSubmit={handleSubmit}
+              className="flex w-full max-w-md flex-col gap-3 sm:flex-row"
+            >
               <label htmlFor="newsletter-email" className="sr-only">
                 Email address
               </label>

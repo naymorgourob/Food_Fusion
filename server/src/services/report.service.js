@@ -63,9 +63,10 @@ export async function getOrdersSummary({ date, month, year }) {
     select: { createdAt: true, totalAmount: true, status: true, orderType: true },
   })
 
-  const series = buildTimeSeries(orders, granularity, { dateField: 'createdAt', amountField: 'totalAmount' }).map(
-    (bucket) => ({ label: bucket.label, orderCount: bucket.count, orderValue: bucket.amount }),
-  )
+  const series = buildTimeSeries(orders, granularity, {
+    dateField: 'createdAt',
+    amountField: 'totalAmount',
+  }).map((bucket) => ({ label: bucket.label, orderCount: bucket.count, orderValue: bucket.amount }))
 
   const byStatus = {
     PENDING: 0,
@@ -139,9 +140,10 @@ export async function getRevenueSummary({ date, month, year }) {
     select: { billDate: true, grandTotal: true, subtotal: true, vatAmount: true, discount: true },
   })
 
-  const series = buildTimeSeries(bills, granularity, { dateField: 'billDate', amountField: 'grandTotal' }).map(
-    (bucket) => ({ label: bucket.label, revenue: bucket.amount }),
-  )
+  const series = buildTimeSeries(bills, granularity, {
+    dateField: 'billDate',
+    amountField: 'grandTotal',
+  }).map((bucket) => ({ label: bucket.label, revenue: bucket.amount }))
 
   const totalRevenue = series.reduce((sum, bucket) => sum + bucket.revenue, 0)
   const totalBills = bills.length

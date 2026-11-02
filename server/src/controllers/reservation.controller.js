@@ -19,7 +19,11 @@ export async function postReservation(req, res) {
   if (errors.length > 0) throw new ApiError(400, 'Validation failed.', errors)
 
   const reservation = await createReservation(req.user.id, input)
-  sendSuccess(res, { statusCode: 201, message: 'Reservation created successfully.', data: { reservation } })
+  sendSuccess(res, {
+    statusCode: 201,
+    message: 'Reservation created successfully.',
+    data: { reservation },
+  })
 }
 
 export async function putReservationStatus(req, res) {

@@ -1,6 +1,14 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Check, CalendarPlus, LayoutDashboard, UtensilsCrossed, Users, Clock, Armchair } from 'lucide-react'
+import {
+  Check,
+  CalendarPlus,
+  LayoutDashboard,
+  UtensilsCrossed,
+  Users,
+  Clock,
+  Armchair,
+} from 'lucide-react'
 import { OCCASION_LABELS } from '@/features/reservations/constants'
 import { orderNo } from '@/utils/format'
 import { ROUTES } from '@/constants'
@@ -25,7 +33,13 @@ function toIcsStamp(date) {
 function buildIcs(reservation) {
   const [hours, minutes] = String(reservation.reservationTime).split(':').map(Number)
   const day = new Date(reservation.reservationDate)
-  const start = new Date(day.getFullYear(), day.getMonth(), day.getDate(), hours || 19, minutes || 0)
+  const start = new Date(
+    day.getFullYear(),
+    day.getMonth(),
+    day.getDate(),
+    hours || 19,
+    minutes || 0,
+  )
   const end = new Date(start.getTime() + Number(reservation.durationMinutes || 120) * 60 * 1000)
 
   return [
@@ -49,7 +63,9 @@ function Detail({ icon: Icon, label, value }) {
   return (
     <div className="flex flex-col items-center gap-1.5 px-2">
       <Icon className="h-4 w-4 text-brand-700 dark:text-brand-400" />
-      <span className="text-[0.65rem] font-medium tracking-wide text-body-faint uppercase">{label}</span>
+      <span className="text-[0.78rem] font-medium tracking-wide text-body-faint uppercase">
+        {label}
+      </span>
       <span className="text-center text-sm font-semibold text-body">{value}</span>
     </div>
   )

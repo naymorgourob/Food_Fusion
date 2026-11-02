@@ -70,7 +70,7 @@ function KpiCard({ icon: Icon, label, value, to, subtext, tone = 'brand', highli
       <div className="flex min-w-0 flex-col">
         <span className="font-display text-2xl font-bold text-body">{value}</span>
         <span className="truncate text-xs font-semibold text-body-muted">{label}</span>
-        {subtext && <span className="truncate text-[0.7rem] text-body-faint">{subtext}</span>}
+        {subtext && <span className="truncate text-[0.82rem] text-body-faint">{subtext}</span>}
       </div>
       {highlight && (
         <span className="absolute top-3 right-3 flex h-2.5 w-2.5">
@@ -220,7 +220,7 @@ export default function WaiterDashboardPage() {
                   <h3 className="font-display text-base font-bold text-body">
                     {readyOrders.length} {readyOrders.length === 1 ? 'Order' : 'Orders'} Ready at Kitchen Pass!
                   </h3>
-                  <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-[0.65rem] font-bold text-white uppercase tracking-wider">
+                  <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-[0.78rem] font-bold text-white uppercase tracking-wider">
                     Immediate Action
                   </span>
                 </div>
@@ -263,11 +263,11 @@ export default function WaiterDashboardPage() {
                           </>
                         )}
                       </span>
-                      <span className="text-[0.7rem] text-body-faint">
+                      <span className="text-[0.82rem] text-body-faint">
                         Order #{orderNo(order.id)} · {itemsCount} items
                       </span>
                     </div>
-                    <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 text-[0.65rem] font-bold text-emerald-800 dark:text-emerald-300">
+                    <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 text-[0.78rem] font-bold text-emerald-800 dark:text-emerald-300">
                       READY
                     </span>
                   </div>
@@ -399,7 +399,7 @@ export default function WaiterDashboardPage() {
                           <span className="font-display text-sm font-bold text-body">
                             Table {table.number}
                           </span>
-                          <span className="block text-[0.7rem] text-body-muted">
+                          <span className="block text-[0.82rem] text-body-muted">
                             Seats {table.capacity}
                           </span>
                         </div>
@@ -413,10 +413,10 @@ export default function WaiterDashboardPage() {
                       <div className="mt-3 flex items-center justify-between pt-2 border-t border-rule/50">
                         {activeOrder ? (
                           <div className="min-w-0">
-                            <span className="block truncate text-[0.7rem] font-bold text-body">
+                            <span className="block truncate text-[0.82rem] font-bold text-body">
                               {money(orderGrandTotal(activeOrder))}
                             </span>
-                            <span className="block text-[0.65rem] text-body-faint">
+                            <span className="block text-[0.78rem] text-body-faint">
                               {activeOrder.status}
                             </span>
                           </div>
@@ -424,17 +424,17 @@ export default function WaiterDashboardPage() {
                           <button
                             type="button"
                             onClick={() => handleStartOrderForTable(table.id)}
-                            className="inline-flex items-center gap-1 text-[0.7rem] font-semibold text-emerald-700 hover:underline dark:text-emerald-400"
+                            className="inline-flex items-center gap-1 text-[0.82rem] font-semibold text-emerald-700 hover:underline dark:text-emerald-400"
                           >
                             <Plus className="h-3 w-3" />
                             Take Order
                           </button>
                         ) : (
-                          <span className="text-[0.65rem] text-body-faint">Reserved</span>
+                          <span className="text-[0.78rem] text-body-faint">Reserved</span>
                         )}
 
                         <span
-                          className={`text-[0.65rem] font-semibold uppercase ${
+                          className={`text-[0.78rem] font-semibold uppercase ${
                             isOccupied
                               ? 'text-red-700 dark:text-red-400'
                               : isAvailable
@@ -473,7 +473,7 @@ export default function WaiterDashboardPage() {
               <div className="flex flex-col items-center justify-center p-6 text-center text-body-muted">
                 <CalendarClock className="h-8 w-8 text-body-faint stroke-[1.5]" />
                 <p className="mt-2 text-xs font-medium">No bookings scheduled for today.</p>
-                <p className="text-[0.7rem] text-body-faint">Walk-in guests can be seated at any available table.</p>
+                <p className="text-[0.82rem] text-body-faint">Walk-in guests can be seated at any available table.</p>
               </div>
             ) : (
               <div className="flex flex-col divide-y divide-rule">
@@ -491,12 +491,12 @@ export default function WaiterDashboardPage() {
                           <span className="font-display text-xs font-bold text-body">
                             {res.customerName}
                           </span>
-                          <span className="block text-[0.7rem] text-body-muted">
+                          <span className="block text-[0.82rem] text-body-muted">
                             {res.guestCount} {res.guestCount === 1 ? 'guest' : 'guests'} · Table {res.table?.number}
                           </span>
                         </div>
                         <div className="flex flex-col items-end gap-1">
-                          <span className="rounded-lg bg-purple-100 dark:bg-purple-950/50 px-2 py-0.5 text-[0.7rem] font-bold text-purple-800 dark:text-purple-300">
+                          <span className="rounded-lg bg-purple-100 dark:bg-purple-950/50 px-2 py-0.5 text-[0.82rem] font-bold text-purple-800 dark:text-purple-300">
                             {formatTime(res.reservationTime)}
                           </span>
                           <ReservationStatusBadge status={res.status} />
@@ -504,14 +504,14 @@ export default function WaiterDashboardPage() {
                       </div>
 
                       {occasion && (
-                        <div className="flex items-center gap-1.5 text-[0.7rem] text-gold-600 dark:text-gold-400 font-medium">
+                        <div className="flex items-center gap-1.5 text-[0.82rem] text-gold-600 dark:text-gold-400 font-medium">
                           <Sparkles className="h-3 w-3 flex-none" />
                           <span>{occasion}</span>
                         </div>
                       )}
 
                       {res.specialRequest && (
-                        <p className="rounded-lg bg-canvas-2 px-2.5 py-1.5 text-[0.7rem] leading-relaxed text-body-muted">
+                        <p className="rounded-lg bg-canvas-2 px-2.5 py-1.5 text-[0.82rem] leading-relaxed text-body-muted">
                           <strong className="text-body font-semibold">Note: </strong>
                           {res.specialRequest}
                         </p>

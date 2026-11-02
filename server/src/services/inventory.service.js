@@ -26,7 +26,10 @@ export async function listInventoryItems() {
   const items = await prisma.inventoryItem.findMany({
     orderBy: { itemName: 'asc' },
     include: {
-      usages: { orderBy: { usageDate: 'desc' }, include: { recordedBy: { select: { id: true, fullName: true, position: true } } } },
+      usages: {
+        orderBy: { usageDate: 'desc' },
+        include: { recordedBy: { select: { id: true, fullName: true, position: true } } },
+      },
     },
   })
   return items.map(withStatus)
@@ -34,7 +37,8 @@ export async function listInventoryItems() {
 
 export async function recordInventoryUsage(id, userId, { quantityUsed, usageDate, note }) {
   const used = Number(quantityUsed)
-  if (!Number.isFinite(used) || used <= 0) throw new ApiError(400, 'Quantity used must be greater than zero.')
+  if (!Number.isFinite(used) || used <= 0)
+    throw new ApiError(400, 'Quantity used must be greater than zero.')
   const date = usageDate ? new Date(usageDate) : new Date()
   if (Number.isNaN(date.getTime())) throw new ApiError(400, 'Usage date is invalid.')
 
@@ -54,7 +58,10 @@ export async function recordInventoryUsage(id, userId, { quantityUsed, usageDate
         usageDate: date,
         note: note?.trim() || null,
       },
-      include: { recordedBy: { select: { id: true, fullName: true, position: true } }, inventoryItem: true },
+      include: {
+        recordedBy: { select: { id: true, fullName: true, position: true } },
+        inventoryItem: true,
+      },
     })
   })
 }
@@ -72,7 +79,10 @@ export async function createInventoryItem({ itemName, category, unit, quantity, 
   return withStatus(item)
 }
 
-export async function updateInventoryItem(id, { itemName, category, unit, quantity, minStockLevel }) {
+export async function updateInventoryItem(
+  id,
+  { itemName, category, unit, quantity, minStockLevel },
+) {
   await getInventoryItemOrThrow(id)
 
   const item = await prisma.inventoryItem.update({

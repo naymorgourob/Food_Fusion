@@ -81,7 +81,9 @@ export async function generateBill({ orderId, vatPercent, discount }) {
     const settings = await getSettings()
     vat = settings.vatPercentage
   }
-  const disc = new Prisma.Decimal(discount !== undefined && discount !== null && discount !== '' ? discount : 0)
+  const disc = new Prisma.Decimal(
+    discount !== undefined && discount !== null && discount !== '' ? discount : 0,
+  )
 
   const subtotal = order.totalAmount
   const { vatAmount, grandTotal } = calculateBillTotals(subtotal, vat, disc)

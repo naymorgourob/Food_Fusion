@@ -79,7 +79,9 @@ export function CartDrawer({
                 <div className="flex flex-col gap-0.5">
                   <h2 className="font-display text-lg font-semibold text-body">Your order</h2>
                   <span className="text-xs text-body-muted">
-                    {count > 0 ? `${count} ${count === 1 ? 'item' : 'items'} selected` : 'Nothing selected yet'}
+                    {count > 0
+                      ? `${count} ${count === 1 ? 'item' : 'items'} selected`
+                      : 'Nothing selected yet'}
                   </span>
                 </div>
               </div>
@@ -100,9 +102,14 @@ export function CartDrawer({
                   <span className="relative flex h-16 w-16 items-center justify-center">
                     <span className="absolute inset-0 rounded-full bg-brand-50 dark:bg-brand-900/40" />
                     <span className="absolute inset-2 rounded-full bg-gold-100 dark:bg-gold-100/10" />
-                    <ShoppingBag className="relative h-7 w-7 text-brand-700 dark:text-brand-400" strokeWidth={1.5} />
+                    <ShoppingBag
+                      className="relative h-7 w-7 text-brand-700 dark:text-brand-400"
+                      strokeWidth={1.5}
+                    />
                   </span>
-                  <p className="font-display text-base font-semibold text-body">Your cart is empty</p>
+                  <p className="font-display text-base font-semibold text-body">
+                    Your cart is empty
+                  </p>
                   <p className="max-w-[15rem] text-sm text-body-muted">
                     Add a dish from the menu and it will appear here.
                   </p>
@@ -117,78 +124,88 @@ export function CartDrawer({
               ) : (
                 <>
                   <div className="mb-4 flex items-center justify-between">
-                    <span className="text-xs font-bold tracking-[0.12em] text-body-faint uppercase">Selected dishes</span>
-                    <span className="text-xs text-body-muted">Adjust quantities before checkout</span>
+                    <span className="text-xs font-bold tracking-[0.12em] text-body-faint uppercase">
+                      Selected dishes
+                    </span>
+                    <span className="text-xs text-body-muted">
+                      Adjust quantities before checkout
+                    </span>
                   </div>
                   <ul className="flex flex-col gap-3">
                     <AnimatePresence initial={false}>
                       {items.map(({ item, quantity, notes }) => {
-                      const image = getImageUrl(item.imageUrl)
-                      return (
-                        <motion.li
-                          key={item.id}
-                          layout
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, x: 40 }}
-                          transition={{ duration: 0.2 }}
-                          className="flex gap-3 rounded-2xl border border-rule bg-card p-3.5 shadow-xs"
-                        >
-                          <div className="h-[4.5rem] w-[4.5rem] flex-none overflow-hidden rounded-xl bg-canvas-2">
-                            {image ? (
-                              <img src={image} alt="" className="h-full w-full object-cover" />
-                            ) : (
-                              <span className="flex h-full w-full items-center justify-center">
-                                <UtensilsCrossed className="h-5 w-5 text-brand-200 dark:text-brand-400/50" />
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                            <div className="flex items-start justify-between gap-3">
-                              <span className="line-clamp-2 text-sm font-semibold leading-snug text-body">{item.name}</span>
-                              <span className="flex-none font-display text-sm font-semibold text-brand-700 dark:text-brand-400">
-                                {money(Number(item.price) * quantity)}
-                              </span>
+                        const image = getImageUrl(item.imageUrl)
+                        return (
+                          <motion.li
+                            key={item.id}
+                            layout
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, x: 40 }}
+                            transition={{ duration: 0.2 }}
+                            className="flex gap-3 rounded-2xl border border-rule bg-card p-3.5 shadow-xs"
+                          >
+                            <div className="h-[4.5rem] w-[4.5rem] flex-none overflow-hidden rounded-xl bg-canvas-2">
+                              {image ? (
+                                <img src={image} alt="" className="h-full w-full object-contain" />
+                              ) : (
+                                <span className="flex h-full w-full items-center justify-center">
+                                  <UtensilsCrossed className="h-5 w-5 text-brand-200 dark:text-brand-400/50" />
+                                </span>
+                              )}
                             </div>
 
-                            {notes && (
-                              <span className="line-clamp-1 text-xs text-body-faint italic">“{notes}”</span>
-                            )}
-
-                            <div className="mt-auto flex items-center justify-between">
-                              <div className="flex items-center gap-1 rounded-xl border border-rule bg-canvas-2 p-0.5">
-                                <button
-                                  type="button"
-                                  onClick={() => onSetQuantity(item.id, quantity - 1, item)}
-                                  aria-label={`Decrease ${item.name} quantity`}
-                                  className="flex h-7 w-7 items-center justify-center rounded-lg text-body-muted transition-colors hover:bg-card hover:text-body"
-                                >
-                                  <Minus className="h-3.5 w-3.5" />
-                                </button>
-                                <span className="w-7 text-center text-sm font-bold text-body">{quantity}</span>
-                                <button
-                                  type="button"
-                                  onClick={() => onSetQuantity(item.id, quantity + 1, item)}
-                                  aria-label={`Increase ${item.name} quantity`}
-                                  className="flex h-7 w-7 items-center justify-center rounded-lg text-body-muted transition-colors hover:bg-card hover:text-body"
-                                >
-                                  <Plus className="h-3.5 w-3.5" />
-                                </button>
+                            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                              <div className="flex items-start justify-between gap-3">
+                                <span className="line-clamp-2 text-sm font-semibold leading-snug text-body">
+                                  {item.name}
+                                </span>
+                                <span className="flex-none font-display text-sm font-semibold text-brand-700 dark:text-brand-400">
+                                  {money(Number(item.price) * quantity)}
+                                </span>
                               </div>
 
-                              <button
-                                type="button"
-                                onClick={() => onRemove(item.id)}
-                                aria-label={`Remove ${item.name} from your order`}
-                                className="rounded-lg p-1.5 text-body-faint transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
-                              >
-                                <Trash2 className="h-3.5 w-3.5" />
-                              </button>
+                              {notes && (
+                                <span className="line-clamp-1 text-xs text-body-faint italic">
+                                  “{notes}”
+                                </span>
+                              )}
+
+                              <div className="mt-auto flex items-center justify-between">
+                                <div className="flex items-center gap-1 rounded-xl border border-rule bg-canvas-2 p-0.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => onSetQuantity(item.id, quantity - 1, item)}
+                                    aria-label={`Decrease ${item.name} quantity`}
+                                    className="flex h-7 w-7 items-center justify-center rounded-lg text-body-muted transition-colors hover:bg-card hover:text-body"
+                                  >
+                                    <Minus className="h-3.5 w-3.5" />
+                                  </button>
+                                  <span className="w-7 text-center text-sm font-bold text-body">
+                                    {quantity}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => onSetQuantity(item.id, quantity + 1, item)}
+                                    aria-label={`Increase ${item.name} quantity`}
+                                    className="flex h-7 w-7 items-center justify-center rounded-lg text-body-muted transition-colors hover:bg-card hover:text-body"
+                                  >
+                                    <Plus className="h-3.5 w-3.5" />
+                                  </button>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => onRemove(item.id)}
+                                  aria-label={`Remove ${item.name} from your order`}
+                                  className="rounded-lg p-1.5 text-body-faint transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        </motion.li>
-                      )
+                          </motion.li>
+                        )
                       })}
                     </AnimatePresence>
                   </ul>
@@ -200,8 +217,12 @@ export function CartDrawer({
             {items.length > 0 && (
               <footer className="flex-none border-t border-rule bg-card px-5 py-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:px-6">
                 <div className="mb-4 flex items-center justify-between">
-                  <span className="text-xs font-bold tracking-[0.12em] text-body-faint uppercase">Order total</span>
-                  <span className="rounded-full bg-brand-50 px-2 py-1 text-[0.65rem] font-semibold text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">Ready for checkout</span>
+                  <span className="text-xs font-bold tracking-[0.12em] text-body-faint uppercase">
+                    Order total
+                  </span>
+                  <span className="rounded-full bg-brand-50 px-2 py-1 text-[0.78rem] font-semibold text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">
+                    Ready for checkout
+                  </span>
                 </div>
                 <dl className="flex flex-col gap-2 text-sm">
                   <div className="flex justify-between text-body-muted">

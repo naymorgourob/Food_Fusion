@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Clock, Minus, Plus, UtensilsCrossed, Heart, ShoppingBag } from 'lucide-react'
-import { getMenuImageUrl } from '@/constants'
+import { X, Clock, Minus, Plus, Heart, ShoppingBag } from 'lucide-react'
+import { FullPhoto } from '@/features/menu/components/FullPhoto'
 import { money } from '@/utils/format'
 
 /**
@@ -19,10 +19,17 @@ import { money } from '@/utils/format'
  * `key={dish.id}` at the call site remounts this per dish, so quantity and
  * notes reset between dishes instead of leaking across.
  */
-export function DishDetailModal({ dish, isOpen, onClose, onAdd, isFavorite, isPending, onToggleFavorite }) {
+export function DishDetailModal({
+  dish,
+  isOpen,
+  onClose,
+  onAdd,
+  isFavorite,
+  isPending,
+  onToggleFavorite,
+}) {
   const [quantity, setQuantity] = useState(1)
   const [notes, setNotes] = useState('')
-  const [imageFailed, setImageFailed] = useState(false)
   const closeRef = useRef(null)
   const dialogRef = useRef(null)
 
@@ -70,8 +77,6 @@ export function DishDetailModal({ dish, isOpen, onClose, onAdd, isFavorite, isPe
 
   if (!dish) return null
 
-  const { primary, fallback } = getMenuImageUrl(dish)
-  const image = imageFailed ? fallback : primary || fallback
   const unavailable = !dish.isAvailable
   const lineTotal = Number(dish.price) * quantity
 
@@ -108,19 +113,7 @@ export function DishDetailModal({ dish, isOpen, onClose, onAdd, isFavorite, isPe
           >
             {/* --- Image ------------------------------------------------- */}
             <div className="relative aspect-[16/10] flex-none overflow-hidden bg-canvas-2">
-              {image ? (
-                <img
-                  src={image}
-                  alt={`${dish.name} - ${dish.description || 'FoodFusion menu item'}`}
-                  title={dish.name}
-                  onError={() => setImageFailed(true)}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-50 to-canvas-2 dark:from-brand-900/50 dark:to-canvas-2">
-                  <UtensilsCrossed className="h-12 w-12 text-brand-200 dark:text-brand-400/50" strokeWidth={1.5} />
-                </span>
-              )}
+              <FullPhoto dish={dish} />
 
               <button
                 ref={closeRef}
@@ -138,7 +131,11 @@ export function DishDetailModal({ dish, isOpen, onClose, onAdd, isFavorite, isPe
                   onClick={() => onToggleFavorite(dish.id)}
                   disabled={isPending}
                   aria-pressed={isFavorite}
-                  aria-label={isFavorite ? `Remove ${dish.name} from favorites` : `Add ${dish.name} to favorites`}
+                  aria-label={
+                    isFavorite
+                      ? `Remove ${dish.name} from favorites`
+                      : `Add ${dish.name} to favorites`
+                  }
                   className="absolute top-3 right-14 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur transition-transform hover:scale-110 disabled:opacity-60 dark:bg-charcoal/85"
                 >
                   <Heart
@@ -148,7 +145,7 @@ export function DishDetailModal({ dish, isOpen, onClose, onAdd, isFavorite, isPe
               )}
 
               {dish.category?.name && (
-                <span className="absolute bottom-3 left-4 rounded-full bg-charcoal/75 px-2.5 py-1 text-[0.65rem] font-semibold text-white backdrop-blur">
+                <span className="absolute bottom-3 left-4 rounded-full bg-charcoal/75 px-2.5 py-1 text-[0.78rem] font-semibold text-white backdrop-blur">
                   {dish.category.name}
                 </span>
               )}
@@ -190,8 +187,12 @@ export function DishDetailModal({ dish, isOpen, onClose, onAdd, isFavorite, isPe
               {/* Special instructions — sent per line and surfaced to the
                   kitchen alongside the order's own instructions. */}
               <div className="mt-6 flex flex-col gap-2">
-                <label htmlFor="dish-notes" className="font-display text-sm font-semibold text-body">
-                  Special instructions <span className="font-sans font-normal text-body-faint">(optional)</span>
+                <label
+                  htmlFor="dish-notes"
+                  className="font-display text-sm font-semibold text-body"
+                >
+                  Special instructions{' '}
+                  <span className="font-sans font-normal text-body-faint">(optional)</span>
                 </label>
                 <textarea
                   id="dish-notes"
@@ -216,7 +217,10 @@ export function DishDetailModal({ dish, isOpen, onClose, onAdd, isFavorite, isPe
                 >
                   <Minus className="h-4 w-4" />
                 </button>
-                <span aria-live="polite" className="w-8 text-center font-display text-base font-semibold text-body">
+                <span
+                  aria-live="polite"
+                  className="w-8 text-center font-display text-base font-semibold text-body"
+                >
                   {quantity}
                 </span>
                 <button

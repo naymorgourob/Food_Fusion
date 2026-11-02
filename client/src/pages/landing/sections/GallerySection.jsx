@@ -29,7 +29,7 @@ export function GallerySection() {
                 src={image.src}
                 alt={image.alt}
                 loading="lazy"
-                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                className={`h-full w-full object-cover transition-transform duration-700 group-hover:scale-110 ${image.position ?? ''}`}
               />
               {/* Caption scrim, revealed on hover/focus. */}
               <span

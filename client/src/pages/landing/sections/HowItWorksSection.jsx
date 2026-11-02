@@ -3,7 +3,11 @@ import { Container, Section, SectionHeading, Reveal } from '@/components/landing
 
 const STEPS = [
   { icon: BookOpen, title: 'Choose Food', description: 'Browse the menu and build your order.' },
-  { icon: ShoppingBag, title: 'Place Order', description: 'Dine-in, delivery, or takeaway — your call.' },
+  {
+    icon: ShoppingBag,
+    title: 'Place Order',
+    description: 'Dine-in, delivery, or takeaway — your call.',
+  },
   { icon: ChefHat, title: 'Chef Prepares', description: 'Straight to the pass, cooked to order.' },
   { icon: Radar, title: 'Track Order', description: 'Live status from accepted to on-the-way.' },
   { icon: Utensils, title: 'Enjoy Food', description: 'At your table or at your door, still hot.' },
@@ -20,10 +24,7 @@ export function HowItWorksSection() {
   return (
     <Section>
       <Container className="flex flex-col gap-16">
-        <SectionHeading
-          eyebrow="How it works"
-          title="From craving to first bite, in five steps"
-        />
+        <SectionHeading eyebrow="How it works" title="From craving to first bite, in five steps" />
 
         <div className="relative">
           {/* Desktop connector — sits at the vertical centre of the icons. */}

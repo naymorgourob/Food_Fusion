@@ -1,6 +1,9 @@
 import { prisma } from '../config/prisma.js'
 import { ApiError } from '../utils/ApiError.js'
-import { MAX_RESERVATION_DURATION_MINUTES, RESERVATION_DURATION_MINUTES } from './reservation.service.js'
+import {
+  MAX_RESERVATION_DURATION_MINUTES,
+  RESERVATION_DURATION_MINUTES,
+} from './reservation.service.js'
 
 // Same "check first for a friendly message, DB @unique as the safety net"
 // pattern used for Category.name in Part 9.
@@ -30,7 +33,11 @@ export async function listTables({ reservationDate, reservationTime, durationMin
   const hasValidTime = requestedParts.length === 2 && requestedParts.every(Number.isFinite)
   const requestedStart = hasValidTime ? requestedParts[0] * 60 + requestedParts[1] : null
   const requestedEnd = hasValidTime
-    ? requestedStart + Math.min(MAX_RESERVATION_DURATION_MINUTES, Math.max(30, Number(durationMinutes) || RESERVATION_DURATION_MINUTES))
+    ? requestedStart +
+      Math.min(
+        MAX_RESERVATION_DURATION_MINUTES,
+        Math.max(30, Number(durationMinutes) || RESERVATION_DURATION_MINUTES),
+      )
     : null
 
   function sameDate(left, right) {
@@ -57,15 +64,16 @@ export async function listTables({ reservationDate, reservationTime, durationMin
 
   return tables.map((table) => {
     const tableReservations = reservations.filter((reservation) => reservation.tableId === table.id)
-    const matchingReservations = hasValidDate && hasValidTime
-      ? tableReservations.filter((reservation) => {
-          if (!sameDate(reservation.reservationDate, requestedDate)) return false
-          const [hours, minutes] = String(reservation.reservationTime).split(':').map(Number)
-          const start = hours * 60 + minutes
-          const end = start + (reservation.durationMinutes || RESERVATION_DURATION_MINUTES)
-          return start < requestedEnd && requestedStart < end
-        })
-      : []
+    const matchingReservations =
+      hasValidDate && hasValidTime
+        ? tableReservations.filter((reservation) => {
+            if (!sameDate(reservation.reservationDate, requestedDate)) return false
+            const [hours, minutes] = String(reservation.reservationTime).split(':').map(Number)
+            const start = hours * 60 + minutes
+            const end = start + (reservation.durationMinutes || RESERVATION_DURATION_MINUTES)
+            return start < requestedEnd && requestedStart < end
+          })
+        : []
     const upcomingReservation = tableReservations
       .filter((reservation) => {
         if (hasValidDate) {
@@ -77,17 +85,29 @@ export async function listTables({ reservationDate, reservationTime, durationMin
         const [hours, minutes] = String(reservation.reservationTime).split(':').map(Number)
         return date > today || (date === today && hours * 60 + minutes >= currentMinutes)
       })
-      .sort((left, right) => `${left.reservationDate.toISOString()}${left.reservationTime}`.localeCompare(`${right.reservationDate.toISOString()}${right.reservationTime}`))[0]
+      .sort((left, right) =>
+        `${left.reservationDate.toISOString()}${left.reservationTime}`.localeCompare(
+          `${right.reservationDate.toISOString()}${right.reservationTime}`,
+        ),
+      )[0]
     const booking = matchingReservations[0] || upcomingReservation
     return {
       ...table,
-      reservationAvailable: hasValidDate && hasValidTime ? matchingReservations.length === 0 : undefined,
+      reservationAvailable:
+        hasValidDate && hasValidTime ? matchingReservations.length === 0 : undefined,
       bookingWindow: booking ? bookingWindow(booking) : null,
     }
   })
 }
 
-export async function createTable({ number, capacity, status, description, windowSidePosition, reservationCost }) {
+export async function createTable({
+  number,
+  capacity,
+  status,
+  description,
+  windowSidePosition,
+  reservationCost,
+}) {
   await assertNumberIsAvailable(number)
   return prisma.table.create({
     data: {
@@ -101,7 +121,10 @@ export async function createTable({ number, capacity, status, description, windo
   })
 }
 
-export async function updateTable(id, { number, capacity, status, description, windowSidePosition, reservationCost }) {
+export async function updateTable(
+  id,
+  { number, capacity, status, description, windowSidePosition, reservationCost },
+) {
   const existing = await getTableOrThrow(id)
   await assertNumberIsAvailable(number, id)
 

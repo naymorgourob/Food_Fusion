@@ -28,7 +28,13 @@ export async function registerCustomer({ fullName, email, phone, password }) {
   // only ever create a CUSTOMER. Admin/Staff accounts are created directly
   // in the database or by Admin-only functionality added in a later part.
   const user = await prisma.user.create({
-    data: { fullName: fullName.trim(), email: normalizedEmail, phone: phone.trim(), password: hashedPassword, role: 'CUSTOMER' },
+    data: {
+      fullName: fullName.trim(),
+      email: normalizedEmail,
+      phone: phone.trim(),
+      password: hashedPassword,
+      role: 'CUSTOMER',
+    },
     select: PUBLIC_USER_FIELDS,
   })
 

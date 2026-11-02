@@ -49,21 +49,25 @@ export function ServicesSection() {
               <Reveal key={title} delay={index * 0.08}>
                 <Wrapper
                   {...linkProps}
-                  className="group relative flex h-full flex-col gap-4 overflow-hidden rounded-3xl border border-rule bg-card p-7 shadow-xl shadow-brand-900/5 transition-all duration-300 hover:-translate-y-1.5 hover:border-brand-200 hover:shadow-2xl hover:shadow-brand-900/10"
+                  className="group relative flex h-full flex-col gap-4 overflow-hidden rounded-3xl border border-rule bg-card p-8 shadow-xl shadow-brand-900/5 transition-all duration-300 hover:-translate-y-1.5 hover:border-brand-200 hover:shadow-2xl hover:shadow-brand-900/10"
                 >
                   {/* Emerald wash that rises from the bottom on hover. */}
                   <span
                     aria-hidden
                     className="pointer-events-none absolute inset-x-0 bottom-0 h-0 bg-gradient-to-t from-brand-50 to-transparent transition-all duration-300 group-hover:h-full dark:from-brand-900/30"
                   />
-                  <span className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-700 text-white shadow-lg shadow-brand-900/20 transition-transform duration-300 group-hover:scale-110">
-                    <Icon className="h-5 w-5" strokeWidth={1.75} />
+                  <span className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-700 text-white shadow-lg shadow-brand-900/20 transition-transform duration-300 group-hover:scale-110">
+                    <Icon className="h-6 w-6" strokeWidth={1.75} />
                   </span>
-                  <h3 className="relative font-display text-xl font-semibold text-body">{title}</h3>
-                  <p className="relative flex-1 text-sm leading-relaxed text-body-muted">{description}</p>
-                  <span className="relative flex items-center gap-1.5 text-sm font-semibold text-brand-700 dark:text-brand-400">
+                  <h3 className="relative font-display text-3xl font-semibold text-body">
+                    {title}
+                  </h3>
+                  <p className="relative flex-1 text-lg leading-relaxed text-body-muted">
+                    {description}
+                  </p>
+                  <span className="relative flex items-center gap-2 text-lg font-semibold text-brand-700 dark:text-brand-400">
                     {cta}
-                    <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                    <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                   </span>
                 </Wrapper>
               </Reveal>

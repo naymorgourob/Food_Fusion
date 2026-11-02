@@ -1,6 +1,10 @@
 import { Router } from 'express'
 import { authenticateUser, authorizeAdmin } from '../middlewares/auth.middleware.js'
-import { getSettingsHandler, getPaymentContactHandler, putSettingsHandler } from '../controllers/settings.controller.js'
+import {
+  getSettingsHandler,
+  getPaymentContactHandler,
+  putSettingsHandler,
+} from '../controllers/settings.controller.js'
 
 const router = Router()
 

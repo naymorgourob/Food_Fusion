@@ -58,7 +58,9 @@ export function ImageUploadField({ existingImageUrl, onFileSelected }) {
         role="button"
         tabIndex={0}
         onClick={() => inputRef.current?.click()}
-        onKeyDown={(event) => (event.key === 'Enter' || event.key === ' ') && inputRef.current?.click()}
+        onKeyDown={(event) =>
+          (event.key === 'Enter' || event.key === ' ') && inputRef.current?.click()
+        }
         onDragOver={(event) => {
           event.preventDefault()
           setIsDragging(true)
@@ -113,8 +115,8 @@ export function ImageUploadField({ existingImageUrl, onFileSelected }) {
 
       {existingImageUrl && !previewUrl && (
         <p className="text-xs text-body-faint">
-          The current photo stays as-is unless you upload a new one — there&rsquo;s no way to save this
-          dish with no photo at all.
+          The current photo stays as-is unless you upload a new one — there&rsquo;s no way to save
+          this dish with no photo at all.
         </p>
       )}
     </div>

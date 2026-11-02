@@ -27,7 +27,14 @@ import { ORDER_STATUS_LABELS, orderGrandTotal } from '@/features/orders/constant
 import { money, orderNo } from '@/utils/format'
 import { ROUTES } from '@/constants'
 
-const ACTIVE_STATUSES = new Set(['PENDING', 'ACCEPTED', 'PREPARING', 'READY', 'ON_THE_WAY', 'SERVED'])
+const ACTIVE_STATUSES = new Set([
+  'PENDING',
+  'ACCEPTED',
+  'PREPARING',
+  'READY',
+  'ON_THE_WAY',
+  'SERVED',
+])
 
 const FLOW_BY_TYPE = {
   DINE_IN: ['PENDING', 'PREPARING', 'READY', 'SERVED', 'COMPLETED'],
@@ -46,7 +53,8 @@ const STEP_ICONS = {
 }
 
 function formatEta(order) {
-  const etaIso = order.orderType === 'DELIVERY' ? order.estimatedDeliveryTime : order.estimatedReadyTime
+  const etaIso =
+    order.orderType === 'DELIVERY' ? order.estimatedDeliveryTime : order.estimatedReadyTime
   if (!etaIso) return null
   const diff = new Date(etaIso).getTime() - Date.now()
   if (diff <= 0) return 'Arriving shortly'
@@ -84,9 +92,7 @@ export default function MyOrdersPage() {
           <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-body">
             My Orders
           </h1>
-          <p className="text-sm text-body-muted">
-            Your orders and their current status.
-          </p>
+          <p className="text-sm text-body-muted">Your orders and their current status.</p>
         </div>
 
         <Link
@@ -140,10 +146,13 @@ export default function MyOrdersPage() {
             <section aria-labelledby="active-orders-heading" className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <h2 id="active-orders-heading" className="font-display text-base sm:text-lg font-semibold text-body">
+                  <h2
+                    id="active-orders-heading"
+                    className="font-display text-base sm:text-lg font-semibold text-body"
+                  >
                     Active Order
                   </h2>
-                  <span className="flex items-center gap-1.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2.5 py-0.5 text-[0.7rem] font-bold text-emerald-800 dark:text-emerald-300 ring-1 ring-emerald-500/20">
+                  <span className="flex items-center gap-1.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2.5 py-0.5 text-[0.82rem] font-bold text-emerald-800 dark:text-emerald-300 ring-1 ring-emerald-500/20">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" />
                     Live
                   </span>
@@ -180,10 +189,13 @@ export default function MyOrdersPage() {
                             <OrderStatusBadge status={order.status} />
                           </div>
                           <span className="text-xs text-body-muted">
-                            Placed on {new Date(order.createdAt).toLocaleDateString([], {
+                            Placed on{' '}
+                            {new Date(order.createdAt).toLocaleDateString([], {
                               month: 'short',
                               day: 'numeric',
-                            })} at {new Date(order.createdAt).toLocaleTimeString([], {
+                            })}{' '}
+                            at{' '}
+                            {new Date(order.createdAt).toLocaleTimeString([], {
                               hour: 'numeric',
                               minute: '2-digit',
                             })}
@@ -212,7 +224,9 @@ export default function MyOrdersPage() {
                       {/* Items Summary Line */}
                       <div className="mt-3.5 flex items-center justify-between text-xs text-body-muted">
                         <span className="line-clamp-1 flex-1 pr-3">
-                          <strong className="text-body font-semibold">{itemsCount} {itemsCount === 1 ? 'item' : 'items'}: </strong>
+                          <strong className="text-body font-semibold">
+                            {itemsCount} {itemsCount === 1 ? 'item' : 'items'}:{' '}
+                          </strong>
                           {itemsSummary}
                         </span>
                       </div>
@@ -232,19 +246,23 @@ export default function MyOrdersPage() {
                                     isDone
                                       ? 'bg-brand-700 text-white'
                                       : isCurrent
-                                      ? 'bg-gold-500 text-charcoal ring-4 ring-gold-500/20 shadow-xs'
-                                      : 'bg-canvas-2 text-body-faint'
+                                        ? 'bg-gold-500 text-charcoal ring-4 ring-gold-500/20 shadow-xs'
+                                        : 'bg-canvas-2 text-body-faint'
                                   }`}
                                 >
-                                  {isDone ? <Check className="h-3.5 w-3.5" strokeWidth={2.5} /> : <Icon className="h-3.5 w-3.5" />}
+                                  {isDone ? (
+                                    <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
+                                  ) : (
+                                    <Icon className="h-3.5 w-3.5" />
+                                  )}
                                 </div>
                                 <span
-                                  className={`text-[0.65rem] sm:text-xs leading-tight ${
+                                  className={`text-[0.78rem] sm:text-xs leading-tight ${
                                     isCurrent
                                       ? 'font-bold text-body'
                                       : isDone
-                                      ? 'font-medium text-body-muted'
-                                      : 'text-body-faint'
+                                        ? 'font-medium text-body-muted'
+                                        : 'text-body-faint'
                                   }`}
                                 >
                                   {ORDER_STATUS_LABELS[step]}
@@ -284,7 +302,10 @@ export default function MyOrdersPage() {
           {/* --- ORDER HISTORY (Clean compact list/card layout) --- */}
           <section aria-labelledby="order-history-heading" className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <h2 id="order-history-heading" className="font-display text-base sm:text-lg font-semibold text-body">
+              <h2
+                id="order-history-heading"
+                className="font-display text-base sm:text-lg font-semibold text-body"
+              >
                 {activeOrders.length > 0 ? 'Past Orders' : 'All Orders'}
               </h2>
               <span className="text-xs text-body-muted">
@@ -327,7 +348,8 @@ export default function MyOrdersPage() {
                             day: 'numeric',
                             year: 'numeric',
                           })}{' '}
-                          · {new Date(order.createdAt).toLocaleTimeString([], {
+                          ·{' '}
+                          {new Date(order.createdAt).toLocaleTimeString([], {
                             hour: 'numeric',
                             minute: '2-digit',
                           })}

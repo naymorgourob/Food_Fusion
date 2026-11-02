@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
-import { Heart, Plus, Star, UtensilsCrossed } from 'lucide-react'
-import { getImageUrl, ROUTES } from '@/constants'
+import { Heart, Plus, Star } from 'lucide-react'
+import { ROUTES } from '@/constants'
+import { FullPhoto } from '@/features/menu/components/FullPhoto'
 import { money } from '@/utils/format'
 
 /**
@@ -23,25 +24,12 @@ function pseudoRating(id) {
 }
 
 export function DishCard({ dish, isFavorite, isPending, onToggleFavorite, className = '' }) {
-  const image = getImageUrl(dish.imageUrl)
-
   return (
     <article
       className={`group flex flex-col overflow-hidden rounded-2xl border border-rule bg-card transition-all duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-lg hover:shadow-brand-900/8 ${className}`}
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-canvas-2">
-        {image ? (
-          <img
-            src={image}
-            alt={dish.name}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        ) : (
-          <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-50 to-canvas-2 dark:from-brand-900/50 dark:to-canvas-2">
-            <UtensilsCrossed className="h-8 w-8 text-brand-200 dark:text-brand-400/50" strokeWidth={1.5} />
-          </span>
-        )}
+        <FullPhoto dish={dish} zoomOnHover />
 
         {onToggleFavorite && (
           <button
@@ -49,7 +37,9 @@ export function DishCard({ dish, isFavorite, isPending, onToggleFavorite, classN
             onClick={() => onToggleFavorite(dish.id)}
             disabled={isPending}
             aria-pressed={Boolean(isFavorite)}
-            aria-label={isFavorite ? `Remove ${dish.name} from favorites` : `Add ${dish.name} to favorites`}
+            aria-label={
+              isFavorite ? `Remove ${dish.name} from favorites` : `Add ${dish.name} to favorites`
+            }
             className="absolute top-2.5 right-2.5 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur transition-transform hover:scale-110 disabled:opacity-60"
           >
             <Heart
@@ -61,7 +51,7 @@ export function DishCard({ dish, isFavorite, isPending, onToggleFavorite, classN
         )}
 
         {dish.category?.name && (
-          <span className="absolute bottom-2.5 left-2.5 rounded-full bg-charcoal/75 px-2 py-0.5 text-[0.65rem] font-semibold text-white backdrop-blur">
+          <span className="absolute bottom-2.5 left-2.5 rounded-full bg-charcoal/75 px-2 py-0.5 text-[0.78rem] font-semibold text-white backdrop-blur">
             {dish.category.name}
           </span>
         )}

@@ -204,7 +204,7 @@ export default function WaiterTablesPage() {
               )}
               {tab.label}
               <span
-                className={`rounded-full px-1.5 py-0.2 text-[0.65rem] font-bold ${
+                className={`rounded-full px-1.5 py-0.2 text-[0.78rem] font-bold ${
                   statusFilter === tab.id
                     ? 'bg-white/20 text-white'
                     : 'bg-canvas-2 text-body-muted'
@@ -318,7 +318,7 @@ export default function WaiterTablesPage() {
                         </div>
 
                         {activeOrder.status === 'READY' && (
-                          <div className="flex items-center gap-1 text-[0.7rem] font-bold text-emerald-700 dark:text-emerald-400">
+                          <div className="flex items-center gap-1 text-[0.82rem] font-bold text-emerald-700 dark:text-emerald-400">
                             <CheckCircle2 className="h-3.5 w-3.5" />
                             Ready at pass! Deliver to table.
                           </div>
@@ -336,7 +336,7 @@ export default function WaiterTablesPage() {
                           {reservation.guestCount} guests booked
                         </span>
                         {reservation.specialRequest && (
-                          <span className="line-clamp-1 text-[0.7rem] italic text-body-faint">
+                          <span className="line-clamp-1 text-[0.82rem] italic text-body-faint">
                             &ldquo;{reservation.specialRequest}&rdquo;
                           </span>
                         )}
@@ -347,7 +347,7 @@ export default function WaiterTablesPage() {
                         <span className="mt-1 text-xs font-medium text-emerald-800 dark:text-emerald-300">
                           Table Ready for Seating
                         </span>
-                        <span className="text-[0.7rem] text-body-faint">Seats up to {table.capacity} guests</span>
+                        <span className="text-[0.82rem] text-body-faint">Seats up to {table.capacity} guests</span>
                       </div>
                     ) : (
                       <div className="p-3 text-center text-xs text-body-faint">

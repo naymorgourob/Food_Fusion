@@ -45,7 +45,7 @@ export function AdminBillRow({
             <span className="font-display text-sm font-bold text-body tracking-tight">
               {billNum}
             </span>
-            <span className="rounded-md border border-rule bg-canvas-2 px-2 py-0.5 text-[11px] font-semibold text-body-muted">
+            <span className="rounded-md border border-rule bg-canvas-2 px-2 py-0.5 text-[0.8rem] font-semibold text-body-muted">
               Order {orderNumberStr}
             </span>
             <PaymentStatusBadge status={bill.paymentStatus} />
@@ -75,7 +75,7 @@ export function AdminBillRow({
           <span className="font-display text-base font-bold text-body">
             {money(bill.grandTotal)}
           </span>
-          <span className="text-[11px] text-body-faint">
+          <span className="text-[0.8rem] text-body-faint">
             Subtotal {money(bill.subtotal)} · VAT {money(bill.vatAmount)}
           </span>
         </div>

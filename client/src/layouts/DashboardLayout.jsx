@@ -36,7 +36,9 @@ export default function DashboardLayout() {
         onCloseMobile={() => setMobileOpen(false)}
       />
 
-      <div className={`flex min-h-screen flex-col transition-all duration-200 ${collapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
+      <div
+        className={`flex min-h-screen flex-col transition-all duration-200 ${collapsed ? 'lg:pl-20' : 'lg:pl-80'}`}
+      >
         <TopNav onOpenMobileSidebar={() => setMobileOpen(true)} />
         <main className="flex-1 p-6 lg:p-8">
           <Outlet />

@@ -2,7 +2,8 @@ import { prisma } from '../src/config/prisma.js'
 import { hashPassword } from '../src/utils/password.js'
 
 const menuImage = (id) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=900&q=80`
-const commonsImage = (name) => `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(name)}.jpg?width=900`
+const commonsImage = (name) =>
+  `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(name)}.jpg?width=900`
 
 async function seed() {
   console.log('--- Starting FoodFusion Idempotent Database Seed ---')
@@ -152,26 +153,131 @@ async function seed() {
 
   // Fetch staff users map
   const chefAlex = await prisma.user.findUnique({ where: { email: 'staff@foodfusion.com' } })
-  const chefTanvir = await prisma.user.findUnique({ where: { email: 'chef.tanvir@foodfusion.com' } })
+  const chefTanvir = await prisma.user.findUnique({
+    where: { email: 'chef.tanvir@foodfusion.com' },
+  })
   const waiterSarah = await prisma.user.findUnique({ where: { email: 'waiter@foodfusion.com' } })
-  const waiterRahim = await prisma.user.findUnique({ where: { email: 'waiter.rahim@foodfusion.com' } })
+  const waiterRahim = await prisma.user.findUnique({
+    where: { email: 'waiter.rahim@foodfusion.com' },
+  })
 
   // 4. DINING FLOOR TABLES
   console.log('Seeding dining tables...')
   const tablesData = [
-    { number: 1, capacity: 2, status: 'AVAILABLE', windowSidePosition: 'Window A', reservationCost: 1200, description: 'Window-side table for 2' },
-    { number: 2, capacity: 2, status: 'AVAILABLE', windowSidePosition: 'Window B', reservationCost: 1100, description: 'Cozy table for 2' },
-    { number: 3, capacity: 4, status: 'AVAILABLE', windowSidePosition: 'Window C', reservationCost: 1800, description: 'Dining table for 4' },
-    { number: 4, capacity: 4, status: 'AVAILABLE', windowSidePosition: 'Interior A', reservationCost: 1500, description: 'Booth for family of 4' },
-    { number: 5, capacity: 6, status: 'AVAILABLE', windowSidePosition: 'Interior B', reservationCost: 2200, description: 'Large dining table for 6' },
-    { number: 6, capacity: 8, status: 'AVAILABLE', windowSidePosition: 'Interior C', reservationCost: 2800, description: 'Banquet table for 8' },
-    { number: 7, capacity: 2, status: 'AVAILABLE', windowSidePosition: 'Garden A', reservationCost: 1300, description: 'Romantic Garden Corner for 2' },
-    { number: 8, capacity: 4, status: 'OCCUPIED', windowSidePosition: 'Garden B', reservationCost: 1700, description: 'Garden View Booth for 4' },
-    { number: 9, capacity: 4, status: 'RESERVED', windowSidePosition: 'Interior D', reservationCost: 1600, description: 'Center Dining Table for 4' },
-    { number: 10, capacity: 6, status: 'OCCUPIED', windowSidePosition: 'Interior E', reservationCost: 2100, description: 'Family Dining Table for 6' },
-    { number: 11, capacity: 8, status: 'AVAILABLE', windowSidePosition: 'Private A', reservationCost: 3200, description: 'Private Dining Alcove for 8' },
-    { number: 12, capacity: 10, status: 'RESERVED', windowSidePosition: 'Private B', reservationCost: 4000, description: 'Executive VIP Banquet for 10' },
+    {
+      number: 1,
+      capacity: 2,
+      status: 'AVAILABLE',
+      windowSidePosition: 'Window A',
+      reservationCost: 1200,
+      description: 'Window-side table for 2',
+    },
+    {
+      number: 2,
+      capacity: 2,
+      status: 'AVAILABLE',
+      windowSidePosition: 'Window B',
+      reservationCost: 1100,
+      description: 'Cozy table for 2',
+    },
+    {
+      number: 3,
+      capacity: 4,
+      status: 'AVAILABLE',
+      windowSidePosition: 'Window C',
+      reservationCost: 1800,
+      description: 'Dining table for 4',
+    },
+    {
+      number: 4,
+      capacity: 4,
+      status: 'AVAILABLE',
+      windowSidePosition: 'Interior A',
+      reservationCost: 1500,
+      description: 'Booth for family of 4',
+    },
+    {
+      number: 5,
+      capacity: 6,
+      status: 'AVAILABLE',
+      windowSidePosition: 'Interior B',
+      reservationCost: 2200,
+      description: 'Large dining table for 6',
+    },
+    {
+      number: 6,
+      capacity: 8,
+      status: 'AVAILABLE',
+      windowSidePosition: 'Interior C',
+      reservationCost: 2800,
+      description: 'Banquet table for 8',
+    },
+    {
+      number: 7,
+      capacity: 2,
+      status: 'AVAILABLE',
+      windowSidePosition: 'Garden A',
+      reservationCost: 1300,
+      description: 'Romantic Garden Corner for 2',
+    },
+    {
+      number: 8,
+      capacity: 4,
+      status: 'OCCUPIED',
+      windowSidePosition: 'Garden B',
+      reservationCost: 1700,
+      description: 'Garden View Booth for 4',
+    },
+    {
+      number: 9,
+      capacity: 4,
+      status: 'RESERVED',
+      windowSidePosition: 'Interior D',
+      reservationCost: 1600,
+      description: 'Center Dining Table for 4',
+    },
+    {
+      number: 10,
+      capacity: 6,
+      status: 'OCCUPIED',
+      windowSidePosition: 'Interior E',
+      reservationCost: 2100,
+      description: 'Family Dining Table for 6',
+    },
+    {
+      number: 11,
+      capacity: 8,
+      status: 'AVAILABLE',
+      windowSidePosition: 'Private A',
+      reservationCost: 3200,
+      description: 'Private Dining Alcove for 8',
+    },
+    {
+      number: 12,
+      capacity: 10,
+      status: 'RESERVED',
+      windowSidePosition: 'Private B',
+      reservationCost: 4000,
+      description: 'Executive VIP Banquet for 10',
+    },
   ]
+
+  // Photos of each table's spot in the restaurant (client/public/tables).
+  const tablePhotos = {
+    1: '/tables/window-live-stream-coffee.jpg',
+    2: '/tables/coffee-and-conversations.jpg',
+    3: '/tables/window-lounge.jpg',
+    4: '/tables/velvet-booths.jpg',
+    5: '/tables/coffee-therapy.jpg',
+    6: '/tables/banquette-long-table.jpg',
+    7: '/tables/calm-corner.jpg',
+    8: '/tables/garden-library.jpg',
+    9: '/tables/cheers-wall.jpg',
+    10: '/tables/welcome-bear.jpg',
+    11: '/tables/banquette-arches.jpg',
+    12: '/tables/banquette-long-table.jpg',
+  }
+  for (const t of tablesData) t.imageUrl = tablePhotos[t.number] ?? null
 
   const tableMap = {}
   for (const t of tablesData) {
@@ -183,6 +289,7 @@ async function seed() {
         status: t.status,
         windowSidePosition: t.windowSidePosition,
         reservationCost: t.reservationCost,
+        imageUrl: t.imageUrl,
       },
       create: t,
     })
@@ -198,14 +305,16 @@ async function seed() {
       foods: [
         {
           name: 'Royal Mutton Kacchi Biryani',
-          description: 'Tender spiced mutton layered with fragrant basmati rice, saffron, and potato',
+          description:
+            'Tender spiced mutton layered with fragrant basmati rice, saffron, and potato',
           price: 650.0,
           prepTimeMinutes: 20,
           imageUrl: menuImage('1563379926898-05f4575a45d8'),
         },
         {
           name: 'Beef Kala Bhuna',
-          description: 'Traditional slow-cooked Chittagong-style dark tender beef in caramelized spices',
+          description:
+            'Traditional slow-cooked Chittagong-style dark tender beef in caramelized spices',
           price: 720.0,
           prepTimeMinutes: 25,
           imageUrl: menuImage('1603360946369-dc9bb6258143'),
@@ -239,7 +348,8 @@ async function seed() {
       foods: [
         {
           name: 'Chicken Reshmi Kebab',
-          description: 'Silky marinated minced chicken skewers infused with cream, cashew and cardamom',
+          description:
+            'Silky marinated minced chicken skewers infused with cream, cashew and cardamom',
           price: 450.0,
           prepTimeMinutes: 18,
           imageUrl: menuImage('1599487488170-d11ec9c172f0'),
@@ -253,7 +363,8 @@ async function seed() {
         },
         {
           name: 'Spiced Lamb Chops Platter',
-          description: 'Double-cut lamb chops glazed in ginger, black pepper, and papaya tenderizer',
+          description:
+            'Double-cut lamb chops glazed in ginger, black pepper, and papaya tenderizer',
           price: 1150.0,
           prepTimeMinutes: 25,
           imageUrl: menuImage('1544025162-d76694265947'),
@@ -299,6 +410,15 @@ async function seed() {
       description: 'Signature western and fusion entrees prepared with fresh ingredients',
       foods: [
         {
+          name: 'Seafood Platter',
+          description:
+            'Grilled pomfret and fish steaks with jumbo prawns over seafood pulao, lime and lettuce — serves 2',
+          price: 1500.0,
+          prepTimeMinutes: 35,
+          isChefPick: true,
+          imageUrl: '/dishes/seafood-platter.jpg',
+        },
+        {
           name: 'Grilled Ribeye Steak',
           description: 'Prime 10oz ribeye with roasted asparagus and peppercorn jus',
           price: 1650.0,
@@ -334,7 +454,8 @@ async function seed() {
       foods: [
         {
           name: 'Shahi Tukra with Rabri',
-          description: 'Golden saffron-soaked brioche topped with rich condensed milk and crushed pistachios',
+          description:
+            'Golden saffron-soaked brioche topped with rich condensed milk and crushed pistachios',
           price: 280.0,
           prepTimeMinutes: 10,
           imageUrl: menuImage('1571877227200-a0d98ea607e9'),
@@ -395,14 +516,16 @@ async function seed() {
       foods: [
         {
           name: 'Dhaka Kacchi Biryani',
-          description: 'Aromatic basmati rice layered with tender mutton, potato, saffron, and barista',
+          description:
+            'Aromatic basmati rice layered with tender mutton, potato, saffron, and barista',
           price: 620.0,
           prepTimeMinutes: 25,
           imageUrl: commonsImage('Kacchi Biryani'),
         },
         {
           name: 'Beef Tehari',
-          description: 'Fragrant kalijira rice cooked with tender beef, mustard oil, and whole spices',
+          description:
+            'Fragrant kalijira rice cooked with tender beef, mustard oil, and whole spices',
           price: 560.0,
           prepTimeMinutes: 22,
           imageUrl: commonsImage('Tehari'),
@@ -449,12 +572,592 @@ async function seed() {
           prepTimeMinutes: 5,
           imageUrl: commonsImage('Mishti Doi'),
         },
+        {
+          name: 'Bhetki Paturi',
+          description: 'Bhetki fillets in mustard-coconut paste, steamed in banana leaf',
+          price: 580.0,
+          prepTimeMinutes: 25,
+          imageUrl: '/dishes/bhetki-paturi.jpg',
+        },
+        {
+          name: 'Bhorta Platter',
+          description:
+            'Eight classic mashes on a brass thali — shutki, begun, alu, dal, tomato and more',
+          price: 450.0,
+          prepTimeMinutes: 15,
+          imageUrl: '/dishes/bhorta-platter.jpg',
+        },
+        {
+          name: 'Dab Chingri',
+          description:
+            'Golda prawns in coconut-mustard gravy, slow-cooked and served inside a tender green coconut',
+          price: 950.0,
+          prepTimeMinutes: 30,
+          imageUrl: '/dishes/dab-chingri.jpg',
+        },
       ],
     },
   ]
 
+  // Dishes adapted from the Guilty Pleasure menu card. Categories that
+  // already exist above just gain dishes; the rest are new sections. The
+  // chili and star printed beside a dish on the card become isSpicy and
+  // isChefPick.
+  const menuAdditions = [
+    {
+      name: 'Appetizers',
+      description: 'Curated bites to start your dining experience',
+      foods: [
+        {
+          name: 'Chicken Strips',
+          description: 'Six golden, crumb-crusted chicken strips with a creamy dip',
+          price: 590.0,
+          prepTimeMinutes: 12,
+          imageUrl: menuImage('1562967914-608f82629710'),
+        },
+        {
+          name: 'Naga Wings',
+          description: 'Six wings tossed in fiery naga chili glaze',
+          price: 520.0,
+          prepTimeMinutes: 15,
+          isSpicy: true,
+          imageUrl: menuImage('1569058242253-92a9c755a0ec'),
+        },
+        {
+          name: 'Fish and Chips',
+          description: 'Two battered fish fillets with fries, slaw and tartar sauce',
+          price: 660.0,
+          prepTimeMinutes: 18,
+          imageUrl: menuImage('1576777647209-e8733d7b851d'),
+        },
+      ],
+    },
+    {
+      name: 'Soups',
+      description: 'Slow-simmered bowls, made from scratch in house',
+      foods: [
+        {
+          name: 'Tom Yum Goong',
+          description: 'Authentic hot and sour Thai broth with sea prawns and mushrooms',
+          price: 480.0,
+          prepTimeMinutes: 15,
+          isSpicy: true,
+          imageUrl: menuImage('1548943487-a2e4e43b4853'),
+        },
+        {
+          name: 'Seafood Chowder',
+          description: 'Rich, creamy soup loaded with seafood and vegetable chunks',
+          price: 610.0,
+          prepTimeMinutes: 18,
+          imageUrl: menuImage('1476718406336-bb5a9690ee2a'),
+        },
+        {
+          name: 'Seafood Clear Soup',
+          description: 'Light, refreshing clear broth with prawns and vegetables',
+          price: 390.0,
+          prepTimeMinutes: 12,
+          imageUrl: menuImage('1603105037880-880cd4edfb0d'),
+        },
+      ],
+    },
+    {
+      name: 'Salads',
+      description: 'Crisp, fresh bowls with house-made dressings',
+      foods: [
+        {
+          name: 'Apple Salad',
+          description: 'Fresh apples, tomatoes, sautéed chicken and nuts with a creamy dressing',
+          price: 550.0,
+          prepTimeMinutes: 10,
+          imageUrl: menuImage('1505253716362-afaea1d3d1af'),
+        },
+        {
+          name: 'Roasted Potato Salad',
+          description: 'Roasted potatoes and greens in honey mustard, finished with croutons',
+          price: 320.0,
+          prepTimeMinutes: 10,
+          imageUrl: menuImage('1512621776951-a57141f2eefd'),
+        },
+        {
+          name: 'Cashew Nut Chicken Salad',
+          description: 'Crispy fried chicken and golden cashews in a sweet, tangy sauce',
+          price: 599.0,
+          prepTimeMinutes: 12,
+          imageUrl: menuImage('1546069901-ba9599a7e63c'),
+        },
+      ],
+    },
+    {
+      name: 'Sandwiches, Burgers & Wraps',
+      description: 'Stacked, pressed and wrapped — all served with fries',
+      foods: [
+        {
+          name: 'Sirloin Steak Sandwich',
+          description: 'Thinly sliced sirloin on toasted bread with fries and dipping sauce',
+          price: 830.0,
+          prepTimeMinutes: 18,
+          imageUrl: menuImage('1553909489-cd47e0907980'),
+        },
+        {
+          name: 'Pesto Chicken Sandwich',
+          description: 'House pesto, chicken and cheese on toasted ciabatta, fries included',
+          price: 690.0,
+          prepTimeMinutes: 15,
+          imageUrl: menuImage('1528735602780-2552fd46c7af'),
+        },
+        {
+          name: 'Crispy Chicken Tortilla Wrap',
+          description: 'Crunchy chicken, slaw and sauce rolled in a warm tortilla',
+          price: 480.0,
+          prepTimeMinutes: 12,
+          imageUrl: menuImage('1626700051175-6818013e1d4f'),
+        },
+        {
+          name: 'Crispy Chicken Burger',
+          description: 'Buttermilk fried chicken on a brioche bun, served with fries',
+          price: 450.0,
+          prepTimeMinutes: 15,
+          imageUrl: menuImage('1606755962773-d324e0a13086'),
+        },
+      ],
+    },
+    {
+      name: 'Pastas',
+      description: 'Fresh sauces tossed to order',
+      foods: [
+        {
+          name: 'Creamy Alfredo',
+          description: 'Fettuccine in a rich cream sauce with mushroom, chicken and garlic bread',
+          price: 689.0,
+          prepTimeMinutes: 18,
+          imageUrl: menuImage('1645112411341-6c4fd023714a'),
+        },
+        {
+          name: 'Spicy Seafood Spaghetti',
+          description: 'Prawn, dory fish and calamari in a spicy fresh tomato sauce',
+          price: 610.0,
+          prepTimeMinutes: 20,
+          isSpicy: true,
+          imageUrl: menuImage('1516100882582-96c3a05fe590'),
+        },
+        {
+          name: 'Shazy',
+          description: 'Bold, smoky Szechuan red sauce pasta with chicken',
+          price: 505.0,
+          prepTimeMinutes: 18,
+          isSpicy: true,
+          isChefPick: true,
+          imageUrl: menuImage('1551183053-bf91a1d81141'),
+        },
+        {
+          name: 'Rustic Carbonara',
+          description: 'Thick, creamy sauce with beef bacon and chicken, topped with bacon bites',
+          price: 690.0,
+          prepTimeMinutes: 18,
+          isChefPick: true,
+          imageUrl: menuImage('1612874742237-6526221588e3'),
+        },
+        {
+          name: 'Pad Thai',
+          description: 'Rice noodles with chicken and prawn, crushed peanuts and chili flakes',
+          price: 680.0,
+          prepTimeMinutes: 15,
+          imageUrl: menuImage('1559314809-0d155014e29e'),
+        },
+      ],
+    },
+    {
+      name: 'Set Meals',
+      description: 'A complete plate — main, sides and sauce',
+      foods: [
+        {
+          name: 'BBQ Chicken Meal',
+          description: 'Glazed grilled chicken with Thai fried rice, fries and sautéed vegetables',
+          price: 690.0,
+          prepTimeMinutes: 22,
+          imageUrl: menuImage('1598515214211-89d3c73ae83b'),
+        },
+        {
+          name: 'Peri Peri Chicken Meal',
+          description: 'House peri peri sauce sizzled over grilled chicken, with veggies and rice',
+          price: 690.0,
+          prepTimeMinutes: 22,
+          isSpicy: true,
+          isChefPick: true,
+          imageUrl: menuImage('1532550907401-a500c9a57435'),
+        },
+        {
+          name: 'Grilled Dory Meal',
+          description: 'Grilled fish with butter rice, saucy fried corn and sautéed vegetables',
+          price: 705.0,
+          prepTimeMinutes: 20,
+          imageUrl: menuImage('1519708227418-c8fd9a32b7a2'),
+        },
+      ],
+    },
+    {
+      name: 'Thai Set Meals',
+      description: 'Authentic Thai plates served with rice',
+      foods: [
+        {
+          name: 'Thai Chicken Basil',
+          description: 'Wok-tossed chicken with holy basil, white rice and a fried egg on top',
+          price: 510.0,
+          prepTimeMinutes: 15,
+          isSpicy: true,
+          imageUrl: menuImage('1604908176997-125f25cc6f3d'),
+        },
+        {
+          name: 'Thai Fried Rice',
+          description: 'Chicken or prawn fried rice with chicken satay and two wings',
+          price: 530.0,
+          prepTimeMinutes: 15,
+          imageUrl: menuImage('1603133872878-684f208fb84b'),
+        },
+        {
+          name: 'Pa Naeng Curry Chicken',
+          description: 'Rich, mildly spicy Thai curry with a nutty peanut finish, with white rice',
+          price: 490.0,
+          prepTimeMinutes: 18,
+          isChefPick: true,
+          imageUrl: menuImage('1455619452474-d2be8b1e70cd'),
+        },
+      ],
+    },
+    {
+      name: 'Desserts',
+      description: 'Sweet endings crafted with care',
+      foods: [
+        {
+          name: 'Signature San Sebastian Cake',
+          description:
+            'Burnt Basque cheesecake with a caramelised top, finished with warm chocolate sauce',
+          price: 450.0,
+          prepTimeMinutes: 5,
+          isChefPick: true,
+          imageUrl: '/dishes/san-sebastian-cake.jpg',
+        },
+        {
+          name: 'Chocolate Bomb with Brownie',
+          description:
+            'A chocolate sphere over fudgy brownie that melts open under hot chocolate sauce at the table',
+          price: 520.0,
+          prepTimeMinutes: 8,
+          imageUrl: '/dishes/chocolate-bomb.jpg',
+        },
+        {
+          name: 'Mango Sticky Rice',
+          description: 'Sweet coconut sticky rice with ripe mango slices',
+          price: 670.0,
+          prepTimeMinutes: 8,
+          isChefPick: true,
+          imageUrl: menuImage('1711161988375-da7eff032e45'),
+        },
+        {
+          name: 'Blueberry Cheesecake',
+          description: 'Creamy baked cheesecake under a glossy blueberry topping',
+          price: 390.0,
+          prepTimeMinutes: 5,
+          imageUrl: menuImage('1533134242443-d4fd215305ad'),
+        },
+        {
+          name: 'Crunchy Chocolate Cake',
+          description: 'Dense, fudgy chocolate layers with a crackly top',
+          price: 295.0,
+          prepTimeMinutes: 5,
+          imageUrl: menuImage('1606313564200-e75d5e30476c'),
+        },
+        {
+          name: 'Tres Leches',
+          description: 'Sponge soaked in three milks, crowned with whipped cream',
+          price: 305.0,
+          prepTimeMinutes: 5,
+          imageUrl: menuImage('1571115177098-24ec42ed204d'),
+        },
+      ],
+    },
+    {
+      name: 'Coffee',
+      description: 'Hot and iced espresso drinks',
+      foods: [
+        {
+          name: 'Espresso',
+          description: 'Strong, bold coffee made by forcing hot water through finely ground beans',
+          price: 170.0,
+          prepTimeMinutes: 3,
+          coffeeStrength: 3,
+          milkLevel: 'NONE',
+          imageUrl: menuImage('1510591509098-f4fdc6d0ff04'),
+        },
+        {
+          name: 'Americano',
+          description: 'Espresso diluted with hot water — smooth, rich and less intense',
+          price: 190.0,
+          prepTimeMinutes: 4,
+          coffeeStrength: 2,
+          milkLevel: 'NONE',
+          imageUrl: menuImage('1521302080334-4bebac2763a6'),
+        },
+        {
+          name: 'Flat White',
+          description:
+            'Espresso with steamed milk and a thin layer of microfoam, made with ristretto shots',
+          price: 320.0,
+          prepTimeMinutes: 5,
+          coffeeStrength: 2,
+          milkLevel: 'MORE',
+          imageUrl: menuImage('1577968897966-3d4325b36b61'),
+        },
+        {
+          name: 'Mocha',
+          description: 'Espresso with steamed milk and chocolate — sweet, creamy and indulgent',
+          price: 300.0,
+          prepTimeMinutes: 5,
+          coffeeStrength: 2,
+          milkLevel: 'MORE',
+          imageUrl: menuImage('1578314675249-a6910f80cc4e'),
+        },
+        {
+          name: 'Macchiato',
+          description: 'Espresso marked with a small amount of steamed milk or foam',
+          price: 220.0,
+          prepTimeMinutes: 4,
+          coffeeStrength: 3,
+          milkLevel: 'LITTLE',
+          imageUrl: menuImage('1485808191679-5f86510681a2'),
+        },
+        {
+          name: 'Caramel Macchiato',
+          description:
+            'Vanilla milk topped with espresso and a caramel drizzle — sweet and layered',
+          price: 350.0,
+          prepTimeMinutes: 5,
+          coffeeStrength: 2,
+          milkLevel: 'MORE',
+          imageUrl: menuImage('1517701604599-bb29b565090c'),
+        },
+        {
+          name: 'Cold Brew',
+          description:
+            'Coffee steeped in cold water for 12–24 hours — smooth, low-acid and refreshing',
+          price: 300.0,
+          prepTimeMinutes: 3,
+          coffeeStrength: 2,
+          milkLevel: 'NONE',
+          imageUrl: menuImage('1517959105821-eaf2591984ca'),
+        },
+        {
+          name: 'Butterscotch Latte',
+          description: 'Iced latte layered with butterscotch and a cocoa-dusted cream top',
+          price: 380.0,
+          prepTimeMinutes: 5,
+          coffeeStrength: 1,
+          milkLevel: 'MORE',
+          imageUrl: menuImage('1662047102608-a6f2e492411f'),
+        },
+        {
+          name: 'Brûlée Cloud Latte',
+          description: 'Latte under a torched sugar crust and a pillow of cloud foam',
+          price: 420.0,
+          prepTimeMinutes: 6,
+          coffeeStrength: 2,
+          milkLevel: 'FOAM',
+          isChefPick: true,
+          imageUrl: menuImage('1570968915860-54d5c301fa9f'),
+        },
+        {
+          name: 'Espresso Ovaltine',
+          description: 'Malty Ovaltine and milk crowned with a shot of espresso',
+          price: 390.0,
+          prepTimeMinutes: 5,
+          coffeeStrength: 2,
+          milkLevel: 'MORE',
+          imageUrl: menuImage('1599398054066-846f28917f38'),
+        },
+        {
+          name: 'Cappuccino',
+          description: 'Espresso with steamed milk and a deep layer of foam',
+          price: 295.0,
+          prepTimeMinutes: 5,
+          imageUrl: menuImage('1572442388796-11668a67e53d'),
+        },
+        {
+          name: 'Caffè Latte',
+          description: 'Smooth espresso with silky steamed milk',
+          price: 290.0,
+          prepTimeMinutes: 5,
+          imageUrl: menuImage('1561882468-9110e03e0f78'),
+        },
+        {
+          name: 'Hazelnut Latte',
+          description: 'Latte sweetened with toasted hazelnut syrup',
+          price: 400.0,
+          prepTimeMinutes: 5,
+          imageUrl: menuImage('1509042239860-f550ce710b93'),
+        },
+        {
+          name: 'Iced Caramel Latte',
+          description: 'Chilled espresso and milk over ice with caramel',
+          price: 350.0,
+          prepTimeMinutes: 5,
+          imageUrl: menuImage('1461023058943-07fcbe16d735'),
+        },
+      ],
+    },
+    {
+      name: 'Shakes & Smoothies',
+      description: 'Thick shakes, fruit smoothies and floats',
+      foods: [
+        {
+          name: 'Oreo Shake',
+          description: 'Vanilla ice cream blended with crushed Oreo cookies',
+          price: 310.0,
+          prepTimeMinutes: 5,
+          imageUrl: menuImage('1572490122747-3968b75cc699'),
+        },
+        {
+          name: 'Mango Shake',
+          description: 'Ripe mango blended thick with milk and ice cream',
+          price: 310.0,
+          prepTimeMinutes: 5,
+          imageUrl: menuImage('1623065422902-30a2d299bbe4'),
+        },
+        {
+          name: 'Tom & Berry',
+          description: 'Mixed berry smoothie with a creamy finish',
+          price: 420.0,
+          prepTimeMinutes: 5,
+          imageUrl: menuImage('1553530666-ba11a7da3888'),
+        },
+        {
+          name: 'Strawberry Float',
+          description: 'Sparkling strawberry cooler topped with ice cream',
+          price: 420.0,
+          prepTimeMinutes: 5,
+          imageUrl: menuImage('1497534446932-c925b458314e'),
+        },
+      ],
+    },
+    {
+      name: 'Beverages',
+      description: 'Refreshing drinks, mocktails, and artisan coffees',
+      foods: [
+        {
+          name: 'Coffee Milk Bubble Tea',
+          description: 'Iced coffee and milk poured over chewy brown-sugar boba pearls',
+          price: 380.0,
+          prepTimeMinutes: 5,
+          coffeeStrength: 2,
+          milkLevel: 'MORE',
+          imageUrl: '/dishes/coffee-boba.jpg',
+        },
+        {
+          name: 'Taro Boba Milk',
+          description: 'Creamy purple taro milk over ice with tapioca pearls',
+          price: 360.0,
+          prepTimeMinutes: 5,
+          milkLevel: 'MORE',
+          imageUrl: '/dishes/taro-boba.jpg',
+        },
+        {
+          name: 'Cloud Matcha Tea',
+          description: 'Ceremonial matcha whisked with milk under a soft cloud foam',
+          price: 400.0,
+          prepTimeMinutes: 5,
+          milkLevel: 'FOAM',
+          isChefPick: true,
+          imageUrl: menuImage('1515823064-d6e0c04616a7'),
+        },
+        {
+          name: 'Peach Iced Tea',
+          description: 'Brewed black tea shaken with peach and fresh mint over ice',
+          price: 395.0,
+          prepTimeMinutes: 4,
+          milkLevel: 'NONE',
+          imageUrl: menuImage('1499638673689-79a0b5115d87'),
+        },
+        {
+          name: 'Ginger Fizz',
+          description: 'Sparkling ginger, lime and mint — bright and zingy',
+          price: 350.0,
+          prepTimeMinutes: 4,
+          milkLevel: 'NONE',
+          imageUrl: menuImage('1513558161293-cdaf765ed2fd'),
+        },
+        {
+          name: 'Hot Chocolate',
+          description: 'Rich melted chocolate whisked into steaming milk',
+          price: 360.0,
+          prepTimeMinutes: 5,
+          milkLevel: 'MORE',
+          imageUrl: menuImage('1542990253-0d0f5be5f0ed'),
+        },
+        {
+          name: 'Ginger Milk Tea',
+          description: 'Spiced ginger milk tea with chewy brown-sugar pearls',
+          price: 350.0,
+          prepTimeMinutes: 5,
+          milkLevel: 'MORE',
+          imageUrl: menuImage('1558857563-b371033873b8'),
+        },
+        {
+          name: 'Lemon Iced Tea',
+          description: 'Fresh-brewed black tea over ice with lemon',
+          price: 320.0,
+          prepTimeMinutes: 4,
+          imageUrl: menuImage('1556679343-c7306c1976bc'),
+        },
+        {
+          name: 'Virgin Mojito',
+          description: 'Lime, mint and soda muddled over crushed ice',
+          price: 395.0,
+          prepTimeMinutes: 4,
+          imageUrl: menuImage('1551538827-9c037cb4f32a'),
+        },
+        {
+          name: 'Orange Juice',
+          description: 'Freshly squeezed oranges, nothing added',
+          price: 280.0,
+          prepTimeMinutes: 4,
+          imageUrl: menuImage('1600271886742-f049cd451bba'),
+        },
+      ],
+    },
+  ]
+
+  // Markers for dishes seeded before the menu card was adopted.
+  // Every category gets at least one chef's pick, so that quick filter is
+  // never empty; coffees get the strength/milk guide from the coffee menu.
+  const existingMarkers = {
+    'Buffalo Wings': { isSpicy: true },
+    'Beef Kala Bhuna': { isSpicy: true },
+    'Royal Mutton Kacchi Biryani': { isChefPick: true },
+    'Chingri Malai Curry': { isChefPick: true },
+    'Grilled Ribeye Steak': { isChefPick: true },
+    'Chicken Reshmi Kebab': { isChefPick: true },
+    'Fish and Chips': { isChefPick: true },
+    'Seafood Chowder': { isChefPick: true },
+    'Apple Salad': { isChefPick: true },
+    'Sirloin Steak Sandwich': { isChefPick: true },
+    'Oreo Shake': { isChefPick: true, milkLevel: 'MORE' },
+    'Mango Shake': { milkLevel: 'MORE' },
+    'Tom & Berry': { milkLevel: 'LITTLE' },
+    'Strawberry Float': { milkLevel: 'LITTLE' },
+    Cappuccino: { coffeeStrength: 2, milkLevel: 'FOAM' },
+    'Caffè Latte': { coffeeStrength: 1, milkLevel: 'MORE' },
+    'Hazelnut Latte': { coffeeStrength: 1, milkLevel: 'MORE' },
+    'Iced Caramel Latte': { coffeeStrength: 2, milkLevel: 'MORE' },
+    'Artisan Iced Latte': { coffeeStrength: 1, milkLevel: 'MORE' },
+    'Sweet Mango Lassi': { milkLevel: 'MORE' },
+    'Lemon Iced Tea': { milkLevel: 'NONE' },
+    'Virgin Mojito': { milkLevel: 'NONE' },
+    'Orange Juice': { milkLevel: 'NONE' },
+    'Mint Lemonade Cooler': { milkLevel: 'NONE' },
+    'Passionfruit Mocktail': { milkLevel: 'NONE' },
+  }
+
   const foodMap = {}
-  for (const cat of categoriesData) {
+  for (const cat of [...categoriesData, ...menuAdditions]) {
     const category = await prisma.category.upsert({
       where: { name: cat.name },
       update: { description: cat.description },
@@ -462,6 +1165,12 @@ async function seed() {
     })
 
     for (const food of cat.foods) {
+      const markers = {
+        isSpicy: Boolean(food.isSpicy ?? existingMarkers[food.name]?.isSpicy),
+        isChefPick: Boolean(food.isChefPick ?? existingMarkers[food.name]?.isChefPick),
+        coffeeStrength: food.coffeeStrength ?? existingMarkers[food.name]?.coffeeStrength ?? null,
+        milkLevel: food.milkLevel ?? existingMarkers[food.name]?.milkLevel ?? null,
+      }
       let existingFood = await prisma.food.findFirst({
         where: { name: food.name, categoryId: category.id },
       })
@@ -475,6 +1184,7 @@ async function seed() {
             imageUrl: food.imageUrl,
             categoryId: category.id,
             isAvailable: true,
+            ...markers,
           },
         })
       } else {
@@ -484,6 +1194,7 @@ async function seed() {
           data: {
             price: food.price,
             description: food.description,
+            ...markers,
             ...(existingFood.imageUrl?.startsWith('/uploads/') ? {} : { imageUrl: food.imageUrl }),
           },
         })
@@ -496,32 +1207,152 @@ async function seed() {
   console.log('Seeding kitchen inventory...')
   const inventoryItems = [
     // Poultry & Meats
-    { itemName: 'Fresh Farm Chicken', category: 'Poultry', unit: 'KG', quantity: 45.0, minStockLevel: 15.0 }, // IN_STOCK
-    { itemName: 'Prime Local Beef Cut', category: 'Meat', unit: 'KG', quantity: 6.0, minStockLevel: 12.0 }, // LOW_STOCK
-    { itemName: 'Angus Beef Ribeye', category: 'Meat', unit: 'KG', quantity: 0.0, minStockLevel: 10.0 }, // OUT_OF_STOCK
-    { itemName: 'Atlantic Salmon Fillet', category: 'Seafood', unit: 'KG', quantity: 18.5, minStockLevel: 5.0 }, // IN_STOCK
-    { itemName: 'Fresh Calamari', category: 'Seafood', unit: 'KG', quantity: 12.0, minStockLevel: 4.0 }, // IN_STOCK
-    { itemName: 'Whole Country Duck', category: 'Poultry', unit: 'KG', quantity: 0.0, minStockLevel: 8.0 }, // OUT_OF_STOCK
+    {
+      itemName: 'Fresh Farm Chicken',
+      category: 'Poultry',
+      unit: 'KG',
+      quantity: 45.0,
+      minStockLevel: 15.0,
+    }, // IN_STOCK
+    {
+      itemName: 'Prime Local Beef Cut',
+      category: 'Meat',
+      unit: 'KG',
+      quantity: 6.0,
+      minStockLevel: 12.0,
+    }, // LOW_STOCK
+    {
+      itemName: 'Angus Beef Ribeye',
+      category: 'Meat',
+      unit: 'KG',
+      quantity: 0.0,
+      minStockLevel: 10.0,
+    }, // OUT_OF_STOCK
+    {
+      itemName: 'Atlantic Salmon Fillet',
+      category: 'Seafood',
+      unit: 'KG',
+      quantity: 18.5,
+      minStockLevel: 5.0,
+    }, // IN_STOCK
+    {
+      itemName: 'Fresh Calamari',
+      category: 'Seafood',
+      unit: 'KG',
+      quantity: 12.0,
+      minStockLevel: 4.0,
+    }, // IN_STOCK
+    {
+      itemName: 'Whole Country Duck',
+      category: 'Poultry',
+      unit: 'KG',
+      quantity: 0.0,
+      minStockLevel: 8.0,
+    }, // OUT_OF_STOCK
     // Grains & Pantry
-    { itemName: 'Basmati Premium Rice', category: 'Grains', unit: 'KG', quantity: 60.0, minStockLevel: 20.0 }, // IN_STOCK
-    { itemName: 'Arborio Rice', category: 'Grains', unit: 'KG', quantity: 30.0, minStockLevel: 8.0 }, // IN_STOCK
-    { itemName: 'All-Purpose Wheat Flour', category: 'Pantry', unit: 'KG', quantity: 40.0, minStockLevel: 15.0 }, // IN_STOCK
-    { itemName: 'Pure Mustard Oil', category: 'Pantry', unit: 'LITER', quantity: 25.0, minStockLevel: 10.0 }, // IN_STOCK
-    { itemName: 'Extra Virgin Olive Oil', category: 'Pantry', unit: 'LITER', quantity: 15.0, minStockLevel: 5.0 }, // IN_STOCK
-    { itemName: 'Truffle Oil', category: 'Pantry', unit: 'ML', quantity: 500.0, minStockLevel: 100.0 }, // IN_STOCK
+    {
+      itemName: 'Basmati Premium Rice',
+      category: 'Grains',
+      unit: 'KG',
+      quantity: 60.0,
+      minStockLevel: 20.0,
+    }, // IN_STOCK
+    {
+      itemName: 'Arborio Rice',
+      category: 'Grains',
+      unit: 'KG',
+      quantity: 30.0,
+      minStockLevel: 8.0,
+    }, // IN_STOCK
+    {
+      itemName: 'All-Purpose Wheat Flour',
+      category: 'Pantry',
+      unit: 'KG',
+      quantity: 40.0,
+      minStockLevel: 15.0,
+    }, // IN_STOCK
+    {
+      itemName: 'Pure Mustard Oil',
+      category: 'Pantry',
+      unit: 'LITER',
+      quantity: 25.0,
+      minStockLevel: 10.0,
+    }, // IN_STOCK
+    {
+      itemName: 'Extra Virgin Olive Oil',
+      category: 'Pantry',
+      unit: 'LITER',
+      quantity: 15.0,
+      minStockLevel: 5.0,
+    }, // IN_STOCK
+    {
+      itemName: 'Truffle Oil',
+      category: 'Pantry',
+      unit: 'ML',
+      quantity: 500.0,
+      minStockLevel: 100.0,
+    }, // IN_STOCK
     // Fresh Produce
-    { itemName: 'Deshi Red Onions', category: 'Produce', unit: 'KG', quantity: 8.0, minStockLevel: 15.0 }, // LOW_STOCK
-    { itemName: 'Garlic Cloves', category: 'Produce', unit: 'KG', quantity: 0.0, minStockLevel: 6.0 }, // OUT_OF_STOCK
-    { itemName: 'Fresh Vine Tomatoes', category: 'Produce', unit: 'KG', quantity: 25.0, minStockLevel: 10.0 }, // IN_STOCK
+    {
+      itemName: 'Deshi Red Onions',
+      category: 'Produce',
+      unit: 'KG',
+      quantity: 8.0,
+      minStockLevel: 15.0,
+    }, // LOW_STOCK
+    {
+      itemName: 'Garlic Cloves',
+      category: 'Produce',
+      unit: 'KG',
+      quantity: 0.0,
+      minStockLevel: 6.0,
+    }, // OUT_OF_STOCK
+    {
+      itemName: 'Fresh Vine Tomatoes',
+      category: 'Produce',
+      unit: 'KG',
+      quantity: 25.0,
+      minStockLevel: 10.0,
+    }, // IN_STOCK
     // Dairy
     { itemName: 'Whole Milk', category: 'Dairy', unit: 'LITER', quantity: 4.0, minStockLevel: 6.0 }, // LOW_STOCK
-    { itemName: 'Parmesan Cheese', category: 'Dairy', unit: 'KG', quantity: 8.0, minStockLevel: 2.0 }, // IN_STOCK
-    { itemName: 'Mozzarella Cheese Block', category: 'Dairy', unit: 'KG', quantity: 0.0, minStockLevel: 5.0 }, // OUT_OF_STOCK
+    {
+      itemName: 'Parmesan Cheese',
+      category: 'Dairy',
+      unit: 'KG',
+      quantity: 8.0,
+      minStockLevel: 2.0,
+    }, // IN_STOCK
+    {
+      itemName: 'Mozzarella Cheese Block',
+      category: 'Dairy',
+      unit: 'KG',
+      quantity: 0.0,
+      minStockLevel: 5.0,
+    }, // OUT_OF_STOCK
     { itemName: 'Pure Cow Ghee', category: 'Dairy', unit: 'KG', quantity: 2.0, minStockLevel: 6.0 }, // LOW_STOCK
-    { itemName: 'Sweetened Curd / Doi', category: 'Dairy', unit: 'KG', quantity: 12.0, minStockLevel: 5.0 }, // IN_STOCK
+    {
+      itemName: 'Sweetened Curd / Doi',
+      category: 'Dairy',
+      unit: 'KG',
+      quantity: 12.0,
+      minStockLevel: 5.0,
+    }, // IN_STOCK
     // Spices
-    { itemName: 'Garam Masala Blend', category: 'Spices', unit: 'PACK', quantity: 3.0, minStockLevel: 10.0 }, // LOW_STOCK
-    { itemName: 'Kashmiri Chili Powder', category: 'Spices', unit: 'PACK', quantity: 15.0, minStockLevel: 5.0 }, // IN_STOCK
+    {
+      itemName: 'Garam Masala Blend',
+      category: 'Spices',
+      unit: 'PACK',
+      quantity: 3.0,
+      minStockLevel: 10.0,
+    }, // LOW_STOCK
+    {
+      itemName: 'Kashmiri Chili Powder',
+      category: 'Spices',
+      unit: 'PACK',
+      quantity: 15.0,
+      minStockLevel: 5.0,
+    }, // IN_STOCK
   ]
 
   for (const item of inventoryItems) {
@@ -840,7 +1671,7 @@ async function seed() {
     })
     if (!existingBill) {
       const subtotal = Number(b.order.totalAmount)
-      const vatAmount = Math.round((subtotal * b.vatPercent) / 100 * 100) / 100
+      const vatAmount = Math.round(((subtotal * b.vatPercent) / 100) * 100) / 100
       const grandTotal = Math.max(0, subtotal + vatAmount - b.discount)
 
       await prisma.bill.create({
@@ -862,8 +1693,12 @@ async function seed() {
   console.log('Seeding reservations...')
   const today = new Date()
   const todayDateOnly = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()))
-  const tomorrowDateOnly = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() + 1))
-  const in3DaysDateOnly = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() + 3))
+  const tomorrowDateOnly = new Date(
+    Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() + 1),
+  )
+  const in3DaysDateOnly = new Date(
+    Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() + 3),
+  )
 
   const reservationsData = [
     {
@@ -948,10 +1783,19 @@ async function seed() {
   // 10. FAVORITES & LOYALTY TRANSACTIONS
   console.log('Seeding customer favorites and loyalty transactions...')
   const favoritesData = [
-    { customer: customerMap['customer@foodfusion.com'], food: foodMap['Royal Mutton Kacchi Biryani'] },
-    { customer: customerMap['customer@foodfusion.com'], food: foodMap['Pan-Seared Atlantic Salmon'] },
+    {
+      customer: customerMap['customer@foodfusion.com'],
+      food: foodMap['Royal Mutton Kacchi Biryani'],
+    },
+    {
+      customer: customerMap['customer@foodfusion.com'],
+      food: foodMap['Pan-Seared Atlantic Salmon'],
+    },
     { customer: customerMap['customer@foodfusion.com'], food: foodMap['Warm Chocolate Lava Cake'] },
-    { customer: customerMap['customer.anika@foodfusion.com'], food: foodMap['Butter Chicken Delicacy'] },
+    {
+      customer: customerMap['customer.anika@foodfusion.com'],
+      food: foodMap['Butter Chicken Delicacy'],
+    },
     { customer: customerMap['customer.anika@foodfusion.com'], food: foodMap['Sweet Mango Lassi'] },
     { customer: customerMap['customer.sakib@foodfusion.com'], food: foodMap['Beef Kala Bhuna'] },
   ]

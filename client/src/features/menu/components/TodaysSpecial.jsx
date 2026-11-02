@@ -1,7 +1,6 @@
-import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Clock, ArrowRight, Sparkles, UtensilsCrossed } from 'lucide-react'
-import { getMenuImageUrl } from '@/constants'
+import { Clock, ArrowRight, Sparkles } from 'lucide-react'
+import { FullPhoto } from '@/features/menu/components/FullPhoto'
 import { money } from '@/utils/format'
 
 /**
@@ -15,12 +14,7 @@ import { money } from '@/utils/format'
  */
 
 export function TodaysSpecial({ dish, onView, onAdd }) {
-  const [imageFailed, setImageFailed] = useState(false)
-
   if (!dish) return null
-
-  const { primary, fallback } = getMenuImageUrl(dish)
-  const image = imageFailed ? fallback : primary || fallback
 
   return (
     <motion.section
@@ -40,7 +34,10 @@ export function TodaysSpecial({ dish, onView, onAdd }) {
             </span>
           </span>
 
-          <h2 id="todays-special-heading" className="font-display text-2xl font-semibold text-white sm:text-3xl">
+          <h2
+            id="todays-special-heading"
+            className="font-display text-2xl font-semibold text-white sm:text-3xl"
+          >
             {dish.name}
           </h2>
 
@@ -49,7 +46,9 @@ export function TodaysSpecial({ dish, onView, onAdd }) {
           )}
 
           <div className="flex flex-wrap items-center gap-4">
-            <span className="font-display text-3xl font-semibold text-gold-300">{money(dish.price)}</span>
+            <span className="font-display text-3xl font-semibold text-gold-300">
+              {money(dish.price)}
+            </span>
             {dish.prepTimeMinutes && (
               <span className="flex items-center gap-1.5 text-sm text-white/70">
                 <Clock className="h-4 w-4" />
@@ -79,19 +78,9 @@ export function TodaysSpecial({ dish, onView, onAdd }) {
 
         {/* --- Image -------------------------------------------------- */}
         <div className="relative min-h-[15rem] overflow-hidden md:min-h-full">
-          {image ? (
-              <img
-                src={image}
-                alt={`${dish.name} - ${dish.description || 'FoodFusion menu item'}`}
-                title={dish.name}
-                onError={() => setImageFailed(true)}
-                className="h-full w-full object-cover"
-              />
-          ) : (
-            <span className="flex h-full w-full items-center justify-center bg-brand-900">
-              <UtensilsCrossed className="h-14 w-14 text-white/15" strokeWidth={1.25} />
-            </span>
-          )}
+          <span className="absolute inset-0">
+            <FullPhoto dish={dish} />
+          </span>
           {/* Feathers the image into the emerald panel on wide screens. */}
           <span
             aria-hidden

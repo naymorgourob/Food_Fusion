@@ -272,7 +272,10 @@ export function TakeOrderModal({
 
                 {orderType === 'DINE_IN' && (
                   <div className="flex flex-1 items-center gap-2 min-w-[200px]">
-                    <label htmlFor="table-select" className="text-xs font-bold text-body whitespace-nowrap">
+                    <label
+                      htmlFor="table-select"
+                      className="text-xs font-bold text-body whitespace-nowrap"
+                    >
                       Table:
                     </label>
                     <select
@@ -370,7 +373,7 @@ export function TakeOrderModal({
                               </span>
                             </div>
                             {dish.description && (
-                              <p className="mt-1 line-clamp-2 text-[0.7rem] text-body-faint">
+                              <p className="mt-1 line-clamp-2 text-[0.82rem] text-body-faint">
                                 {dish.description}
                               </p>
                             )}
@@ -420,7 +423,7 @@ export function TakeOrderModal({
                   <span className="font-display text-sm font-bold text-body">
                     Kitchen Ticket Summary
                   </span>
-                  <span className="rounded-full bg-brand-100 px-2 py-0.5 text-[0.65rem] font-bold text-brand-800 dark:bg-brand-950/40 dark:text-brand-300">
+                  <span className="rounded-full bg-brand-100 px-2 py-0.5 text-[0.78rem] font-bold text-brand-800 dark:bg-brand-950/40 dark:text-brand-300">
                     {totalItemCount} {totalItemCount === 1 ? 'item' : 'items'}
                   </span>
                 </div>
@@ -445,7 +448,7 @@ export function TakeOrderModal({
                         <li key={item.id} className="flex items-center justify-between py-2">
                           <div className="flex flex-col">
                             <span className="font-semibold text-body">{item.name}</span>
-                            <span className="text-[0.7rem] text-body-faint">
+                            <span className="text-[0.82rem] text-body-faint">
                               {quantity} × {money(item.price)}
                             </span>
                           </div>
@@ -468,7 +471,10 @@ export function TakeOrderModal({
 
                 {/* Special Instructions Note */}
                 <div className="mt-4">
-                  <label htmlFor="special-notes" className="flex items-center gap-1.5 text-xs font-semibold text-body">
+                  <label
+                    htmlFor="special-notes"
+                    className="flex items-center gap-1.5 text-xs font-semibold text-body"
+                  >
                     <ScrollText className="h-3.5 w-3.5 text-amber-600" /> Special Kitchen Note:
                   </label>
                   <textarea

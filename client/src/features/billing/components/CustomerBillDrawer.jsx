@@ -142,7 +142,7 @@ export function CustomerBillDrawer({ bill, isOpen, onClose, onViewReceipt }) {
                       <div key={item.id} className="flex items-center gap-3.5 p-3.5">
                         <div className="h-10 w-10 flex-none overflow-hidden rounded-xl bg-canvas-2 border border-rule/50">
                           {imageUrl ? (
-                            <img src={imageUrl} alt={item.menuItem?.name} className="h-full w-full object-cover" />
+                            <img src={imageUrl} alt={item.menuItem?.name} className="h-full w-full object-contain" />
                           ) : (
                             <div className="flex h-full w-full items-center justify-center text-body-faint">
                               <UtensilsCrossed className="h-4 w-4" />
@@ -154,7 +154,7 @@ export function CustomerBillDrawer({ bill, isOpen, onClose, onViewReceipt }) {
                           <span className="font-medium text-xs text-body truncate">
                             {item.menuItem?.name || 'Dish'}
                           </span>
-                          <span className="text-[0.7rem] text-body-muted">
+                          <span className="text-[0.82rem] text-body-muted">
                             {money(item.unitPrice)} × {item.quantity}
                           </span>
                         </div>

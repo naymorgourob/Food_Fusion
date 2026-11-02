@@ -1,6 +1,18 @@
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, UserRound, Phone, CalendarDays, Clock, Users, Armchair, Sparkles, ScrollText, History, Receipt } from 'lucide-react'
+import {
+  X,
+  UserRound,
+  Phone,
+  CalendarDays,
+  Clock,
+  Users,
+  Armchair,
+  Sparkles,
+  ScrollText,
+  History,
+  Receipt,
+} from 'lucide-react'
 import { StatusBadge } from '@/features/reservations/components/StatusBadge'
 import { OCCASION_LABELS } from '@/features/reservations/constants'
 import { orderNo, money } from '@/utils/format'
@@ -42,7 +54,13 @@ function Row({ icon: Icon, label, children }) {
  * the two real facts: when the booking was made, and — only when it
  * genuinely differs — when it was last changed.
  */
-export function AdminReservationDrawer({ reservation, isOpen, onClose, onStatusChange, isUpdatingStatus }) {
+export function AdminReservationDrawer({
+  reservation,
+  isOpen,
+  onClose,
+  onStatusChange,
+  isUpdatingStatus,
+}) {
   useEffect(() => {
     if (!isOpen) return undefined
     function onKeyDown(event) {
@@ -65,7 +83,8 @@ export function AdminReservationDrawer({ reservation, isOpen, onClose, onStatusC
       : OCCASION_LABELS[reservation.occasion]
     : null
 
-  const wasUpdated = new Date(reservation.updatedAt).getTime() !== new Date(reservation.createdAt).getTime()
+  const wasUpdated =
+    new Date(reservation.updatedAt).getTime() !== new Date(reservation.createdAt).getTime()
 
   return (
     <AnimatePresence>
@@ -151,15 +170,28 @@ export function AdminReservationDrawer({ reservation, isOpen, onClose, onStatusC
                 )}
 
                 <section className="flex flex-col gap-3 rounded-2xl border border-gold-300 bg-gold-100/40 p-4 dark:border-gold-700 dark:bg-gold-100/5">
-                  <span className="text-xs font-semibold tracking-wide text-gold-700 uppercase dark:text-gold-300">Advance payment proof</span>
-                  <Row icon={Receipt} label="Advance amount">{money(reservation.advanceAmount ?? 0)}</Row>
-                  <Row icon={Receipt} label="Transaction / Reference ID">{reservation.paymentReference}</Row>
+                  <span className="text-xs font-semibold tracking-wide text-gold-700 uppercase dark:text-gold-300">
+                    Advance payment proof
+                  </span>
+                  <Row icon={Receipt} label="Advance amount">
+                    {money(reservation.advanceAmount ?? 0)}
+                  </Row>
+                  <Row icon={Receipt} label="Transaction / Reference ID">
+                    {reservation.paymentReference}
+                  </Row>
                   {reservation.paymentProofImage && (
-                    <a href={getImageUrl(`/uploads/payment/${reservation.paymentProofImage}`)} target="_blank" rel="noreferrer" className="text-sm font-semibold text-brand-700 underline dark:text-brand-400">
+                    <a
+                      href={getImageUrl(`/uploads/payment/${reservation.paymentProofImage}`)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm font-semibold text-brand-700 underline dark:text-brand-400"
+                    >
                       View uploaded payment screenshot
                     </a>
                   )}
-                  {!reservation.paymentReference && !reservation.paymentProofImage && <span className="text-sm text-red-600">No payment proof submitted</span>}
+                  {!reservation.paymentReference && !reservation.paymentProofImage && (
+                    <span className="text-sm text-red-600">No payment proof submitted</span>
+                  )}
                 </section>
 
                 {reservation.specialRequest && (

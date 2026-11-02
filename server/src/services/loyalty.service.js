@@ -30,7 +30,11 @@ function getNextTier(currentPoints) {
   // filter preserves the high->low order, so the *last* entry is the
   // nearest tier above the current balance.
   const next = higher[higher.length - 1]
-  return { level: next.level, minPoints: next.minPoints, pointsAway: next.minPoints - currentPoints }
+  return {
+    level: next.level,
+    minPoints: next.minPoints,
+    pointsAway: next.minPoints - currentPoints,
+  }
 }
 
 /**
@@ -81,7 +85,10 @@ export async function listTransactions(customerId) {
 // Shared by every award path (order completion, first-order bonus).
 // `tx` lets callers pass a Prisma transaction client so awarding can be
 // atomic with whatever else they're doing; defaults to the normal client.
-export async function recordTransaction({ customerId, type, points, reason, orderId = null }, tx = prisma) {
+export async function recordTransaction(
+  { customerId, type, points, reason, orderId = null },
+  tx = prisma,
+) {
   if (points <= 0) return null
   return tx.loyaltyTransaction.create({
     data: { customerId, type, points, reason, orderId },
@@ -120,7 +127,13 @@ export async function awardPointsForCompletedOrder(order, settings, tx = prisma)
   const points = eligibleAmount.mul(rate).floor().toNumber()
 
   await recordTransaction(
-    { customerId: order.customerId, type: 'EARNED', points, reason: 'Order completed', orderId: order.id },
+    {
+      customerId: order.customerId,
+      type: 'EARNED',
+      points,
+      reason: 'Order completed',
+      orderId: order.id,
+    },
     tx,
   )
 

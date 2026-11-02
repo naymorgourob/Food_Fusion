@@ -43,7 +43,9 @@ export function AdminCategoryCard({ category, onEdit, onDelete, onView }) {
             <UtensilsCrossed className="h-5 w-5" strokeWidth={1.5} />
           </span>
           <span className="flex min-w-0 flex-col">
-            <span className="font-display text-base leading-snug font-semibold text-body">{category.name}</span>
+            <span className="font-display text-base leading-snug font-semibold text-body">
+              {category.name}
+            </span>
             <span className="text-xs text-body-faint">
               {category.itemCount} {category.itemCount === 1 ? 'dish' : 'dishes'}
             </span>
@@ -51,7 +53,7 @@ export function AdminCategoryCard({ category, onEdit, onDelete, onView }) {
         </button>
 
         <span
-          className={`flex-none rounded-full px-2.5 py-1 text-[0.65rem] font-bold whitespace-nowrap ${
+          className={`flex-none rounded-full px-2.5 py-1 text-[0.78rem] font-bold whitespace-nowrap ${
             inactive
               ? 'bg-canvas-2 text-body-faint'
               : 'bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-400'
@@ -62,7 +64,9 @@ export function AdminCategoryCard({ category, onEdit, onDelete, onView }) {
       </div>
 
       {category.description ? (
-        <p className="line-clamp-2 text-sm leading-relaxed text-body-muted">{category.description}</p>
+        <p className="line-clamp-2 text-sm leading-relaxed text-body-muted">
+          {category.description}
+        </p>
       ) : (
         <p className="text-sm text-body-faint italic">No description added yet.</p>
       )}

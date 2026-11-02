@@ -1,8 +1,22 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, UserRound, Clock, MapPin, Phone, ScrollText, CalendarClock, ChefHat, Receipt } from 'lucide-react'
+import {
+  X,
+  UserRound,
+  Clock,
+  MapPin,
+  Phone,
+  ScrollText,
+  CalendarClock,
+  ChefHat,
+  Receipt,
+} from 'lucide-react'
 import { OrderStatusBadge } from '@/features/orders/components/OrderStatusBadge'
-import { ORDER_STATUS_LABELS, orderGrandTotal, getScheduledDineInTimes } from '@/features/orders/constants'
+import {
+  ORDER_STATUS_LABELS,
+  orderGrandTotal,
+  getScheduledDineInTimes,
+} from '@/features/orders/constants'
 import { ORDER_TYPE_ICONS } from '@/features/orders/staffOrderHelpers'
 import { orderNo, money } from '@/utils/format'
 import { getImageUrl } from '@/constants'
@@ -62,8 +76,12 @@ export function StaffOrderDrawer({
   // key={order.id} whenever a different order is opened (see
   // StaffOrdersPage), so these only ever need to be set once per mount —
   // exactly the pattern OrderDetailsModal already uses for the same forms.
-  const [readyTimeInput, setReadyTimeInput] = useState(() => toLocalInputValue(order?.estimatedReadyTime))
-  const [deliveryTimeInput, setDeliveryTimeInput] = useState(() => toLocalInputValue(order?.estimatedDeliveryTime))
+  const [readyTimeInput, setReadyTimeInput] = useState(() =>
+    toLocalInputValue(order?.estimatedReadyTime),
+  )
+  const [deliveryTimeInput, setDeliveryTimeInput] = useState(() =>
+    toLocalInputValue(order?.estimatedDeliveryTime),
+  )
 
   useEffect(() => {
     if (!isOpen) return undefined
@@ -90,7 +108,9 @@ export function StaffOrderDrawer({
     if (order.orderType !== 'DELIVERY') {
       payload.estimatedReadyTime = readyTimeInput ? new Date(readyTimeInput).toISOString() : null
     } else {
-      payload.estimatedDeliveryTime = deliveryTimeInput ? new Date(deliveryTimeInput).toISOString() : null
+      payload.estimatedDeliveryTime = deliveryTimeInput
+        ? new Date(deliveryTimeInput).toISOString()
+        : null
     }
     onUpdateEstimatedTime(payload)
   }
@@ -123,7 +143,9 @@ export function StaffOrderDrawer({
             <header className="flex flex-none items-center justify-between border-b border-rule px-5 py-4">
               <div className="flex items-center gap-2.5">
                 <TypeIcon className="h-4 w-4 text-brand-700 dark:text-brand-400" />
-                <h2 className="font-display text-lg font-semibold text-body">{orderNo(order.orderNumber)}</h2>
+                <h2 className="font-display text-lg font-semibold text-body">
+                  {orderNo(order.orderNumber)}
+                </h2>
                 <OrderStatusBadge status={order.status} />
               </div>
               <button
@@ -168,11 +190,15 @@ export function StaffOrderDrawer({
                   </section>
                 )}
 
-                <section className={`flex flex-col gap-3 rounded-2xl border p-4 ${
-                  order.bill?.paymentStatus === 'PAID' || order.paymentReference || order.paymentProofImage
-                    ? 'border-emerald-200 bg-emerald-50/60 dark:border-emerald-900/50 dark:bg-emerald-950/20'
-                    : 'border-red-200 bg-red-50/60 dark:border-red-900/50 dark:bg-red-950/20'
-                }`}>
+                <section
+                  className={`flex flex-col gap-3 rounded-2xl border p-4 ${
+                    order.bill?.paymentStatus === 'PAID' ||
+                    order.paymentReference ||
+                    order.paymentProofImage
+                      ? 'border-emerald-200 bg-emerald-50/60 dark:border-emerald-900/50 dark:bg-emerald-950/20'
+                      : 'border-red-200 bg-red-50/60 dark:border-red-900/50 dark:bg-red-950/20'
+                  }`}
+                >
                   <span className="flex items-center gap-2 text-xs font-semibold tracking-wide uppercase">
                     <Receipt className="h-4 w-4" /> Payment verification
                   </span>
@@ -185,7 +211,11 @@ export function StaffOrderDrawer({
                         : 'Not submitted'}
                     </Row>
                     <Row icon={Receipt} label="Bill status">
-                      {order.bill?.paymentStatus === 'PAID' ? 'Paid' : order.bill ? 'Unpaid' : 'Bill not generated'}
+                      {order.bill?.paymentStatus === 'PAID'
+                        ? 'Paid'
+                        : order.bill
+                          ? 'Unpaid'
+                          : 'Bill not generated'}
                     </Row>
                   </div>
                   {order.paymentProofImage && (
@@ -220,10 +250,16 @@ export function StaffOrderDrawer({
                       Scheduled dine-in
                     </span>
                     <Row icon={Clock} label="Arrival">
-                      {scheduled.arrival.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                      {scheduled.arrival.toLocaleTimeString([], {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                      })}
                     </Row>
                     <Row icon={ChefHat} label="Kitchen starts">
-                      {scheduled.prepStartsAt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                      {scheduled.prepStartsAt.toLocaleTimeString([], {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                      })}
                     </Row>
                     <Row icon={ScrollText} label="Guests">
                       {order.guestCount}
@@ -240,7 +276,9 @@ export function StaffOrderDrawer({
 
                 {/* --- Items ------------------------------------------ */}
                 <section className="flex flex-col gap-2">
-                  <h3 className="text-xs font-semibold tracking-wide text-body-faint uppercase">Items</h3>
+                  <h3 className="text-xs font-semibold tracking-wide text-body-faint uppercase">
+                    Items
+                  </h3>
                   <ul className="flex flex-col gap-2 rounded-2xl border border-rule bg-card p-4">
                     {order.items.map((item) => (
                       <li key={item.id} className="flex items-center justify-between gap-3 text-sm">
@@ -255,7 +293,10 @@ export function StaffOrderDrawer({
 
                 {/* --- Status --------------------------------------- */}
                 <section className="flex flex-col gap-2">
-                  <label htmlFor="staff-order-status" className="text-xs font-semibold tracking-wide text-body-faint uppercase">
+                  <label
+                    htmlFor="staff-order-status"
+                    className="text-xs font-semibold tracking-wide text-body-faint uppercase"
+                  >
                     Update status
                   </label>
                   <select
@@ -275,7 +316,10 @@ export function StaffOrderDrawer({
 
                 {/* --- Assign staff ----------------------------------- */}
                 <section className="flex flex-col gap-2">
-                  <label htmlFor="staff-order-assign" className="text-xs font-semibold tracking-wide text-body-faint uppercase">
+                  <label
+                    htmlFor="staff-order-assign"
+                    className="text-xs font-semibold tracking-wide text-body-faint uppercase"
+                  >
                     Assign staff
                   </label>
                   <select
@@ -300,7 +344,9 @@ export function StaffOrderDrawer({
                     htmlFor="staff-order-eta"
                     className="text-xs font-semibold tracking-wide text-body-faint uppercase"
                   >
-                    {order.orderType === 'DELIVERY' ? 'Estimated delivery time' : 'Estimated ready time'}
+                    {order.orderType === 'DELIVERY'
+                      ? 'Estimated delivery time'
+                      : 'Estimated ready time'}
                   </label>
                   <input
                     id="staff-order-eta"

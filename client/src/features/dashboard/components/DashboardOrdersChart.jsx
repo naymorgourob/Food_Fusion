@@ -74,7 +74,7 @@ export function DashboardOrdersChart({ ordersSummary, isLoading }) {
       {/* Fulfillment Mix Badges */}
       <div className="my-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-rule bg-canvas/60 p-3 text-xs">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] uppercase font-bold text-body-faint">Fulfillment:</span>
+          <span className="text-[0.75rem] uppercase font-bold text-body-faint">Fulfillment:</span>
           <span className="inline-flex items-center gap-1 rounded-md border border-rule bg-card px-2 py-0.5 font-semibold text-body">
             <Utensils className="h-3 w-3 text-brand-500" />
             Dine-In: {dineInCount}

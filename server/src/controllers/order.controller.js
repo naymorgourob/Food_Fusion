@@ -1,4 +1,8 @@
-import { validateOrder, validateStatus, validateEstimatedTime } from '../validators/order.validator.js'
+import {
+  validateOrder,
+  validateStatus,
+  validateEstimatedTime,
+} from '../validators/order.validator.js'
 import {
   listOrders,
   getOrderById,
@@ -36,10 +40,18 @@ export async function postOrder(req, res) {
       throw new ApiError(400, 'Order items must be valid JSON.')
     }
   }
-  const errors = validateOrder({ ...input, requirePaymentProof: req.user.role === 'CUSTOMER' })
+  // Paying online means the gateway verifies the advance instead of a
+  // manually submitted proof, and paying at the restaurant has no advance
+  // at all, so neither needs proof up front.
+  const errors = validateOrder({
+    ...input,
+    requirePaymentProof:
+      req.user.role === 'CUSTOMER' && !['ONLINE', 'AT_RESTAURANT'].includes(input.paymentMethod),
+  })
   if (errors.length > 0) throw new ApiError(400, 'Validation failed.', errors)
 
-  const customerId = req.user.role !== 'CUSTOMER' && req.body.customerId ? req.body.customerId : req.user.id
+  const customerId =
+    req.user.role !== 'CUSTOMER' && req.body.customerId ? req.body.customerId : req.user.id
   const order = await createOrder(customerId, input)
   sendSuccess(res, { statusCode: 201, message: 'Order placed successfully.', data: { order } })
 }

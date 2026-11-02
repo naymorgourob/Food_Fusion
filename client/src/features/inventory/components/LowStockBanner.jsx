@@ -37,7 +37,7 @@ export function LowStockBanner({ items = [], onFilterUrgent }) {
             {urgentItems.slice(0, 3).map((item) => (
               <span
                 key={item.id}
-                className="inline-flex items-center gap-1 rounded-lg border border-amber-300/60 bg-white/70 px-2 py-0.5 text-[11px] font-semibold text-amber-900 dark:border-amber-800/60 dark:bg-black/30 dark:text-amber-200"
+                className="inline-flex items-center gap-1 rounded-lg border border-amber-300/60 bg-white/70 px-2 py-0.5 text-[0.8rem] font-semibold text-amber-900 dark:border-amber-800/60 dark:bg-black/30 dark:text-amber-200"
               >
                 <span>{item.itemName}:</span>
                 <strong className={item.status === 'OUT_OF_STOCK' ? 'text-red-600' : 'text-amber-700'}>
@@ -46,7 +46,7 @@ export function LowStockBanner({ items = [], onFilterUrgent }) {
               </span>
             ))}
             {urgentItems.length > 3 && (
-              <span className="self-center text-[10px] font-medium text-amber-700 dark:text-amber-300">
+              <span className="self-center text-[0.75rem] font-medium text-amber-700 dark:text-amber-300">
                 +{urgentItems.length - 3} more
               </span>
             )}

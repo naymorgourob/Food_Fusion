@@ -3,9 +3,22 @@ import { Container, Section, Reveal, Photo } from '@/components/landing/primitiv
 import { AMBIENCE_IMAGE, CHEF_IMAGE } from '@/pages/landing/content'
 
 const PILLARS = [
-  { icon: Award, title: 'Quality', description: 'One menu, cooked properly. Nothing leaves the pass we would not serve a friend.' },
-  { icon: Sprout, title: 'Freshness', description: 'Market produce every morning; the menu follows the season, not the other way round.' },
-  { icon: HandHeart, title: 'Hospitality', description: 'Staff who remember your table, your allergy, and the wine you liked last time.' },
+  {
+    icon: Award,
+    title: 'Quality',
+    description: 'One menu, cooked properly. Nothing leaves the pass we would not serve a friend.',
+  },
+  {
+    icon: Sprout,
+    title: 'Freshness',
+    description:
+      'Market produce every morning; the menu follows the season, not the other way round.',
+  },
+  {
+    icon: HandHeart,
+    title: 'Hospitality',
+    description: 'Staff who remember your table, your allergy, and the wine you liked last time.',
+  },
 ]
 
 /**
@@ -41,7 +54,7 @@ export function ExperienceSection() {
           {/* Est. badge, anchored to the image's top-left corner. */}
           <div className="absolute -top-5 -left-4 flex flex-col items-center rounded-2xl bg-brand-700 px-5 py-4 shadow-xl shadow-brand-900/30 lg:-left-8">
             <span className="font-display text-2xl font-semibold text-gold-300">18</span>
-            <span className="text-[0.65rem] tracking-wider text-white/70 uppercase">Years</span>
+            <span className="text-[0.78rem] tracking-wider text-white/70 uppercase">Years</span>
           </div>
         </Reveal>
 
@@ -57,8 +70,8 @@ export function ExperienceSection() {
               A dining room built for the long evening
             </h2>
             <p className="text-base leading-relaxed text-body-muted sm:text-lg">
-              FoodFusion started as a twelve-seat kitchen with one rule: cook things properly and let
-              people take their time. Eighteen years on the room is bigger, but the rule has not
+              FoodFusion started as a twelve-seat kitchen with one rule: cook things properly and
+              let people take their time. Eighteen years on the room is bigger, but the rule has not
               changed — seasonal produce, classical technique, and service that never rushes you
               toward the door.
             </p>

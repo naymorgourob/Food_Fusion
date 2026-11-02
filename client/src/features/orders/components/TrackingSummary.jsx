@@ -44,7 +44,7 @@ export function TrackingSummary({ order }) {
             <li key={item.id} className="flex items-center gap-3">
               <div className="h-12 w-12 flex-none overflow-hidden rounded-lg bg-canvas-2">
                 {image ? (
-                  <img src={image} alt="" className="h-full w-full object-cover" />
+                  <img src={image} alt="" className="h-full w-full object-contain" />
                 ) : (
                   <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-50 to-canvas-2 dark:from-brand-900/50 dark:to-canvas-2">
                     <UtensilsCrossed className="h-4 w-4 text-brand-200 dark:text-brand-400/50" />

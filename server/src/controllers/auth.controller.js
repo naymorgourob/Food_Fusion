@@ -13,7 +13,11 @@ export async function register(req, res) {
   const { fullName, email, phone, password } = req.body
   const { user, token } = await registerCustomer({ fullName, email, phone, password })
 
-  sendSuccess(res, { statusCode: 201, message: 'Account created successfully.', data: { user, token } })
+  sendSuccess(res, {
+    statusCode: 201,
+    message: 'Account created successfully.',
+    data: { user, token },
+  })
 }
 
 export async function login(req, res) {

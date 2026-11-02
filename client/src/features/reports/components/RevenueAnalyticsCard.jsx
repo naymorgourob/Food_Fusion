@@ -71,7 +71,7 @@ export function RevenueAnalyticsCard({ revenueSummary, isLoading }) {
       {/* Metric Breakdown Badges */}
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <div className="flex flex-col rounded-xl bg-canvas p-2.5">
-          <span className="flex items-center gap-1 text-[11px] text-body-muted">
+          <span className="flex items-center gap-1 text-[0.8rem] text-body-muted">
             <TrendingUp className="h-3 w-3 text-body-faint" />
             Avg. Ticket
           </span>
@@ -81,7 +81,7 @@ export function RevenueAnalyticsCard({ revenueSummary, isLoading }) {
         </div>
 
         <div className="flex flex-col rounded-xl bg-canvas p-2.5">
-          <span className="flex items-center gap-1 text-[11px] text-body-muted">
+          <span className="flex items-center gap-1 text-[0.8rem] text-body-muted">
             <Receipt className="h-3 w-3 text-body-faint" />
             Paid Bills
           </span>
@@ -91,7 +91,7 @@ export function RevenueAnalyticsCard({ revenueSummary, isLoading }) {
         </div>
 
         <div className="flex flex-col rounded-xl bg-canvas p-2.5">
-          <span className="flex items-center gap-1 text-[11px] text-body-muted">
+          <span className="flex items-center gap-1 text-[0.8rem] text-body-muted">
             <Receipt className="h-3 w-3 text-body-faint" />
             Tax (VAT)
           </span>
@@ -101,7 +101,7 @@ export function RevenueAnalyticsCard({ revenueSummary, isLoading }) {
         </div>
 
         <div className="flex flex-col rounded-xl bg-canvas p-2.5">
-          <span className="flex items-center gap-1 text-[11px] text-body-muted">
+          <span className="flex items-center gap-1 text-[0.8rem] text-body-muted">
             <Percent className="h-3 w-3 text-body-faint" />
             Discounts
           </span>

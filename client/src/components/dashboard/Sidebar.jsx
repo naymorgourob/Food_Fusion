@@ -17,6 +17,7 @@ import {
   ChevronsRight,
   X,
   ExternalLink,
+  Wallet,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { ROUTES, USER_ROLES } from '@/constants'
@@ -110,6 +111,12 @@ const NAV_SECTIONS = [
         roles: [USER_ROLES.ADMIN],
       },
       {
+        label: 'Payroll',
+        path: '/dashboard/payroll',
+        icon: Wallet,
+        roles: [USER_ROLES.ADMIN],
+      },
+      {
         label: 'Reports',
         path: '/dashboard/reports',
         icon: BarChart3,
@@ -153,13 +160,13 @@ export function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobil
       <aside
         aria-label="Admin Navigation"
         className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-surface transition-all duration-300 shadow-xs
-          ${collapsed ? 'lg:w-20' : 'lg:w-64'}
-          ${mobileOpen ? 'w-64 translate-x-0 shadow-2xl' : 'w-64 -translate-x-full lg:translate-x-0'}
+          ${collapsed ? 'lg:w-20' : 'lg:w-80'}
+          ${mobileOpen ? 'w-80 translate-x-0 shadow-2xl' : 'w-80 -translate-x-full lg:translate-x-0'}
         `}
       >
         {/* ── Header: Branding & Toggle ─────────────────────────────── */}
         <div
-          className={`flex h-16 flex-none items-center border-b border-border px-3.5 transition-all ${
+          className={`flex h-24 flex-none items-center border-b border-border px-3.5 transition-all ${
             collapsed ? 'lg:justify-center' : 'justify-between'
           }`}
         >
@@ -171,14 +178,17 @@ export function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobil
               collapsed ? 'lg:hidden' : ''
             }`}
           >
-            <span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-brand-800 font-display text-sm font-bold text-white shadow-xs">
-              F
-            </span>
+            <img
+              src="/brand/logo-mark.png"
+              alt=""
+              aria-hidden
+              className="h-[4.5rem] w-[4.5rem] flex-none rounded-full object-cover shadow-lg ring-2 ring-gold-300/60"
+            />
             <div className="flex flex-col leading-none">
-              <span className="font-display text-base font-bold tracking-tight text-ink">
+              <span className="font-display text-xl font-bold tracking-tight text-ink">
                 FoodFusion
               </span>
-              <span className="text-[10px] font-semibold tracking-wider text-ink-faint uppercase mt-0.5">
+              <span className="mt-1 text-[0.8rem] font-semibold tracking-wider text-ink-faint uppercase">
                 {isAdmin ? 'Admin Console' : 'Staff Portal'}
               </span>
             </div>
@@ -192,9 +202,14 @@ export function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobil
                 onClick={onToggleCollapsed}
                 aria-label="Expand sidebar"
                 title="Expand sidebar (⌘B)"
-                className="group flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-brand-800 text-white shadow-xs hover:ring-2 hover:ring-brand-500/30 transition-all"
+                className="group relative flex h-14 w-14 items-center justify-center rounded-full shadow-lg ring-2 ring-gold-300/60 transition-all hover:ring-brand-500/40"
               >
-                <span className="font-display text-sm font-bold group-hover:hidden">F</span>
+                <img
+                  src="/brand/logo-mark.png"
+                  alt=""
+                  aria-hidden
+                  className="h-full w-full rounded-full object-cover group-hover:hidden"
+                />
                 <ChevronsRight className="h-4 w-4 hidden group-hover:block transition-transform" />
               </button>
             </div>
@@ -227,16 +242,14 @@ export function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobil
         {/* ── Navigation Items & Sections ──────────────────────────── */}
         <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-4 scrollbar-thin">
           {NAV_SECTIONS.map((section, sectionIdx) => {
-            const visibleItems = section.items.filter((item) =>
-              item.roles.includes(user?.role)
-            )
+            const visibleItems = section.items.filter((item) => item.roles.includes(user?.role))
             if (visibleItems.length === 0) return null
 
             return (
               <div key={section.title} className="flex flex-col gap-1">
                 {/* Section Header */}
                 <div
-                  className={`px-3 pt-1 pb-1 text-[10px] font-bold uppercase tracking-wider text-ink-faint ${
+                  className={`px-3 pt-1 pb-1 text-[0.85rem] font-bold uppercase tracking-wider text-ink-faint ${
                     collapsed ? 'lg:hidden' : ''
                   }`}
                 >
@@ -258,7 +271,7 @@ export function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobil
                         onClick={onCloseMobile}
                         title={collapsed ? label : undefined}
                         className={({ isActive }) =>
-                          `group relative flex items-center gap-3 rounded-xl py-2.5 text-sm font-medium transition-all ${
+                          `group relative flex items-center gap-3.5 rounded-xl py-3 text-base font-medium transition-all ${
                             collapsed ? 'lg:justify-center lg:px-0' : 'px-3'
                           } ${
                             isActive
@@ -279,7 +292,7 @@ export function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobil
 
                             {/* Icon */}
                             <Icon
-                              className={`h-5 w-5 flex-none transition-transform duration-150 group-hover:scale-105 ${
+                              className={`h-[1.35rem] w-[1.35rem] flex-none transition-transform duration-150 group-hover:scale-105 ${
                                 isActive
                                   ? 'text-brand-600 dark:text-brand-400'
                                   : 'text-ink-faint group-hover:text-ink'
@@ -289,7 +302,7 @@ export function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobil
 
                             {/* Label */}
                             <span
-                              className={`truncate font-display text-[13px] tracking-tight ${
+                              className={`truncate font-display text-[1.08rem] tracking-tight ${
                                 collapsed ? 'lg:hidden' : ''
                               }`}
                             >
@@ -316,19 +329,15 @@ export function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobil
           >
             <span
               title={user?.fullName || 'User Profile'}
-              className="flex h-8 w-8 flex-none items-center justify-center rounded-lg bg-brand-500/10 font-display text-xs font-bold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300"
+              className="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-brand-500/10 font-display text-base font-bold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300"
             >
               {initial}
             </span>
-            <div
-              className={`flex min-w-0 flex-col leading-tight ${
-                collapsed ? 'lg:hidden' : ''
-              }`}
-            >
-              <span className="truncate text-xs font-bold text-ink">
+            <div className={`flex min-w-0 flex-col leading-tight ${collapsed ? 'lg:hidden' : ''}`}>
+              <span className="truncate text-base font-bold text-ink">
                 {user?.fullName || 'Administrator'}
               </span>
-              <span className="truncate text-[10px] font-semibold text-ink-faint">
+              <span className="truncate text-sm font-semibold text-ink-faint">
                 {isAdmin ? 'Executive Admin' : 'Staff Member'}
               </span>
             </div>
@@ -340,14 +349,12 @@ export function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobil
             target="_blank"
             rel="noopener noreferrer"
             title={collapsed ? 'View Public Restaurant' : undefined}
-            className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-ink-muted hover:bg-surface-2 hover:text-ink transition-colors ${
+            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-base font-medium text-ink-muted hover:bg-surface-2 hover:text-ink transition-colors ${
               collapsed ? 'lg:justify-center lg:px-0' : ''
             }`}
           >
-            <ExternalLink className="h-4 w-4 flex-none text-ink-faint" />
-            <span className={`truncate ${collapsed ? 'lg:hidden' : ''}`}>
-              View Restaurant
-            </span>
+            <ExternalLink className="h-5 w-5 flex-none text-ink-faint" />
+            <span className={`truncate ${collapsed ? 'lg:hidden' : ''}`}>View Restaurant</span>
           </Link>
 
           {/* Logout Action */}
@@ -355,11 +362,11 @@ export function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobil
             type="button"
             onClick={handleLogout}
             title={collapsed ? 'Sign Out' : undefined}
-            className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-ink-muted hover:bg-danger-soft hover:text-danger transition-colors ${
+            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-base font-semibold text-ink-muted hover:bg-danger-soft hover:text-danger transition-colors ${
               collapsed ? 'lg:justify-center lg:px-0' : ''
             }`}
           >
-            <LogOut className="h-4 w-4 flex-none" strokeWidth={1.75} />
+            <LogOut className="h-5 w-5 flex-none" strokeWidth={1.75} />
             <span className={collapsed ? 'lg:hidden' : ''}>Sign Out</span>
           </button>
         </div>

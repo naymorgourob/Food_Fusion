@@ -1,7 +1,12 @@
 import { UtensilsCrossed, Bike, ShoppingBag } from 'lucide-react'
 
 const OPTIONS = [
-  { value: 'DINE_IN', label: 'Dine-In', description: 'Eat at the restaurant', icon: UtensilsCrossed },
+  {
+    value: 'DINE_IN',
+    label: 'Dine-In',
+    description: 'Eat at the restaurant',
+    icon: UtensilsCrossed,
+  },
   { value: 'DELIVERY', label: 'Delivery', description: 'Delivered to your address', icon: Bike },
   { value: 'TAKEAWAY', label: 'Takeaway', description: 'Pick up yourself', icon: ShoppingBag },
 ]

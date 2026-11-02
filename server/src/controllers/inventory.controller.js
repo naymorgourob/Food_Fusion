@@ -20,7 +20,11 @@ export async function postInventoryItem(req, res) {
   if (errors.length > 0) throw new ApiError(400, 'Validation failed.', errors)
 
   const item = await createInventoryItem(req.body)
-  sendSuccess(res, { statusCode: 201, message: 'Inventory item created successfully.', data: { item } })
+  sendSuccess(res, {
+    statusCode: 201,
+    message: 'Inventory item created successfully.',
+    data: { item },
+  })
 }
 
 export async function putInventoryItem(req, res) {
@@ -33,7 +37,12 @@ export async function putInventoryItem(req, res) {
 
 export async function patchInventoryStock(req, res) {
   const { quantity } = req.body
-  if (quantity === undefined || quantity === null || isNaN(Number(quantity)) || Number(quantity) < 0) {
+  if (
+    quantity === undefined ||
+    quantity === null ||
+    isNaN(Number(quantity)) ||
+    Number(quantity) < 0
+  ) {
     throw new ApiError(400, 'A valid non-negative quantity is required.')
   }
 
@@ -43,7 +52,11 @@ export async function patchInventoryStock(req, res) {
 
 export async function postInventoryUsage(req, res) {
   const usage = await recordInventoryUsage(req.params.id, req.user.id, req.body)
-  sendSuccess(res, { statusCode: 201, message: 'Inventory usage recorded successfully.', data: { usage } })
+  sendSuccess(res, {
+    statusCode: 201,
+    message: 'Inventory usage recorded successfully.',
+    data: { usage },
+  })
 }
 
 export async function removeInventoryItem(req, res) {

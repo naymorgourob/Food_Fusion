@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Quote, ChevronLeft, ChevronRight } from 'lucide-react'
-import { Container, Section, SectionHeading, Reveal, Rating, Photo } from '@/components/landing/primitives'
+import { Container, Section, SectionHeading, Reveal, Rating } from '@/components/landing/primitives'
 import { TESTIMONIALS } from '@/pages/landing/content'
 
 /**
@@ -15,8 +15,7 @@ export function TestimonialsSection() {
   const [index, setIndex] = useState(0)
   const current = TESTIMONIALS[index]
 
-  const go = (delta) =>
-    setIndex((i) => (i + delta + TESTIMONIALS.length) % TESTIMONIALS.length)
+  const go = (delta) => setIndex((i) => (i + delta + TESTIMONIALS.length) % TESTIMONIALS.length)
 
   return (
     <Section>
@@ -44,14 +43,17 @@ export function TestimonialsSection() {
                     “{current.quote}”
                   </blockquote>
                   <figcaption className="flex items-center gap-3">
-                    <Photo
-                      src={current.avatar}
-                      alt=""
-                      loading="lazy"
-                      className="h-12 w-12 rounded-full object-cover ring-2 ring-gold-300"
-                    />
+                    {/* Initial badge rather than a stock face photo. */}
+                    <span
+                      aria-hidden
+                      className="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-brand-700 font-display text-lg font-semibold text-gold-300 ring-2 ring-gold-300"
+                    >
+                      {current.name.charAt(0)}
+                    </span>
                     <span className="flex flex-col">
-                      <span className="font-display text-sm font-semibold text-body">{current.name}</span>
+                      <span className="font-display text-sm font-semibold text-body">
+                        {current.name}
+                      </span>
                       <span className="text-xs text-body-faint">{current.role}</span>
                     </span>
                   </figcaption>
@@ -69,7 +71,9 @@ export function TestimonialsSection() {
                     aria-label={`Show review ${i + 1} of ${TESTIMONIALS.length}`}
                     aria-current={i === index}
                     className={`h-2 rounded-full transition-all duration-300 ${
-                      i === index ? 'w-8 bg-brand-700 dark:bg-brand-400' : 'w-2 bg-rule hover:bg-brand-200'
+                      i === index
+                        ? 'w-8 bg-brand-700 dark:bg-brand-400'
+                        : 'w-2 bg-rule hover:bg-brand-200'
                     }`}
                   />
                 ))}

@@ -11,7 +11,9 @@ export function FavoriteButton({ isFavorite, isPending, onToggle, itemName }) {
       aria-label={isFavorite ? `Remove ${itemName} from favorites` : `Add ${itemName} to favorites`}
       aria-pressed={isFavorite}
       className={`rounded-md p-1.5 transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-        isFavorite ? 'text-danger hover:bg-danger-soft' : 'text-ink-faint hover:bg-surface-2 hover:text-ink-muted'
+        isFavorite
+          ? 'text-danger hover:bg-danger-soft'
+          : 'text-ink-faint hover:bg-surface-2 hover:text-ink-muted'
       }`}
     >
       <Heart className="h-4 w-4" fill={isFavorite ? 'currentColor' : 'none'} strokeWidth={2} />

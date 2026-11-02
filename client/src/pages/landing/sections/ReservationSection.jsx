@@ -52,9 +52,14 @@ export function ReservationSection() {
   }
 
   return (
-    <section id="reserve" className="relative isolate scroll-mt-24 overflow-hidden py-20 sm:py-28">
+    <section id="reserve" className="relative isolate scroll-mt-28 overflow-hidden py-20 sm:py-28">
       <div aria-hidden className="absolute inset-0 -z-20">
-        <Photo src={AMBIENCE_IMAGE.src} alt="" loading="lazy" className="h-full w-full object-cover" />
+        <Photo
+          src={AMBIENCE_IMAGE.src}
+          alt=""
+          loading="lazy"
+          className="h-full w-full object-cover"
+        />
       </div>
       <div aria-hidden className="absolute inset-0 -z-10 bg-brand-900/88" />
 
@@ -74,14 +79,16 @@ export function ReservationSection() {
             course to your arrival, and the floor team will have the table dressed for the occasion.
           </p>
           <ul className="flex flex-col gap-2.5 pt-2">
-            {['Instant confirmation', 'Free to cancel up to 2 hours before', 'Occasion noted for the floor team'].map(
-              (line) => (
-                <li key={line} className="flex items-center gap-2.5 text-sm text-white/75">
-                  <span className="h-1.5 w-1.5 rounded-full bg-gold-300" />
-                  {line}
-                </li>
-              ),
-            )}
+            {[
+              'Instant confirmation',
+              'Free to cancel up to 2 hours before',
+              'Occasion noted for the floor team',
+            ].map((line) => (
+              <li key={line} className="flex items-center gap-2.5 text-sm text-white/75">
+                <span className="h-1.5 w-1.5 rounded-full bg-gold-300" />
+                {line}
+              </li>
+            ))}
           </ul>
         </Reveal>
 
@@ -109,7 +116,13 @@ export function ReservationSection() {
                 <span className="flex items-center gap-2 text-xs font-semibold tracking-wider text-white/70 uppercase">
                   <Clock className="h-3.5 w-3.5" /> Time
                 </span>
-                <input type="time" value={form.time} onChange={update('time')} className={FIELD_CLASSES} required />
+                <input
+                  type="time"
+                  value={form.time}
+                  onChange={update('time')}
+                  className={FIELD_CLASSES}
+                  required
+                />
               </label>
 
               <label className="flex flex-col gap-2">
@@ -129,7 +142,11 @@ export function ReservationSection() {
                 <span className="flex items-center gap-2 text-xs font-semibold tracking-wider text-white/70 uppercase">
                   <Sparkles className="h-3.5 w-3.5" /> Occasion
                 </span>
-                <select value={form.occasion} onChange={update('occasion')} className={FIELD_CLASSES}>
+                <select
+                  value={form.occasion}
+                  onChange={update('occasion')}
+                  className={FIELD_CLASSES}
+                >
                   {OCCASIONS.map((occasion) => (
                     <option key={occasion.label} value={occasion.value} className="text-charcoal">
                       {occasion.label}

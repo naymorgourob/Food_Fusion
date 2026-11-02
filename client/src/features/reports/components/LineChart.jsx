@@ -23,7 +23,7 @@ export function LineChart({
     return (
       <div className="flex h-56 flex-col items-center justify-center rounded-2xl border border-dashed border-rule bg-canvas/40 text-center">
         <p className="text-xs font-medium text-body-muted">{emptyMessage}</p>
-        <span className="mt-1 text-[11px] text-body-faint">Try adjusting your date or filter range</span>
+        <span className="mt-1 text-[0.8rem] text-body-faint">Try adjusting your date or filter range</span>
       </div>
     )
   }
@@ -128,7 +128,7 @@ export function LineChart({
                   x={point.x}
                   y={HEIGHT - 8}
                   textAnchor="middle"
-                  className="fill-body-faint text-[10px] font-medium"
+                  className="fill-body-faint text-[0.75rem] font-medium"
                 >
                   {point.shortLabel ?? point.label}
                 </text>
@@ -153,7 +153,7 @@ export function LineChart({
               x={lastPoint.x - 13}
               y={Math.max(18, lastPoint.y - 11)}
               textAnchor="middle"
-              className="fill-white text-[10px] font-bold"
+              className="fill-white text-[0.75rem] font-bold"
             >
               {formatValue(lastPoint.value)}
             </text>
@@ -171,7 +171,7 @@ export function LineChart({
           }}
         >
           <div className="flex flex-col items-center">
-            <span className="text-[10px] font-semibold text-body-muted">
+            <span className="text-[0.75rem] font-semibold text-body-muted">
               {hoveredPoint.shortLabel ?? hoveredPoint.label}
             </span>
             <span className="font-display text-xs font-bold text-body">

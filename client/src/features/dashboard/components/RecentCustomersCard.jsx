@@ -25,7 +25,7 @@ export function RecentCustomersCard({ customers = [], isLoading = false }) {
           </span>
           <div>
             <h3 className="font-display text-sm font-bold text-body">Recent Diners</h3>
-            <span className="text-[11px] text-body-faint">Registered customer profiles</span>
+            <span className="text-[0.8rem] text-body-faint">Registered customer profiles</span>
           </div>
         </div>
         <Link
@@ -78,7 +78,7 @@ export function RecentCustomersCard({ customers = [], isLoading = false }) {
                       <span className="truncate text-xs font-bold text-body max-w-[130px] sm:max-w-[160px]">
                         {customer.fullName}
                       </span>
-                      <span className="truncate text-[11px] text-body-muted max-w-[130px] sm:max-w-[160px]">
+                      <span className="truncate text-[0.8rem] text-body-muted max-w-[130px] sm:max-w-[160px]">
                         {customer.email}
                       </span>
                     </div>
@@ -86,12 +86,12 @@ export function RecentCustomersCard({ customers = [], isLoading = false }) {
 
                   <div className="flex flex-col items-end gap-1 flex-none">
                     <div className="flex items-center gap-1.5">
-                      <span className="inline-flex items-center gap-1 rounded-md border border-rule bg-canvas-2 px-1.5 py-0.5 text-[10px] font-semibold text-body-muted">
+                      <span className="inline-flex items-center gap-1 rounded-md border border-rule bg-canvas-2 px-1.5 py-0.5 text-[0.75rem] font-semibold text-body-muted">
                         <ShoppingBag className="h-2.5 w-2.5" />
                         {customer._count?.orders ?? 0} orders
                       </span>
                       <span
-                        className={`rounded-md border px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                        className={`rounded-md border px-1.5 py-0.5 text-[0.75rem] font-bold uppercase tracking-wider ${
                           customer.isActive
                             ? 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-900/40'
                             : 'bg-canvas-2 text-body-muted border-rule'
@@ -100,7 +100,7 @@ export function RecentCustomersCard({ customers = [], isLoading = false }) {
                         {customer.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </div>
-                    <span className="text-[10px] text-body-faint">
+                    <span className="text-[0.75rem] text-body-faint">
                       Joined {formatTimeAgo(customer.createdAt)}
                     </span>
                   </div>
@@ -115,7 +115,7 @@ export function RecentCustomersCard({ customers = [], isLoading = false }) {
       <div className="pt-3 border-t border-rule/60">
         <Link
           to="/dashboard/customers"
-          className="text-[11px] font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 hover:underline block text-center"
+          className="text-[0.8rem] font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 hover:underline block text-center"
         >
           Manage all restaurant diners & accounts →
         </Link>

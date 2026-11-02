@@ -36,7 +36,7 @@ export function RecentOrdersCard({ orders = [], isLoading = false }) {
           </span>
           <div>
             <h3 className="font-display text-sm font-bold text-body">Recent Orders</h3>
-            <span className="text-[11px] text-body-faint">Latest guest purchases</span>
+            <span className="text-[0.8rem] text-body-faint">Latest guest purchases</span>
           </div>
         </div>
         <Link
@@ -88,7 +88,7 @@ export function RecentOrdersCard({ orders = [], isLoading = false }) {
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2 pt-0.5 text-[11px] text-body-muted">
+                    <div className="flex items-center gap-2 pt-0.5 text-[0.8rem] text-body-muted">
                       <span>
                         {order.orderType === 'DINE_IN'
                           ? order.table
@@ -107,11 +107,11 @@ export function RecentOrdersCard({ orders = [], isLoading = false }) {
 
                   <div className="flex flex-col items-end gap-1 flex-none">
                     <span
-                      className={`rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${badgeClass}`}
+                      className={`rounded-md border px-2 py-0.5 text-[0.75rem] font-bold uppercase tracking-wider ${badgeClass}`}
                     >
                       {order.status}
                     </span>
-                    <span className="text-[10px] text-body-faint">
+                    <span className="text-[0.75rem] text-body-faint">
                       {formatTimeAgo(order.createdAt)}
                     </span>
                   </div>
@@ -126,7 +126,7 @@ export function RecentOrdersCard({ orders = [], isLoading = false }) {
       <div className="pt-3 border-t border-rule/60">
         <Link
           to="/dashboard/orders"
-          className="text-[11px] font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 hover:underline block text-center"
+          className="text-[0.8rem] font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 hover:underline block text-center"
         >
           Manage all restaurant orders →
         </Link>

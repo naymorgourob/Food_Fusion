@@ -8,11 +8,14 @@ import { ApiError } from '../utils/ApiError.js'
 // file only has one branch to worry about. Anything not recognized here
 // falls through to the generic 500 below.
 function normalizeKnownError(err) {
-  if (err instanceof ApiError) return { statusCode: err.statusCode, message: err.message, details: err.details }
+  if (err instanceof ApiError)
+    return { statusCode: err.statusCode, message: err.message, details: err.details }
 
   if (err instanceof multer.MulterError) {
     const message =
-      err.code === 'LIMIT_FILE_SIZE' ? 'Image must be 2MB or smaller.' : `Upload failed: ${err.message}`
+      err.code === 'LIMIT_FILE_SIZE'
+        ? 'Image must be 2MB or smaller.'
+        : `Upload failed: ${err.message}`
     return { statusCode: 400, message, details: null }
   }
 
@@ -20,13 +23,19 @@ function normalizeKnownError(err) {
     // P2002 (unique constraint) is already caught up front in the service
     // layer for a specific message — this is only a safety net for a race
     // condition slipping past that check.
-    if (err.code === 'P2002') return { statusCode: 409, message: 'That value is already in use.', details: null }
-    if (err.code === 'P2025') return { statusCode: 404, message: 'Record not found.', details: null }
+    if (err.code === 'P2002')
+      return { statusCode: 409, message: 'That value is already in use.', details: null }
+    if (err.code === 'P2025')
+      return { statusCode: 404, message: 'Record not found.', details: null }
     // P2003: the onDelete: Restrict guard on Food.category firing directly
     // at the database level, in case the application-level check in
     // category.service.js is ever bypassed.
     if (err.code === 'P2003') {
-      return { statusCode: 409, message: 'This record is still referenced by other data.', details: null }
+      return {
+        statusCode: 409,
+        message: 'This record is still referenced by other data.',
+        details: null,
+      }
     }
   }
 

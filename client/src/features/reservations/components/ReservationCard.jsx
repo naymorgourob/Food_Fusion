@@ -1,5 +1,16 @@
 import { motion } from 'framer-motion'
-import { CalendarDays, Clock, Users, Armchair, Sparkles, Phone, X, MessageSquare } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import {
+  CalendarDays,
+  Clock,
+  Users,
+  Armchair,
+  Sparkles,
+  Phone,
+  X,
+  MessageSquare,
+  UtensilsCrossed,
+} from 'lucide-react'
 import { StatusBadge } from '@/features/reservations/components/StatusBadge'
 import { OCCASION_LABELS } from '@/features/reservations/constants'
 import { orderNo } from '@/utils/format'
@@ -25,7 +36,12 @@ const CANCELLABLE = new Set(['PENDING', 'CONFIRMED'])
 
 function formatDate(value) {
   const date = new Date(value)
-  return date.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+  return date.toLocaleDateString([], {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
 }
 
 function formatTime(value) {
@@ -49,7 +65,10 @@ export function ReservationCard({ reservation, onCancel, isCancelling }) {
       : OCCASION_LABELS[reservation.occasion]
     : null
 
-  const canCancel = CANCELLABLE.has(reservation.status) && !isPast(reservation)
+  // A table booked at checkout belongs to its dine-in order: it is
+  // released by cancelling the order (the server refuses it otherwise).
+  const linkedOrder = reservation.order
+  const canCancel = CANCELLABLE.has(reservation.status) && !isPast(reservation) && !linkedOrder
 
   return (
     <motion.article
@@ -103,10 +122,22 @@ export function ReservationCard({ reservation, onCancel, isCancelling }) {
         </div>
       </dl>
 
-      {reservation.specialRequest && (
+      {linkedOrder && (
+        <Link
+          to={`/orders/${linkedOrder.id}`}
+          className="flex items-center gap-2.5 rounded-xl bg-brand-50 px-3.5 py-3 text-xs font-semibold text-brand-800 transition-colors hover:bg-brand-100 dark:bg-brand-900/30 dark:text-brand-100 dark:hover:bg-brand-900/50"
+        >
+          <UtensilsCrossed className="h-3.5 w-3.5 flex-none" />
+          Booked with dine-in order {orderNo(linkedOrder.orderNumber)} — view order
+        </Link>
+      )}
+
+      {reservation.specialRequest && !linkedOrder && (
         <div className="flex items-start gap-2.5 rounded-xl bg-canvas-2 px-3.5 py-3">
           <MessageSquare className="mt-0.5 h-3.5 w-3.5 flex-none text-body-faint" />
-          <span className="text-xs leading-relaxed text-body-muted">{reservation.specialRequest}</span>
+          <span className="text-xs leading-relaxed text-body-muted">
+            {reservation.specialRequest}
+          </span>
         </div>
       )}
 

@@ -125,7 +125,7 @@ export default function MyBillsPage() {
                 <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-brand-50 text-brand-700 dark:bg-brand-950/40 dark:text-brand-300 ring-1 ring-brand-500/20">
                   <CreditCard className="h-5 w-5" strokeWidth={1.75} />
                 </span>
-                <span className="text-[0.7rem] font-bold uppercase tracking-wider text-body-faint">
+                <span className="text-[0.82rem] font-bold uppercase tracking-wider text-body-faint">
                   Settled
                 </span>
               </div>
@@ -144,7 +144,7 @@ export default function MyBillsPage() {
                 <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 ring-1 ring-emerald-500/20">
                   <CheckCircle2 className="h-5 w-5" strokeWidth={1.75} />
                 </span>
-                <span className="text-[0.7rem] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                <span className="text-[0.82rem] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
                   Completed
                 </span>
               </div>
@@ -163,7 +163,7 @@ export default function MyBillsPage() {
                 <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 ring-1 ring-amber-500/20">
                   <Clock className="h-5 w-5" strokeWidth={1.75} />
                 </span>
-                <span className="text-[0.7rem] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                <span className="text-[0.82rem] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
                   Awaiting
                 </span>
               </div>
@@ -198,7 +198,7 @@ export default function MyBillsPage() {
                 >
                   <span>{tab.label}</span>
                   <span
-                    className={`rounded-full px-1.5 py-0.2 text-[0.65rem] font-bold ${
+                    className={`rounded-full px-1.5 py-0.2 text-[0.78rem] font-bold ${
                       statusFilter === tab.id ? 'bg-white/20 text-white' : 'bg-canvas-2 text-body-muted'
                     }`}
                   >
@@ -256,7 +256,7 @@ export default function MyBillsPage() {
                               </span>
                               <OrderTypeBadge orderType={order?.orderType} />
                             </div>
-                            <span className="text-[0.65rem] text-body-faint block mt-0.5">
+                            <span className="text-[0.78rem] text-body-faint block mt-0.5">
                               Bill #{orderNo(bill.billNumber)}
                             </span>
                           </td>
@@ -269,7 +269,7 @@ export default function MyBillsPage() {
                                 year: 'numeric',
                               })}
                             </span>
-                            <span className="text-[0.65rem] text-body-faint">
+                            <span className="text-[0.78rem] text-body-faint">
                               {new Date(bill.billDate).toLocaleTimeString([], {
                                 hour: 'numeric',
                                 minute: '2-digit',
@@ -352,7 +352,7 @@ export default function MyBillsPage() {
                             </span>
                             <OrderTypeBadge orderType={order?.orderType} />
                           </div>
-                          <span className="text-[0.7rem] text-body-faint">
+                          <span className="text-[0.82rem] text-body-faint">
                             Bill #{orderNo(bill.billNumber)} ·{' '}
                             {new Date(bill.billDate).toLocaleDateString([], {
                               month: 'short',

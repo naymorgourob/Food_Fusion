@@ -67,8 +67,10 @@ export default function CategoriesPage() {
 
   const sorted = useMemo(() => {
     const list = [...categories]
-    if (sortBy === 'newest') return list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    if (sortBy === 'oldest') return list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+    if (sortBy === 'newest')
+      return list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    if (sortBy === 'oldest')
+      return list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
     if (sortBy === 'items') return list.sort((a, b) => b.itemCount - a.itemCount)
     return list.sort((a, b) => a.name.localeCompare(b.name))
   }, [categories, sortBy])
@@ -140,7 +142,9 @@ export default function CategoriesPage() {
         <div className="flex flex-col gap-1">
           <h1 className="font-display text-2xl font-semibold text-body">Categories</h1>
           <p className="text-sm text-body-muted">
-            {isLoading ? 'Loading…' : `${categories.length} ${categories.length === 1 ? 'category' : 'categories'}`}
+            {isLoading
+              ? 'Loading…'
+              : `${categories.length} ${categories.length === 1 ? 'category' : 'categories'}`}
           </p>
         </div>
 
@@ -193,7 +197,10 @@ export default function CategoriesPage() {
       ) : isLoading ? (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, index) => (
-            <div key={index} className="flex flex-col gap-4 rounded-2xl border border-rule bg-card p-5">
+            <div
+              key={index}
+              className="flex flex-col gap-4 rounded-2xl border border-rule bg-card p-5"
+            >
               <div className="flex items-center gap-3">
                 <div className="skeleton h-12 w-12 rounded-2xl" aria-hidden />
                 <div className="flex flex-1 flex-col gap-1.5">
@@ -212,9 +219,15 @@ export default function CategoriesPage() {
             <span className="absolute inset-0 rounded-full bg-brand-50 dark:bg-brand-900/40" />
             <span className="absolute inset-2 rounded-full bg-gold-100 dark:bg-gold-100/10" />
             {isFiltered ? (
-              <SearchX className="relative h-6 w-6 text-brand-700 dark:text-brand-400" strokeWidth={1.5} />
+              <SearchX
+                className="relative h-6 w-6 text-brand-700 dark:text-brand-400"
+                strokeWidth={1.5}
+              />
             ) : (
-              <Tag className="relative h-6 w-6 text-brand-700 dark:text-brand-400" strokeWidth={1.5} />
+              <Tag
+                className="relative h-6 w-6 text-brand-700 dark:text-brand-400"
+                strokeWidth={1.5}
+              />
             )}
           </span>
           <p className="font-display text-base font-semibold text-body">
@@ -245,7 +258,10 @@ export default function CategoriesPage() {
           )}
         </div>
       ) : (
-        <motion.div layout className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <motion.div
+          layout
+          className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        >
           <AnimatePresence mode="popLayout">
             {sorted.map((category) => (
               <AdminCategoryCard

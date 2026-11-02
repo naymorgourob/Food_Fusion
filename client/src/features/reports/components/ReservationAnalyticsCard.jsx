@@ -126,11 +126,11 @@ export function ReservationAnalyticsCard({ reservationsSummary, isLoading }) {
               key={c.key}
               className="flex flex-col gap-1 rounded-xl border border-rule bg-card/60 p-2.5 text-center"
             >
-              <span className="text-[11px] font-semibold text-body-muted">{c.label}</span>
+              <span className="text-[0.8rem] font-semibold text-body-muted">{c.label}</span>
               <span className="font-display text-base font-bold text-body leading-none">
                 {count}
               </span>
-              <span className="text-[10px] text-body-faint font-medium">{pct}% of total</span>
+              <span className="text-[0.75rem] text-body-faint font-medium">{pct}% of total</span>
             </div>
           )
         })}

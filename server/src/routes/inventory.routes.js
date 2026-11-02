@@ -1,5 +1,9 @@
 import { Router } from 'express'
-import { authenticateUser, authorizeAdmin, authorizeStaffOrAdmin } from '../middlewares/auth.middleware.js'
+import {
+  authenticateUser,
+  authorizeAdmin,
+  authorizeStaffOrAdmin,
+} from '../middlewares/auth.middleware.js'
 import {
   getInventoryItems,
   postInventoryItem,

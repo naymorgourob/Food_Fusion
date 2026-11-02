@@ -1,5 +1,41 @@
 import { motion } from 'framer-motion'
-import { Sparkles } from 'lucide-react'
+import {
+  Sparkles,
+  Drumstick,
+  Soup,
+  Salad,
+  Sandwich,
+  CakeSlice,
+  Coffee,
+  CupSoda,
+  Beef,
+  Flame,
+  Wheat,
+  Milk,
+  UtensilsCrossed,
+} from 'lucide-react'
+
+// First keyword match wins, so more specific words come first.
+const CATEGORY_ICONS = [
+  ['thai', Flame],
+  ['shake', Milk],
+  ['smoothie', Milk],
+  ['coffee', Coffee],
+  ['beverage', CupSoda],
+  ['dessert', CakeSlice],
+  ['soup', Soup],
+  ['salad', Salad],
+  ['sandwich', Sandwich],
+  ['pasta', Wheat],
+  ['grill', Beef],
+  ['kebab', Beef],
+  ['appetizer', Drumstick],
+]
+
+function iconFor(name) {
+  const lower = name.toLowerCase()
+  return CATEGORY_ICONS.find(([keyword]) => lower.includes(keyword))?.[1] ?? UtensilsCrossed
+}
 
 /**
  * Horizontal category filter pills (UI-03).
@@ -23,7 +59,10 @@ export function CategoryChips({ categories, activeId, onSelect, isLoading }) {
     )
   }
 
-  const chips = [{ id: 'all', name: 'All dishes', icon: Sparkles }, ...categories]
+  const chips = [
+    { id: 'all', name: 'All dishes', icon: Sparkles },
+    ...categories.map((category) => ({ ...category, icon: iconFor(category.name) })),
+  ]
 
   return (
     <div

@@ -64,7 +64,7 @@ export function LiveOperationsPulse({
           </div>
           <Link
             to="/dashboard/orders"
-            className="inline-flex items-center gap-1 text-[11px] font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 hover:underline"
+            className="inline-flex items-center gap-1 text-[0.8rem] font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 hover:underline"
           >
             Manage <ChevronRight className="h-3 w-3" />
           </Link>
@@ -79,7 +79,7 @@ export function LiveOperationsPulse({
             <span className="font-mono text-xl font-bold text-amber-700 dark:text-amber-400">
               {pendingOrdersCount}
             </span>
-            <span className="text-[10px] font-semibold text-amber-800 dark:text-amber-300">
+            <span className="text-[0.75rem] font-semibold text-amber-800 dark:text-amber-300">
               Pending
             </span>
           </Link>
@@ -92,7 +92,7 @@ export function LiveOperationsPulse({
             <span className="font-mono text-xl font-bold text-orange-700 dark:text-orange-400">
               {prepOrdersCount}
             </span>
-            <span className="text-[10px] font-semibold text-orange-800 dark:text-orange-300">
+            <span className="text-[0.75rem] font-semibold text-orange-800 dark:text-orange-300">
               Cooking
             </span>
           </Link>
@@ -105,13 +105,13 @@ export function LiveOperationsPulse({
             <span className="font-mono text-xl font-bold text-emerald-700 dark:text-emerald-400">
               {readyOrdersCount}
             </span>
-            <span className="text-[10px] font-semibold text-emerald-800 dark:text-emerald-300">
+            <span className="text-[0.75rem] font-semibold text-emerald-800 dark:text-emerald-300">
               Ready
             </span>
           </Link>
         </div>
 
-        <p className="text-[11px] text-body-muted">
+        <p className="text-[0.8rem] text-body-muted">
           {pendingOrdersCount + prepOrdersCount + readyOrdersCount === 0
             ? 'Kitchen queue is currently clear.'
             : `${pendingOrdersCount + prepOrdersCount + readyOrdersCount} orders currently moving through the kitchen line.`}
@@ -129,7 +129,7 @@ export function LiveOperationsPulse({
           </div>
           <Link
             to="/dashboard/tables"
-            className="inline-flex items-center gap-1 text-[11px] font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 hover:underline"
+            className="inline-flex items-center gap-1 text-[0.8rem] font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 hover:underline"
           >
             Floor Plan <ChevronRight className="h-3 w-3" />
           </Link>
@@ -153,7 +153,7 @@ export function LiveOperationsPulse({
             />
           </div>
 
-          <div className="flex items-center justify-between text-[11px] text-body-muted pt-1">
+          <div className="flex items-center justify-between text-[0.8rem] text-body-muted pt-1">
             <span className="flex items-center gap-1">
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
               {availableTables} Available
@@ -169,7 +169,7 @@ export function LiveOperationsPulse({
           </div>
         </div>
 
-        <p className="text-[11px] text-body-muted">
+        <p className="text-[0.8rem] text-body-muted">
           {availableTables > 0
             ? 'Capacity available for walk-in and reservation seatings.'
             : 'Dining floor is currently at peak capacity.'}
@@ -187,7 +187,7 @@ export function LiveOperationsPulse({
           </div>
           <Link
             to="/dashboard/inventory"
-            className="inline-flex items-center gap-1 text-[11px] font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 hover:underline"
+            className="inline-flex items-center gap-1 text-[0.8rem] font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 hover:underline"
           >
             Inventory <ChevronRight className="h-3 w-3" />
           </Link>
@@ -201,7 +201,7 @@ export function LiveOperationsPulse({
                 <span className="font-bold">
                   {lowStockItems.length} {lowStockItems.length === 1 ? 'item' : 'items'} below restock threshold
                 </span>
-                <span className="text-[11px] text-rose-700/80 dark:text-rose-300/80 truncate max-w-[200px]">
+                <span className="text-[0.8rem] text-rose-700/80 dark:text-rose-300/80 truncate max-w-[200px]">
                   Needs restock: {lowStockItems.map((i) => i.itemName).join(', ')}
                 </span>
               </div>
@@ -211,7 +211,7 @@ export function LiveOperationsPulse({
               <CheckCircle2 className="h-5 w-5 flex-none text-emerald-600 dark:text-emerald-400" />
               <div className="flex flex-col">
                 <span className="font-bold">All stock levels healthy</span>
-                <span className="text-[11px] text-emerald-700/80 dark:text-emerald-300/80">
+                <span className="text-[0.8rem] text-emerald-700/80 dark:text-emerald-300/80">
                   {inventoryItems.length} ingredients tracked above safety limits.
                 </span>
               </div>

@@ -19,7 +19,7 @@ export function RecentReservationsCard({ reservations = [], isLoading = false })
           </span>
           <div>
             <h3 className="font-display text-sm font-bold text-body">Recent Bookings</h3>
-            <span className="text-[11px] text-body-faint">Guest table reservations</span>
+            <span className="text-[0.8rem] text-body-faint">Guest table reservations</span>
           </div>
         </div>
         <Link
@@ -70,13 +70,13 @@ export function RecentReservationsCard({ reservations = [], isLoading = false })
                       <span className="truncate text-xs font-bold text-body max-w-[130px] sm:max-w-[160px]">
                         {res.customerName || 'Guest Diner'}
                       </span>
-                      <span className="inline-flex items-center gap-1 rounded-md border border-rule bg-canvas-2 px-1.5 py-0.5 text-[10px] font-semibold text-body-muted">
+                      <span className="inline-flex items-center gap-1 rounded-md border border-rule bg-canvas-2 px-1.5 py-0.5 text-[0.75rem] font-semibold text-body-muted">
                         <Users className="h-2.5 w-2.5" />
                         {res.guestCount} {res.guestCount === 1 ? 'guest' : 'guests'}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2 pt-0.5 text-[11px] text-body-muted">
+                    <div className="flex items-center gap-2 pt-0.5 text-[0.8rem] text-body-muted">
                       <span>{res.table ? `Table ${res.table.number}` : 'Unassigned'}</span>
                       <span>·</span>
                       <span className="font-medium text-body">
@@ -87,7 +87,7 @@ export function RecentReservationsCard({ reservations = [], isLoading = false })
 
                   <div className="flex flex-col items-end gap-1 flex-none">
                     <span
-                      className={`rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${badgeClass}`}
+                      className={`rounded-md border px-2 py-0.5 text-[0.75rem] font-bold uppercase tracking-wider ${badgeClass}`}
                     >
                       {res.status}
                     </span>
@@ -103,7 +103,7 @@ export function RecentReservationsCard({ reservations = [], isLoading = false })
       <div className="pt-3 border-t border-rule/60">
         <Link
           to="/dashboard/reservations"
-          className="text-[11px] font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 hover:underline block text-center"
+          className="text-[0.8rem] font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 hover:underline block text-center"
         >
           Manage table reservations schedule →
         </Link>

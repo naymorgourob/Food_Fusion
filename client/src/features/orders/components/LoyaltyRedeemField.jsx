@@ -15,9 +15,10 @@ export function LoyaltyRedeemField({ summary, itemsTotal, pointsToRedeem, onChan
   if (!summary || summary.currentPoints <= 0) return null
 
   const { currentPoints, pointValue } = summary
-  const pointsNeededForFullDiscount = pointValue > 0
-    ? Math.floor((itemsTotal * (MAX_LOYALTY_DISCOUNT_PERCENT / 100)) / pointValue)
-    : 0
+  const pointsNeededForFullDiscount =
+    pointValue > 0
+      ? Math.floor((itemsTotal * (MAX_LOYALTY_DISCOUNT_PERCENT / 100)) / pointValue)
+      : 0
   const maxRedeemable = Math.min(currentPoints, pointsNeededForFullDiscount)
 
   const applied = Math.min(Math.max(0, Number(pointsToRedeem) || 0), maxRedeemable)
@@ -35,7 +36,8 @@ export function LoyaltyRedeemField({ summary, itemsTotal, pointsToRedeem, onChan
       </div>
 
       <p className="text-xs leading-relaxed text-ink-muted">
-        Redeem points for up to {MAX_LOYALTY_DISCOUNT_PERCENT}% off food. Points cannot cover the full order.
+        Redeem points for up to {MAX_LOYALTY_DISCOUNT_PERCENT}% off food. Points cannot cover the
+        full order.
       </p>
 
       <div className="flex flex-wrap items-end gap-3">

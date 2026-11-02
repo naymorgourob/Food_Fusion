@@ -1,4 +1,8 @@
-import { validateStaffCreate, validateStaffUpdate, validateActiveStatus } from '../validators/user.validator.js'
+import {
+  validateStaffCreate,
+  validateStaffUpdate,
+  validateActiveStatus,
+} from '../validators/user.validator.js'
 import {
   listStaff,
   getStaffById,
@@ -24,7 +28,11 @@ export async function postStaff(req, res) {
   if (errors.length > 0) throw new ApiError(400, 'Validation failed.', errors)
 
   const staff = await createStaff(req.body)
-  sendSuccess(res, { statusCode: 201, message: 'Staff account created successfully.', data: { staff } })
+  sendSuccess(res, {
+    statusCode: 201,
+    message: 'Staff account created successfully.',
+    data: { staff },
+  })
 }
 
 export async function putStaff(req, res) {

@@ -1,0 +1,36 @@
+# Render Blueprint for the FoodFusion API (client is on Vercel, database
+# on Neon). Secrets are marked sync: false — Render asks for them when the
+# Blueprint is first applied, so none are stored in the repo.
+services:
+  - type: web
+    name: foodfusion-api
+    runtime: node
+    plan: free
+    # Same region as the Neon database.
+    region: singapore
+    rootDir: server
+    # Free instances have no pre-deploy step, so migrations run at build.
+    buildCommand: npm ci && npx prisma generate && npx prisma migrate deploy
+    startCommand: node src/server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: '24'
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: DATABASE_URL
+        sync: false
+      - key: CLIENT_URL
+        sync: false
+      - key: API_PUBLIC_URL
+        sync: false
+      - key: SSLCOMMERZ_STORE_ID
+        value: testbox
+      - key: SSLCOMMERZ_STORE_PASSWORD
+        value: qwerty
+      - key: SSLCOMMERZ_LIVE
+        value: 'false'

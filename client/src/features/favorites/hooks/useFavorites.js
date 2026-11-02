@@ -56,4 +56,3 @@ export function useFavorites() {
 
   return { favorites, isLoading, error, refetch: load, isFavorite, toggleFavorite, pendingId }
 }
-

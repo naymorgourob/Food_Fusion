@@ -228,7 +228,7 @@ export default function ChefInventoryPage() {
             <Package className="h-4 w-4 text-body-faint" />
           </div>
           <div className="mt-2 text-2xl font-bold text-body">{stats.total}</div>
-          <div className="text-[0.7rem] text-body-faint">Catalog ingredients</div>
+          <div className="text-[0.82rem] text-body-faint">Catalog ingredients</div>
         </Card>
 
         <Card
@@ -243,7 +243,7 @@ export default function ChefInventoryPage() {
             <CheckCircle2 className="h-4 w-4" />
           </div>
           <div className="mt-2 text-2xl font-bold text-emerald-600 dark:text-emerald-400">{stats.inStock}</div>
-          <div className="text-[0.7rem] text-body-faint">Optimal quantity</div>
+          <div className="text-[0.82rem] text-body-faint">Optimal quantity</div>
         </Card>
 
         <Card
@@ -258,7 +258,7 @@ export default function ChefInventoryPage() {
             <AlertTriangle className="h-4 w-4" />
           </div>
           <div className="mt-2 text-2xl font-bold text-amber-600 dark:text-amber-400">{stats.lowStock}</div>
-          <div className="text-[0.7rem] text-body-faint">Below threshold</div>
+          <div className="text-[0.82rem] text-body-faint">Below threshold</div>
         </Card>
 
         <Card
@@ -273,7 +273,7 @@ export default function ChefInventoryPage() {
             <AlertOctagon className="h-4 w-4" />
           </div>
           <div className="mt-2 text-2xl font-bold text-red-600 dark:text-red-400">{stats.outOfStock}</div>
-          <div className="text-[0.7rem] text-body-faint">Needs urgent restock</div>
+          <div className="text-[0.82rem] text-body-faint">Needs urgent restock</div>
         </Card>
       </div>
 
@@ -363,7 +363,7 @@ export default function ChefInventoryPage() {
                       <span className="text-xs text-body-faint">{item.category}</span>
                     </div>
                     <span
-                      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[0.65rem] font-bold ${statusConfig.badge}`}
+                      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[0.78rem] font-bold ${statusConfig.badge}`}
                     >
                       <span className={`h-1.5 w-1.5 rounded-full ${statusConfig.dot}`} />
                       {statusConfig.label}
@@ -373,7 +373,7 @@ export default function ChefInventoryPage() {
                   {/* Stock numbers */}
                   <div className="mt-4 flex items-baseline justify-between rounded-xl bg-canvas-2 px-3 py-2">
                     <div className="flex flex-col">
-                      <span className="text-[0.65rem] font-medium uppercase tracking-wider text-body-faint">
+                      <span className="text-[0.78rem] font-medium uppercase tracking-wider text-body-faint">
                         In Stock
                       </span>
                       <span className="text-lg font-bold text-body">
@@ -381,7 +381,7 @@ export default function ChefInventoryPage() {
                       </span>
                     </div>
                     <div className="flex flex-col text-right">
-                      <span className="text-[0.65rem] font-medium uppercase tracking-wider text-body-faint">
+                      <span className="text-[0.78rem] font-medium uppercase tracking-wider text-body-faint">
                         Min Level
                       </span>
                       <span className="text-xs font-semibold text-body-muted">
@@ -414,7 +414,7 @@ export default function ChefInventoryPage() {
                     </button>
                   </div>
                   {item.usages?.[0] && (
-                    <p className="mb-3 text-[0.7rem] text-body-faint">
+                    <p className="mb-3 text-[0.82rem] text-body-faint">
                       Last used {Number(item.usages[0].quantityUsed)} {unitLabel} on {new Date(item.usages[0].usageDate).toLocaleDateString()} by {item.usages[0].recordedBy?.fullName || 'staff'}; remaining {Number(item.usages[0].remainingQuantity)} {unitLabel}.
                     </p>
                   )}

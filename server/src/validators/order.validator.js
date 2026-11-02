@@ -1,6 +1,17 @@
-const VALID_STATUSES = ['PENDING', 'ACCEPTED', 'PREPARING', 'READY', 'ON_THE_WAY', 'SERVED', 'COMPLETED', 'CANCELLED']
+const VALID_STATUSES = [
+  'PENDING',
+  'ACCEPTED',
+  'PREPARING',
+  'READY',
+  'ON_THE_WAY',
+  'SERVED',
+  'COMPLETED',
+  'CANCELLED',
+]
 const VALID_ORDER_TYPES = ['DINE_IN', 'DELIVERY', 'TAKEAWAY']
 const PHONE_REGEX = /^[+\d][\d\s-]{6,14}\d$/
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/
+const TIME_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/
 
 // Structural checks only (shape, types, presence) — whether the menu item
 // ids actually exist and are available is a database question, answered
@@ -14,13 +25,19 @@ export function validateOrder({
   deliveryPhone,
   scheduledArrivalTime,
   guestCount,
+  reservationDate,
+  reservationTime,
   paymentReference,
   paymentProofImage,
   requirePaymentProof = true,
 }) {
   const errors = []
 
-  if (requirePaymentProof && (!paymentReference || !String(paymentReference).trim()) && !paymentProofImage) {
+  if (
+    requirePaymentProof &&
+    (!paymentReference || !String(paymentReference).trim()) &&
+    !paymentProofImage
+  ) {
     errors.push('Submit a transaction/reference ID or upload payment proof.')
   }
 
@@ -71,6 +88,24 @@ export function validateOrder({
     }
   }
 
+  // A table picked at checkout is booked as a reservation for this slot,
+  // so the booking needs a date, a time and how many it seats.
+  if (orderType === 'DINE_IN' && tableId && (reservationDate || reservationTime)) {
+    if (!reservationDate || !DATE_REGEX.test(reservationDate)) {
+      errors.push('Table booking date is invalid.')
+    }
+    if (!reservationTime || !TIME_REGEX.test(reservationTime)) {
+      errors.push('Table booking time is invalid.')
+    }
+    if (!scheduledArrivalTime) {
+      if (guestCount === undefined || guestCount === null || guestCount === '') {
+        errors.push('Number of guests is required to book a table.')
+      } else if (!Number.isInteger(Number(guestCount)) || Number(guestCount) <= 0) {
+        errors.push('Number of guests must be a positive whole number.')
+      }
+    }
+  }
+
   return errors
 }
 
@@ -85,11 +120,13 @@ export function validateEstimatedTime({ estimatedReadyTime, estimatedDeliveryTim
   const errors = []
 
   if (estimatedReadyTime) {
-    if (Number.isNaN(new Date(estimatedReadyTime).getTime())) errors.push('Estimated ready time is invalid.')
+    if (Number.isNaN(new Date(estimatedReadyTime).getTime()))
+      errors.push('Estimated ready time is invalid.')
   }
 
   if (estimatedDeliveryTime) {
-    if (Number.isNaN(new Date(estimatedDeliveryTime).getTime())) errors.push('Estimated delivery time is invalid.')
+    if (Number.isNaN(new Date(estimatedDeliveryTime).getTime()))
+      errors.push('Estimated delivery time is invalid.')
   }
 
   if (!estimatedReadyTime && !estimatedDeliveryTime) {

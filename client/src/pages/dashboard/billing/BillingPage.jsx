@@ -187,7 +187,7 @@ export default function BillingPage() {
               {bills.length} invoices
             </span>
             {eligibleOrders.length > 0 && (
-              <span className="hidden sm:inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 border border-emerald-200 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-300">
+              <span className="hidden sm:inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[0.8rem] font-semibold text-emerald-700 border border-emerald-200 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-300">
                 {eligibleOrders.length} ready to bill
               </span>
             )}
@@ -307,7 +307,7 @@ export default function BillingPage() {
             <SlidersHorizontal className="h-3.5 w-3.5" />
             Sort
             {sortBy !== 'date-desc' && (
-              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-brand-500 text-[10px] font-bold text-white">
+              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-brand-500 text-[0.75rem] font-bold text-white">
                 1
               </span>
             )}

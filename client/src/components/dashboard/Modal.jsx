@@ -26,11 +26,7 @@ export function Modal({ isOpen, onClose, title, size = 'md', children }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <button
-        aria-label="Close dialog"
-        onClick={onClose}
-        className="fixed inset-0 bg-ink/40"
-      />
+      <button aria-label="Close dialog" onClick={onClose} className="fixed inset-0 bg-ink/40" />
       <div
         role="dialog"
         aria-modal="true"

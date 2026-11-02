@@ -3,7 +3,8 @@ import { AlertCircle, CheckCircle2, Info } from 'lucide-react'
 const VARIANTS = {
   error: {
     icon: AlertCircle,
-    className: 'border-red-200 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-300',
+    className:
+      'border-red-200 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-300',
   },
   success: {
     icon: CheckCircle2,
@@ -33,7 +34,10 @@ export function AuthFormMessage({ variant = 'error', messages }) {
   const { icon: Icon, className } = VARIANTS[variant]
 
   return (
-    <div role={variant === 'error' ? 'alert' : 'status'} className={`rounded-xl border px-4 py-3 text-sm ${className}`}>
+    <div
+      role={variant === 'error' ? 'alert' : 'status'}
+      className={`rounded-xl border px-4 py-3 text-sm ${className}`}
+    >
       <ul className="flex flex-col gap-1.5">
         {list.map((message) => (
           <li key={message} className="flex items-start gap-2">

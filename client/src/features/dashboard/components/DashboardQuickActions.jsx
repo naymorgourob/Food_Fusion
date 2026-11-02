@@ -97,7 +97,7 @@ export function DashboardQuickActions() {
                 <span className="text-xs font-bold text-body group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
                   {action.label}
                 </span>
-                <span className="truncate text-[11px] leading-tight text-body-faint">
+                <span className="truncate text-[0.8rem] leading-tight text-body-faint">
                   {action.description}
                 </span>
               </div>

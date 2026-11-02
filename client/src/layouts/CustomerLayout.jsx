@@ -12,7 +12,14 @@ const COLLAPSE_KEY = 'foodfusion-customer-sidebar-collapsed'
 
 // Matches OrderProgressTracker's flow — everything short of a terminal
 // state is still "in progress" for the customer.
-const ACTIVE_STATUSES = new Set(['PENDING', 'ACCEPTED', 'PREPARING', 'READY', 'ON_THE_WAY', 'SERVED'])
+const ACTIVE_STATUSES = new Set([
+  'PENDING',
+  'ACCEPTED',
+  'PREPARING',
+  'READY',
+  'ON_THE_WAY',
+  'SERVED',
+])
 
 /**
  * Chrome for every customer page: emerald sidebar + glass top bar.
@@ -69,7 +76,7 @@ export function CustomerShell({ children }) {
 
       <div
         className={`flex min-h-screen flex-col transition-all duration-300 ${
-          collapsed ? 'lg:pl-[5.25rem]' : 'lg:pl-64'
+          collapsed ? 'lg:pl-[5.25rem]' : 'lg:pl-80'
         }`}
       >
         <CustomerTopBar

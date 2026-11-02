@@ -9,6 +9,7 @@ import {
   LogOut,
   ChevronsLeft,
   ChevronsRight,
+  Wallet,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { ROUTES } from '@/constants'
@@ -19,6 +20,7 @@ const NAV_ITEMS = [
   { label: 'Orders', to: ROUTES.WAITER_ORDERS, icon: UtensilsCrossed },
   { label: 'Tables', to: ROUTES.WAITER_TABLES, icon: LayoutGrid },
   { label: 'Reservations', to: ROUTES.WAITER_RESERVATIONS, icon: CalendarCheck },
+  { label: 'My Payslips', to: '/staff/waiter/payslips', icon: Wallet },
 ]
 
 export function WaiterSidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobile }) {
@@ -45,19 +47,22 @@ export function WaiterSidebar({ collapsed, onToggleCollapsed, mobileOpen, onClos
       <aside
         aria-label="Waiter Workspace Navigation"
         className={`fixed inset-y-0 left-0 z-50 flex flex-col bg-brand-900 transition-all duration-300 ${
-          collapsed ? 'lg:w-[5.25rem]' : 'lg:w-64'
-        } ${mobileOpen ? 'w-72 translate-x-0' : 'w-72 -translate-x-full lg:translate-x-0'}`}
+          collapsed ? 'lg:w-[5.25rem]' : 'lg:w-80'
+        } ${mobileOpen ? 'w-80 translate-x-0' : 'w-80 -translate-x-full lg:translate-x-0'}`}
       >
-        <div className="flex h-16 flex-none items-center justify-between px-4">
+        <div className="flex h-24 flex-none items-center justify-between px-4">
           <NavLink to={ROUTES.WAITER_HOME} className="flex items-center gap-2.5 overflow-hidden">
-            <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-white/10 font-display text-sm font-semibold text-gold-300 ring-1 ring-gold-500/40">
-              F
-            </span>
+            <img
+              src="/brand/logo-mark.png"
+              alt=""
+              aria-hidden
+              className={`h-[4.5rem] w-[4.5rem] flex-none rounded-full object-cover shadow-lg ring-2 ring-gold-300/60 transition-all ${collapsed ? 'lg:h-14 lg:w-14' : ''}`}
+            />
             <span className={`flex flex-col leading-none ${collapsed ? 'lg:hidden' : ''}`}>
-              <span className="font-display text-base font-semibold whitespace-nowrap text-white">
+              <span className="font-display text-xl font-semibold whitespace-nowrap text-white">
                 FoodFusion
               </span>
-              <span className="text-[0.6rem] tracking-[0.18em] whitespace-nowrap text-gold-300 uppercase">
+              <span className="mt-1 text-[0.75rem] tracking-[0.1em] whitespace-nowrap text-gold-300 uppercase">
                 Waiter Workspace
               </span>
             </span>
@@ -69,7 +74,11 @@ export function WaiterSidebar({ collapsed, onToggleCollapsed, mobileOpen, onClos
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             className="hidden rounded-lg p-1.5 text-white/50 transition-colors hover:bg-white/10 hover:text-white lg:block"
           >
-            {collapsed ? <ChevronsRight className="h-4 w-4" /> : <ChevronsLeft className="h-4 w-4" />}
+            {collapsed ? (
+              <ChevronsRight className="h-4 w-4" />
+            ) : (
+              <ChevronsLeft className="h-4 w-4" />
+            )}
           </button>
         </div>
 
@@ -83,7 +92,7 @@ export function WaiterSidebar({ collapsed, onToggleCollapsed, mobileOpen, onClos
                   onClick={onCloseMobile}
                   title={collapsed ? label : undefined}
                   className={({ isActive }) =>
-                    `group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+                    `group relative flex items-center gap-3.5 rounded-xl px-3.5 py-3 text-base font-medium transition-colors ${
                       isActive
                         ? 'bg-white/12 text-white'
                         : 'text-white/60 hover:bg-white/8 hover:text-white'
@@ -98,7 +107,7 @@ export function WaiterSidebar({ collapsed, onToggleCollapsed, mobileOpen, onClos
                           isActive ? 'opacity-100' : 'opacity-0'
                         }`}
                       />
-                      <Icon className="h-[1.15rem] w-[1.15rem] flex-none" strokeWidth={1.75} />
+                      <Icon className="h-[1.35rem] w-[1.35rem] flex-none" strokeWidth={1.75} />
                       <span className={`truncate ${collapsed ? 'lg:hidden' : ''}`}>{label}</span>
                     </>
                   )}
@@ -109,13 +118,15 @@ export function WaiterSidebar({ collapsed, onToggleCollapsed, mobileOpen, onClos
         </nav>
 
         <div className="flex-none border-t border-white/10 p-3">
-          <div className={`mb-2 flex items-center gap-3 px-2 py-1.5 ${collapsed ? 'lg:justify-center lg:px-0' : ''}`}>
-            <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-gold-500 font-display text-sm font-semibold text-charcoal">
+          <div
+            className={`mb-2 flex items-center gap-3 px-2 py-1.5 ${collapsed ? 'lg:justify-center lg:px-0' : ''}`}
+          >
+            <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-gold-500 font-display text-base font-semibold text-charcoal">
               {initial}
             </span>
             <span className={`flex min-w-0 flex-col leading-tight ${collapsed ? 'lg:hidden' : ''}`}>
-              <span className="truncate text-sm font-medium text-white">{user?.fullName}</span>
-              <span className="truncate text-xs text-white/50">{user?.position ?? 'Waiter'}</span>
+              <span className="truncate text-base font-medium text-white">{user?.fullName}</span>
+              <span className="truncate text-sm text-white/50">{user?.position ?? 'Waiter'}</span>
             </span>
           </div>
 
@@ -123,12 +134,14 @@ export function WaiterSidebar({ collapsed, onToggleCollapsed, mobileOpen, onClos
             to={ROUTES.WAITER_PROFILE}
             onClick={onCloseMobile}
             className={({ isActive }) =>
-              `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
-                isActive ? 'bg-white/12 text-white' : 'text-white/60 hover:bg-white/8 hover:text-white'
+              `flex items-center gap-3.5 rounded-xl px-3.5 py-3 text-base font-medium transition-colors ${
+                isActive
+                  ? 'bg-white/12 text-white'
+                  : 'text-white/60 hover:bg-white/8 hover:text-white'
               }`
             }
           >
-            <UserRound className="h-[1.15rem] w-[1.15rem] flex-none" strokeWidth={1.75} />
+            <UserRound className="h-[1.35rem] w-[1.35rem] flex-none" strokeWidth={1.75} />
             <span className={collapsed ? 'lg:hidden' : ''}>Profile</span>
           </NavLink>
 
@@ -136,21 +149,23 @@ export function WaiterSidebar({ collapsed, onToggleCollapsed, mobileOpen, onClos
             to={ROUTES.WAITER_SETTINGS}
             onClick={onCloseMobile}
             className={({ isActive }) =>
-              `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
-                isActive ? 'bg-white/12 text-white' : 'text-white/60 hover:bg-white/8 hover:text-white'
+              `flex items-center gap-3.5 rounded-xl px-3.5 py-3 text-base font-medium transition-colors ${
+                isActive
+                  ? 'bg-white/12 text-white'
+                  : 'text-white/60 hover:bg-white/8 hover:text-white'
               }`
             }
           >
-            <Settings className="h-[1.15rem] w-[1.15rem] flex-none" strokeWidth={1.75} />
+            <Settings className="h-[1.35rem] w-[1.35rem] flex-none" strokeWidth={1.75} />
             <span className={collapsed ? 'lg:hidden' : ''}>Settings</span>
           </NavLink>
 
           <button
             type="button"
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/60 transition-colors hover:bg-white/8 hover:text-white"
+            className="flex w-full items-center gap-3.5 rounded-xl px-3.5 py-3 text-base font-medium text-white/60 transition-colors hover:bg-white/8 hover:text-white"
           >
-            <LogOut className="h-[1.15rem] w-[1.15rem] flex-none" strokeWidth={1.75} />
+            <LogOut className="h-[1.35rem] w-[1.35rem] flex-none" strokeWidth={1.75} />
             <span className={collapsed ? 'lg:hidden' : ''}>Logout</span>
           </button>
         </div>
@@ -158,4 +173,3 @@ export function WaiterSidebar({ collapsed, onToggleCollapsed, mobileOpen, onClos
     </>
   )
 }
-

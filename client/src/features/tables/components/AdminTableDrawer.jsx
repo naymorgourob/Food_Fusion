@@ -80,14 +80,14 @@ function ReservationMiniCard({ reservation }) {
             {reservation.customerPhone}
           </span>
         </div>
-        <span className={`flex-none rounded-full px-2 py-0.5 text-[0.65rem] font-bold ${STATUS_STYLES[reservation.status]}`}>
+        <span className={`flex-none rounded-full px-2 py-0.5 text-[0.78rem] font-bold ${STATUS_STYLES[reservation.status]}`}>
           {STATUS_LABELS[reservation.status]}
         </span>
       </div>
 
       <div className="grid grid-cols-3 gap-2 text-xs">
         <div className="flex flex-col gap-0.5">
-          <span className="font-medium text-body-faint uppercase tracking-wide text-[0.6rem]">Date</span>
+          <span className="font-medium text-body-faint uppercase tracking-wide text-[0.72rem]">Date</span>
           <span className="font-semibold text-body">
             {isToday
               ? 'Today'
@@ -95,11 +95,11 @@ function ReservationMiniCard({ reservation }) {
           </span>
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="font-medium text-body-faint uppercase tracking-wide text-[0.6rem]">Time</span>
+          <span className="font-medium text-body-faint uppercase tracking-wide text-[0.72rem]">Time</span>
           <span className="font-semibold text-body">{formatTime(reservation.reservationTime)}</span>
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="font-medium text-body-faint uppercase tracking-wide text-[0.6rem]">Guests</span>
+          <span className="font-medium text-body-faint uppercase tracking-wide text-[0.72rem]">Guests</span>
           <span className="font-semibold text-body">{reservation.guestCount}</span>
         </div>
       </div>
@@ -107,7 +107,7 @@ function ReservationMiniCard({ reservation }) {
       {reservation.specialRequest && (
         <div className="flex items-start gap-1.5 rounded-lg border border-rule bg-card px-2.5 py-2">
           <ScrollText className="mt-0.5 h-3 w-3 flex-none text-body-faint" />
-          <span className="text-[0.7rem] text-body-muted italic">{reservation.specialRequest}</span>
+          <span className="text-[0.82rem] text-body-muted italic">{reservation.specialRequest}</span>
         </div>
       )}
     </div>
@@ -220,7 +220,7 @@ export function AdminTableDrawer({ table, linkedReservations, isOpen, onClose, o
                     <CalendarDays className="h-3.5 w-3.5" />
                     Active Reservations
                     {activeReservations.length > 0 && (
-                      <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[0.65rem] font-bold text-brand-700 dark:bg-brand-900/40 dark:text-brand-400">
+                      <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[0.78rem] font-bold text-brand-700 dark:bg-brand-900/40 dark:text-brand-400">
                         {activeReservations.length}
                       </span>
                     )}

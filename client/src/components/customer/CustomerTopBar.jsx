@@ -1,6 +1,15 @@
 import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Menu, Search, Bell, ShoppingBag, ChevronDown, UserRound, Receipt, LogOut } from 'lucide-react'
+import {
+  Menu,
+  Search,
+  Bell,
+  ShoppingBag,
+  ChevronDown,
+  UserRound,
+  Receipt,
+  LogOut,
+} from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useClickOutside } from '@/hooks/useClickOutside'
 import { ROUTES } from '@/constants'
@@ -48,7 +57,7 @@ export function CustomerTopBar({ onOpenMobileSidebar, notifications = [], cartCo
 
   return (
     <header className="sticky top-0 z-30 border-b border-rule bg-canvas/80 backdrop-blur-xl">
-      <div className="flex items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6 lg:px-8">
+      <div className="flex h-24 items-center gap-3 px-4 sm:gap-4 sm:px-6 lg:px-8">
         <button
           onClick={onOpenMobileSidebar}
           aria-label="Open menu"
@@ -70,7 +79,10 @@ export function CustomerTopBar({ onOpenMobileSidebar, notifications = [], cartCo
           </span>
         </div>
 
-        <form onSubmit={handleSearch} className="ml-auto flex min-w-0 flex-1 justify-end lg:max-w-sm">
+        <form
+          onSubmit={handleSearch}
+          className="ml-auto flex min-w-0 flex-1 justify-end lg:max-w-sm"
+        >
           <label htmlFor="customer-search" className="sr-only">
             Search the menu
           </label>
@@ -110,7 +122,9 @@ export function CustomerTopBar({ onOpenMobileSidebar, notifications = [], cartCo
                   <p className="font-display text-sm font-semibold text-body">Notifications</p>
                 </div>
                 {notifications.length === 0 ? (
-                  <p className="px-4 py-6 text-center text-sm text-body-faint">You&apos;re all caught up.</p>
+                  <p className="px-4 py-6 text-center text-sm text-body-faint">
+                    You&apos;re all caught up.
+                  </p>
                 ) : (
                   <ul className="max-h-80 divide-y divide-rule overflow-y-auto">
                     {notifications.map((item) => (
@@ -120,12 +134,16 @@ export function CustomerTopBar({ onOpenMobileSidebar, notifications = [], cartCo
                           onClick={() => setNotifOpen(false)}
                           className="flex gap-3 px-4 py-3 transition-colors hover:bg-canvas-2"
                         >
-                          <span className={`mt-0.5 flex h-8 w-8 flex-none items-center justify-center rounded-full ${item.tone}`}>
+                          <span
+                            className={`mt-0.5 flex h-8 w-8 flex-none items-center justify-center rounded-full ${item.tone}`}
+                          >
                             <item.icon className="h-4 w-4" />
                           </span>
                           <span className="flex min-w-0 flex-col">
                             <span className="text-sm font-medium text-body">{item.title}</span>
-                            <span className="truncate text-xs text-body-faint">{item.description}</span>
+                            <span className="truncate text-xs text-body-faint">
+                              {item.description}
+                            </span>
                           </span>
                         </Link>
                       </li>
@@ -143,7 +161,7 @@ export function CustomerTopBar({ onOpenMobileSidebar, notifications = [], cartCo
           >
             <ShoppingBag className="h-[1.15rem] w-[1.15rem]" />
             {cartCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-700 px-1 text-[0.6rem] font-bold text-white">
+              <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-700 px-1 text-[0.72rem] font-bold text-white">
                 {cartCount}
               </span>
             )}

@@ -10,7 +10,14 @@
  * and would otherwise clip inside its narrow card, so that usage passes a
  * smaller value.
  */
-export function DataTable({ columns, rows, getRowKey, isLoading, emptyMessage = 'No data yet.', minWidth = 640 }) {
+export function DataTable({
+  columns,
+  rows,
+  getRowKey,
+  isLoading,
+  emptyMessage = 'No data yet.',
+  minWidth = 640,
+}) {
   return (
     <div className="overflow-x-auto rounded-lg border border-border">
       <table className="w-full text-left text-sm" style={{ minWidth: `${minWidth}px` }}>
@@ -29,13 +36,19 @@ export function DataTable({ columns, rows, getRowKey, isLoading, emptyMessage = 
         <tbody className="divide-y divide-border bg-surface">
           {isLoading ? (
             <tr>
-              <td colSpan={columns.length} className="px-4 py-10 text-center text-sm text-ink-muted">
+              <td
+                colSpan={columns.length}
+                className="px-4 py-10 text-center text-sm text-ink-muted"
+              >
                 Loading…
               </td>
             </tr>
           ) : rows.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="px-4 py-10 text-center text-sm text-ink-muted">
+              <td
+                colSpan={columns.length}
+                className="px-4 py-10 text-center text-sm text-ink-muted"
+              >
                 {emptyMessage}
               </td>
             </tr>

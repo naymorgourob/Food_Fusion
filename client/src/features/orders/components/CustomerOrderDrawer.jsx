@@ -25,7 +25,14 @@ import { ORDER_STATUS_LABELS, orderGrandTotal } from '@/features/orders/constant
 import { money, orderNo } from '@/utils/format'
 import { getImageUrl, ROUTES } from '@/constants'
 
-const ACTIVE_STATUSES = new Set(['PENDING', 'ACCEPTED', 'PREPARING', 'READY', 'ON_THE_WAY', 'SERVED'])
+const ACTIVE_STATUSES = new Set([
+  'PENDING',
+  'ACCEPTED',
+  'PREPARING',
+  'READY',
+  'ON_THE_WAY',
+  'SERVED',
+])
 
 export function CustomerOrderDrawer({ order, isOpen, onClose }) {
   // Close on Escape key
@@ -88,12 +95,15 @@ export function CustomerOrderDrawer({ order, isOpen, onClose }) {
                   <OrderStatusBadge status={order.status} />
                 </div>
                 <span className="text-xs text-body-muted">
-                  Placed on {new Date(order.createdAt).toLocaleDateString([], {
+                  Placed on{' '}
+                  {new Date(order.createdAt).toLocaleDateString([], {
                     weekday: 'short',
                     month: 'short',
                     day: 'numeric',
                     year: 'numeric',
-                  })} at {new Date(order.createdAt).toLocaleTimeString([], {
+                  })}{' '}
+                  at{' '}
+                  {new Date(order.createdAt).toLocaleTimeString([], {
                     hour: 'numeric',
                     minute: '2-digit',
                   })}
@@ -156,7 +166,9 @@ export function CustomerOrderDrawer({ order, isOpen, onClose }) {
                       <ShoppingBag className="h-4 w-4 text-brand-600 dark:text-brand-400 flex-none" />
                       <span>
                         {order.scheduledPickupTime
-                          ? `Scheduled Pickup: ${new Date(order.scheduledPickupTime).toLocaleTimeString([], {
+                          ? `Scheduled Pickup: ${new Date(
+                              order.scheduledPickupTime,
+                            ).toLocaleTimeString([], {
                               hour: 'numeric',
                               minute: '2-digit',
                             })}`
@@ -172,7 +184,8 @@ export function CustomerOrderDrawer({ order, isOpen, onClose }) {
                 <div className="flex items-center justify-between">
                   <h3 className="font-display text-sm font-semibold text-body">Items Ordered</h3>
                   <span className="text-xs text-body-muted">
-                    {items.reduce((sum, it) => sum + it.quantity, 0)} {items.length === 1 ? 'item' : 'items'}
+                    {items.reduce((sum, it) => sum + it.quantity, 0)}{' '}
+                    {items.length === 1 ? 'item' : 'items'}
                   </span>
                 </div>
 
@@ -183,7 +196,11 @@ export function CustomerOrderDrawer({ order, isOpen, onClose }) {
                       <div key={item.id} className="flex items-start gap-3.5 p-3.5">
                         <div className="h-12 w-12 flex-none overflow-hidden rounded-xl bg-canvas-2 border border-rule/50">
                           {imageUrl ? (
-                            <img src={imageUrl} alt={item.menuItem?.name} className="h-full w-full object-cover" />
+                            <img
+                              src={imageUrl}
+                              alt={item.menuItem?.name}
+                              className="h-full w-full object-contain"
+                            />
                           ) : (
                             <div className="flex h-full w-full items-center justify-center text-body-faint">
                               <UtensilsCrossed className="h-5 w-5" />
@@ -199,7 +216,7 @@ export function CustomerOrderDrawer({ order, isOpen, onClose }) {
                             {money(item.unitPrice)} × {item.quantity}
                           </span>
                           {item.specialInstructions && (
-                            <span className="mt-1 text-[0.7rem] text-gold-600 dark:text-gold-400 italic">
+                            <span className="mt-1 text-[0.82rem] text-gold-600 dark:text-gold-400 italic">
                               &ldquo;{item.specialInstructions}&rdquo;
                             </span>
                           )}
@@ -264,14 +281,16 @@ export function CustomerOrderDrawer({ order, isOpen, onClose }) {
                     <div className="flex items-center gap-2">
                       <Receipt className="h-4 w-4 text-body-muted" />
                       <div>
-                        <span className="font-semibold text-body block">Invoice #{bill.billNumber}</span>
-                        <span className="text-[0.7rem] text-body-faint">
+                        <span className="font-semibold text-body block">
+                          Invoice #{bill.billNumber}
+                        </span>
+                        <span className="text-[0.82rem] text-body-faint">
                           {bill.paymentStatus === 'PAID' ? 'Payment Completed' : 'Payment Pending'}
                         </span>
                       </div>
                     </div>
                     <span
-                      className={`rounded-full px-2 py-0.5 text-[0.65rem] font-bold ${
+                      className={`rounded-full px-2 py-0.5 text-[0.78rem] font-bold ${
                         bill.paymentStatus === 'PAID'
                           ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
                           : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
@@ -320,4 +339,3 @@ export function CustomerOrderDrawer({ order, isOpen, onClose }) {
     </AnimatePresence>
   )
 }
-

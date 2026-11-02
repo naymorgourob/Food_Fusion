@@ -1,7 +1,9 @@
 import { prisma } from '../config/prisma.js'
 import { Prisma } from '../generated/prisma/client.ts'
+import { ADVANCE_RATE } from '../config/payments.js'
 import { ApiError } from '../utils/ApiError.js'
 import { getSettings } from './settings.service.js'
+import { RESERVATION_DURATION_MINUTES } from './reservation.service.js'
 import {
   getLoyaltySummary,
   recordTransaction,
@@ -105,11 +107,17 @@ export async function createOrder(customerId, input) {
     scheduledPickupTime,
     scheduledArrivalTime,
     guestCount,
+    reservationDate,
+    reservationTime,
     specialInstructions,
     pointsToRedeem,
-    paymentReference,
-    paymentProofImage,
+    paymentMethod,
   } = input
+  // Paying at the restaurant: no advance and no proof — a waiter is
+  // assigned to settle the bill with the customer and serve the food.
+  const payAtRestaurant = paymentMethod === 'AT_RESTAURANT'
+  const paymentReference = payAtRestaurant ? null : input.paymentReference
+  const paymentProofImage = payAtRestaurant ? null : input.paymentProofImage
 
   // A table only means something for Dine-In — Delivery/Takeaway orders
   // never have one, regardless of what the client sends.
@@ -152,7 +160,9 @@ export async function createOrder(customerId, input) {
 
     const settings = await getSettings()
     const rawDiscount = new Prisma.Decimal(requestedPoints).mul(settings.loyaltyPointValue)
-    const maximumDiscount = totalAmount.mul(new Prisma.Decimal(MAX_LOYALTY_DISCOUNT_PERCENT)).div(100)
+    const maximumDiscount = totalAmount
+      .mul(new Prisma.Decimal(MAX_LOYALTY_DISCOUNT_PERCENT))
+      .div(100)
     // Loyalty covers only a small part of the food subtotal, so customers
     // must earn a meaningful balance and can never make the order free.
     loyaltyDiscount = Prisma.Decimal.min(rawDiscount, maximumDiscount)
@@ -168,93 +178,203 @@ export async function createOrder(customerId, input) {
   const deliveryCharge = orderType === 'DELIVERY' ? DELIVERY_CHARGE : new Prisma.Decimal(0)
   totalAmount = totalAmount.add(deliveryCharge)
 
-  const advanceAmount = totalAmount.mul(new Prisma.Decimal('0.20')).toDecimalPlaces(2)
+  const advanceAmount = payAtRestaurant
+    ? new Prisma.Decimal(0)
+    : totalAmount.mul(ADVANCE_RATE).toDecimalPlaces(2)
+  const assignedStaffId = payAtRestaurant ? await pickWaiter() : null
 
-  // A transaction so the order and its REDEEMED ledger row are written
+  // Dine-In Now sits down immediately, so the table has to be free right
+  // now and is marked OCCUPIED; a scheduled dine-in only holds the table
+  // through its reservation and leaves the live status alone.
+  // Customer checkout sends the slot it picked the table for; staff
+  // walk-in orders (TakeOrderModal) don't, and just seat the table.
+  const booksTable = Boolean(resolvedTableId && reservationDate && reservationTime)
+  const isScheduledDineIn = booksTable && Boolean(scheduledArrivalTime)
+
+  // Who the table booking is under — read before the transaction, same
+  // reason as getSettings() in updateOrderStatus.
+  const customer = booksTable
+    ? await prisma.user.findUnique({
+        where: { id: customerId },
+        select: { fullName: true, phone: true },
+      })
+    : null
+
+  // A transaction so the order and its REDEEMED ledger row (and any table booking) are written
   // together — a crash between them would otherwise either charge points
   // for no order or give a discount without deducting points.
-  return prisma.$transaction(async (tx) => {
-    if (resolvedTableId) {
-      const table = await tx.table.findUnique({ where: { id: resolvedTableId } })
-      if (!table) throw new ApiError(400, 'Selected table does not exist.')
-      if (table.status !== 'AVAILABLE') {
-        throw new ApiError(400, `Table ${table.number} is not available for dine-in.`)
-      }
-      if (guestCount && Number(guestCount) > table.capacity) {
-        throw new ApiError(400, `Table ${table.number} only seats ${table.capacity} guests.`)
-      }
-    }
+  return prisma.$transaction(
+    async (tx) => {
+      let reservationDateValue = null
+      if (resolvedTableId) {
+        const table = await tx.table.findUnique({ where: { id: resolvedTableId } })
+        if (!table) throw new ApiError(400, 'Selected table does not exist.')
+        if (table.status === 'INACTIVE' || (!isScheduledDineIn && table.status !== 'AVAILABLE')) {
+          throw new ApiError(400, `Table ${table.number} is not available for dine-in.`)
+        }
+        if (guestCount && Number(guestCount) > table.capacity) {
+          throw new ApiError(400, `Table ${table.number} only seats ${table.capacity} guests.`)
+        }
 
-    const order = await tx.order.create({
-    data: {
-      customerId,
-      tableId: resolvedTableId,
-      totalAmount,
-      orderType,
-      pointsRedeemed,
-      loyaltyDiscount,
-      advanceAmount,
-      paymentReference: paymentReference?.trim() || null,
-      paymentProofImage: paymentProofImage || null,
-      paymentSubmittedAt: new Date(),
-      items: { create: orderItemsData },
-      specialInstructions: specialInstructions?.trim() || null,
-      // Delivery-only
-      ...(orderType === 'DELIVERY'
-        ? {
-            deliveryAddress: deliveryAddress.trim(),
-            deliveryPhone: deliveryPhone.trim(),
-            deliveryCharge,
+        if (booksTable) {
+          // Same overlap rule as createReservation, so a table booked from
+          // the Reservations page can't be double-booked from checkout.
+          reservationDateValue = new Date(reservationDate)
+          const existingReservations = await tx.reservation.findMany({
+            where: {
+              tableId: resolvedTableId,
+              reservationDate: reservationDateValue,
+              status: { in: ['PENDING', 'CONFIRMED'] },
+            },
+            select: { reservationTime: true, durationMinutes: true },
+          })
+          const [requestedHours, requestedMinutes] = reservationTime.split(':').map(Number)
+          const requestedStart = requestedHours * 60 + requestedMinutes
+          const requestedEnd = requestedStart + RESERVATION_DURATION_MINUTES
+          const hasConflict = existingReservations.some((existing) => {
+            const [hours, minutes] = existing.reservationTime.split(':').map(Number)
+            const start = hours * 60 + minutes
+            const end = start + (existing.durationMinutes || RESERVATION_DURATION_MINUTES)
+            return start < requestedEnd && requestedStart < end
+          })
+          if (hasConflict) {
+            throw new ApiError(
+              409,
+              `Table ${table.number} is already reserved for that time. Please pick another table.`,
+            )
           }
-        : {}),
-      // Takeaway-only
-      ...(orderType === 'TAKEAWAY' && scheduledPickupTime ? { scheduledPickupTime: new Date(scheduledPickupTime) } : {}),
-      // Dine-in "Schedule Dine-In" only — "Dine-In Now" leaves both null
-      ...(orderType === 'DINE_IN' && scheduledArrivalTime
-        ? { scheduledArrivalTime: new Date(scheduledArrivalTime), guestCount: Number(guestCount) }
-        : {}),
-      },
-      include: ORDER_INCLUDE,
-    })
-
-    if (pointsRedeemed > 0) {
-      await recordTransaction(
-        {
-          customerId,
-          type: 'REDEEMED',
-          points: pointsRedeemed,
-          reason: `Redeemed on order #${String(order.orderNumber).padStart(6, '0')}`,
-          orderId: order.id,
-        },
-        tx,
-      )
-    }
-
-    // When dine-in order is placed, mark table as OCCUPIED
-    if (resolvedTableId) {
-      const occupiedTable = await tx.table.updateMany({
-        where: { id: resolvedTableId, status: 'AVAILABLE' },
-        data: { status: 'OCCUPIED' },
-      })
-      if (occupiedTable.count !== 1) {
-        throw new ApiError(409, 'The selected table is no longer available.')
+        }
       }
-    }
 
-    return order
+      const order = await tx.order.create({
+        data: {
+          customerId,
+          tableId: resolvedTableId,
+          totalAmount,
+          orderType,
+          pointsRedeemed,
+          loyaltyDiscount,
+          advanceAmount,
+          assignedStaffId,
+          paymentReference: paymentReference?.trim() || null,
+          paymentProofImage: paymentProofImage || null,
+          paymentSubmittedAt: payAtRestaurant ? null : new Date(),
+          items: { create: orderItemsData },
+          specialInstructions: specialInstructions?.trim() || null,
+          // Delivery-only
+          ...(orderType === 'DELIVERY'
+            ? {
+                deliveryAddress: deliveryAddress.trim(),
+                deliveryPhone: deliveryPhone.trim(),
+                deliveryCharge,
+              }
+            : {}),
+          // Takeaway-only
+          ...(orderType === 'TAKEAWAY' && scheduledPickupTime
+            ? { scheduledPickupTime: new Date(scheduledPickupTime) }
+            : {}),
+          // Dine-in "Schedule Dine-In" only — "Dine-In Now" leaves the
+          // arrival null (guest count is kept when a table was picked)
+          ...(orderType === 'DINE_IN' && scheduledArrivalTime
+            ? { scheduledArrivalTime: new Date(scheduledArrivalTime) }
+            : {}),
+          ...(orderType === 'DINE_IN' && guestCount ? { guestCount: Number(guestCount) } : {}),
+        },
+        include: ORDER_INCLUDE,
+      })
+
+      // Picking a table books it: the order gets a reservation of its own,
+      // which shows up on the customer's Reservations page. It carries no
+      // table charge — the order's advance already secures the visit — and
+      // its payment details mirror the order's.
+      if (booksTable) {
+        await tx.reservation.create({
+          data: {
+            customerId,
+            customerName: customer.fullName,
+            customerPhone: customer.phone,
+            tableId: resolvedTableId,
+            guestCount: Number(guestCount),
+            reservationDate: reservationDateValue,
+            reservationTime,
+            durationMinutes: RESERVATION_DURATION_MINUTES,
+            specialRequest: `Dine-in order #${String(order.orderNumber).padStart(6, '0')}`,
+            paymentReference: paymentReference?.trim() || null,
+            paymentProofImage: paymentProofImage || null,
+            paymentSubmittedAt: payAtRestaurant ? null : new Date(),
+            orderId: order.id,
+          },
+        })
+      }
+
+      if (pointsRedeemed > 0) {
+        await recordTransaction(
+          {
+            customerId,
+            type: 'REDEEMED',
+            points: pointsRedeemed,
+            reason: `Redeemed on order #${String(order.orderNumber).padStart(6, '0')}`,
+            orderId: order.id,
+          },
+          tx,
+        )
+      }
+
+      // When a Dine-In Now order is placed, mark table as OCCUPIED
+      if (resolvedTableId && !isScheduledDineIn) {
+        const occupiedTable = await tx.table.updateMany({
+          where: { id: resolvedTableId, status: 'AVAILABLE' },
+          data: { status: 'OCCUPIED' },
+        })
+        if (occupiedTable.count !== 1) {
+          throw new ApiError(409, 'The selected table is no longer available.')
+        }
+      }
+
+      return order
+    },
+    { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+  )
+}
+
+// The waiter with the fewest open orders, so pay-at-restaurant orders are
+// spread across the floor. Null when no waiter is on staff — staff can
+// still assign one by hand.
+async function pickWaiter() {
+  const staff = await prisma.user.findMany({
+    where: { role: 'STAFF', isActive: true },
+    select: {
+      id: true,
+      position: true,
+      _count: {
+        select: { assignedOrders: { where: { status: { notIn: ['COMPLETED', 'CANCELLED'] } } } },
+      },
+    },
   })
+  const waiters = staff.filter((member) => {
+    const position = String(member.position || '').toLowerCase()
+    return ['waiter', 'server'].some((term) => position.includes(term)) && !isChef(member)
+  })
+  if (waiters.length === 0) return null
+  waiters.sort((a, b) => a._count.assignedOrders - b._count.assignedOrders)
+  return waiters[0].id
 }
 
 function isChef(user) {
   const position = String(user?.position || '').toLowerCase()
-  return ['chef', 'cook', 'kitchen', 'baker', 'pastry', 'culinary'].some((term) => position.includes(term))
+  return ['chef', 'cook', 'kitchen', 'baker', 'pastry', 'culinary'].some((term) =>
+    position.includes(term),
+  )
 }
 
 export async function updateOrderStatus(id, status, user) {
   const order = await getOrderOrThrow(id)
 
   if (user?.role === 'STAFF') {
-    const staff = await prisma.user.findUnique({ where: { id: user.id }, select: { position: true } })
+    const staff = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { position: true },
+    })
     const staffUser = { ...user, position: staff?.position }
     const chefStatuses = new Set(['ACCEPTED', 'PREPARING', 'READY'])
     const waiterStatuses = new Set(['SERVED', 'ON_THE_WAY', 'COMPLETED'])
@@ -275,6 +395,8 @@ export async function updateOrderStatus(id, status, user) {
   if (
     status === 'ACCEPTED' &&
     order.customer.role === 'CUSTOMER' &&
+    // Pay-at-restaurant orders carry no advance, so there is no proof to wait for.
+    Number(order.advanceAmount) > 0 &&
     !order.paymentReference &&
     !order.paymentProofImage
   ) {
@@ -314,6 +436,14 @@ export async function updateOrderStatus(id, status, user) {
     const updated = await tx.order.update({ where: { id }, data, include: ORDER_INCLUDE })
     if (status === 'COMPLETED') {
       await awardPointsForCompletedOrder(updated, settings, tx)
+    }
+
+    // The table booking made at checkout ends with its order.
+    if (['COMPLETED', 'CANCELLED'].includes(status)) {
+      await tx.reservation.updateMany({
+        where: { orderId: id, status: { in: ['PENDING', 'CONFIRMED'] } },
+        data: { status },
+      })
     }
 
     // When order completes or is cancelled, if no other active orders remain for table, mark AVAILABLE
@@ -367,7 +497,9 @@ export async function updateEstimatedTimes(id, { estimatedReadyTime, estimatedDe
   return prisma.order.update({
     where: { id },
     data: {
-      ...(estimatedReadyTime !== undefined ? { estimatedReadyTime: estimatedReadyTime ? new Date(estimatedReadyTime) : null } : {}),
+      ...(estimatedReadyTime !== undefined
+        ? { estimatedReadyTime: estimatedReadyTime ? new Date(estimatedReadyTime) : null }
+        : {}),
       ...(estimatedDeliveryTime !== undefined
         ? { estimatedDeliveryTime: estimatedDeliveryTime ? new Date(estimatedDeliveryTime) : null }
         : {}),

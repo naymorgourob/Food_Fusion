@@ -39,7 +39,10 @@ function FilterBody({ filters, onChange, onReset, maxPrice }) {
       <fieldset className="flex flex-col gap-2.5">
         <legend className="mb-1 font-display text-sm font-semibold text-body">Sort by</legend>
         {SORT_OPTIONS.map(({ value, label }) => (
-          <label key={value} className="flex cursor-pointer items-center gap-2.5 text-sm text-body-muted">
+          <label
+            key={value}
+            className="flex cursor-pointer items-center gap-2.5 text-sm text-body-muted"
+          >
             <input
               type="radio"
               name="menu-sort"
@@ -57,7 +60,10 @@ function FilterBody({ filters, onChange, onReset, maxPrice }) {
       <fieldset className="flex flex-col gap-2.5 border-t border-rule pt-6">
         <legend className="mb-1 font-display text-sm font-semibold text-body">Availability</legend>
         {AVAILABILITY_OPTIONS.map(({ value, label }) => (
-          <label key={value} className="flex cursor-pointer items-center gap-2.5 text-sm text-body-muted">
+          <label
+            key={value}
+            className="flex cursor-pointer items-center gap-2.5 text-sm text-body-muted"
+          >
             <input
               type="radio"
               name="menu-availability"
@@ -125,7 +131,7 @@ export function MenuFilterPanel({ filters, onChange, onReset, maxPrice, isOpen, 
       {/* Desktop: a sticky rail beside the grid. */}
       <aside
         aria-label="Menu filters"
-        className="sticky top-24 hidden h-fit w-60 flex-none rounded-2xl border border-rule bg-card p-5 lg:block"
+        className="sticky top-28 hidden h-fit w-60 flex-none rounded-2xl border border-rule bg-card p-5 lg:block"
       >
         <FilterBody filters={filters} onChange={onChange} onReset={onReset} maxPrice={maxPrice} />
       </aside>
@@ -165,7 +171,12 @@ export function MenuFilterPanel({ filters, onChange, onReset, maxPrice, isOpen, 
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto p-5">
-                <FilterBody filters={filters} onChange={onChange} onReset={onReset} maxPrice={maxPrice} />
+                <FilterBody
+                  filters={filters}
+                  onChange={onChange}
+                  onReset={onReset}
+                  maxPrice={maxPrice}
+                />
               </div>
               <div className="flex-none border-t border-rule p-4">
                 <button

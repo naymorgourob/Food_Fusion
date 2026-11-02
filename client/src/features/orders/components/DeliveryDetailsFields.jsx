@@ -56,8 +56,8 @@ export function DeliveryDetailsFields({
       </div>
 
       <p className={NOTE}>
-        Delivery charge: {money(deliveryChargePreview)} — the restaurant will confirm your estimated delivery
-        time once the order is accepted.
+        Delivery charge: {money(deliveryChargePreview)} — the restaurant will confirm your estimated
+        delivery time once the order is accepted.
       </p>
     </div>
   )

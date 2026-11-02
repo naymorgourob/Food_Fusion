@@ -3,7 +3,14 @@ const TIME_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/
 const MIN_DURATION_MINUTES = 30
 const MAX_DURATION_MINUTES = 240
 const VALID_STATUSES = ['PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED']
-const VALID_OCCASIONS = ['BIRTHDAY', 'ANNIVERSARY', 'FAMILY_DINNER', 'BUSINESS_MEETING', 'DATE', 'OTHER']
+const VALID_OCCASIONS = [
+  'BIRTHDAY',
+  'ANNIVERSARY',
+  'FAMILY_DINNER',
+  'BUSINESS_MEETING',
+  'DATE',
+  'OTHER',
+]
 
 export function validateReservation({
   customerName,
@@ -16,10 +23,16 @@ export function validateReservation({
   occasion,
   paymentReference,
   paymentProofImage,
+  paymentMethod,
 }) {
   const errors = []
 
-  if ((!paymentReference || !String(paymentReference).trim()) && !paymentProofImage) {
+  // ONLINE: the advance is paid through SSLCommerz right after booking.
+  if (
+    paymentMethod !== 'ONLINE' &&
+    (!paymentReference || !String(paymentReference).trim()) &&
+    !paymentProofImage
+  ) {
     errors.push('Submit a transaction/reference ID or upload payment proof.')
   }
 
@@ -39,11 +52,18 @@ export function validateReservation({
   if (!reservationDate) errors.push('Reservation date is required.')
 
   if (!reservationTime) errors.push('Reservation time is required.')
-  else if (!TIME_REGEX.test(reservationTime)) errors.push('Reservation time must be in HH:MM format.')
+  else if (!TIME_REGEX.test(reservationTime))
+    errors.push('Reservation time must be in HH:MM format.')
 
   if (durationMinutes !== undefined && durationMinutes !== null && durationMinutes !== '') {
-    if (!Number.isInteger(Number(durationMinutes)) || Number(durationMinutes) < MIN_DURATION_MINUTES || Number(durationMinutes) > MAX_DURATION_MINUTES) {
-      errors.push(`Reservation duration must be between ${MIN_DURATION_MINUTES} and ${MAX_DURATION_MINUTES} minutes.`)
+    if (
+      !Number.isInteger(Number(durationMinutes)) ||
+      Number(durationMinutes) < MIN_DURATION_MINUTES ||
+      Number(durationMinutes) > MAX_DURATION_MINUTES
+    ) {
+      errors.push(
+        `Reservation duration must be between ${MIN_DURATION_MINUTES} and ${MAX_DURATION_MINUTES} minutes.`,
+      )
     }
   }
 

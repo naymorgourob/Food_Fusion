@@ -8,7 +8,7 @@ import { ROUTES } from '@/constants'
 function Stat({ label, value, emphasis = false }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="text-[0.7rem] font-medium tracking-wide text-white/55 uppercase">{label}</span>
+      <span className="text-[0.82rem] font-medium tracking-wide text-white/55 uppercase">{label}</span>
       <span className={`font-display font-semibold ${emphasis ? 'text-3xl text-gold-300' : 'text-xl text-white'}`}>
         {value}
       </span>

@@ -56,9 +56,12 @@ export function RecommendedRail({ title, subtitle, dishes, cart, favorites, onQu
         </div>
       </div>
 
-      <ul ref={railRef} className="no-scrollbar -mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto px-1 pb-2">
+      <ul
+        ref={railRef}
+        className="no-scrollbar -mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto px-1 pb-2"
+      >
         {dishes.map((dish) => (
-          <li key={dish.id} className="w-56 flex-none snap-start sm:w-64">
+          <li key={dish.id} className="flex w-80 flex-none snap-start flex-col sm:w-96">
             <MenuDishCard
               dish={dish}
               quantity={cart.quantityOf(dish.id)}
@@ -67,6 +70,7 @@ export function RecommendedRail({ title, subtitle, dishes, cart, favorites, onQu
               onToggleFavorite={favorites.toggleFavorite}
               onQuickView={onQuickView}
               onAdd={onAdd}
+              onSetQuantity={cart.setQuantity}
             />
           </li>
         ))}

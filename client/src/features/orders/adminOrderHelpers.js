@@ -82,7 +82,8 @@ export function filterOrders(orders, { search, status, orderType, paymentStatus,
   return orders.filter((order) => {
     if (query) {
       const matchesQuery =
-        String(order.orderNumber).includes(query) || order.customer.fullName.toLowerCase().includes(query)
+        String(order.orderNumber).includes(query) ||
+        order.customer.fullName.toLowerCase().includes(query)
       if (!matchesQuery) return false
     }
     if (status && order.status !== status) return false

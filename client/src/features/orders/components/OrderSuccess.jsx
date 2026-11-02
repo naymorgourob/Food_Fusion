@@ -75,9 +75,7 @@ export function OrderSuccess({ order, total, paymentLabel }) {
             <Clock className="h-4 w-4 text-brand-700 dark:text-brand-400" />
             {order.orderType === 'DELIVERY' ? 'Estimated delivery' : 'Estimated ready'}
           </dt>
-          <dd className="text-sm font-medium text-body">
-            {etaLabel ?? 'Confirmed once accepted'}
-          </dd>
+          <dd className="text-sm font-medium text-body">{etaLabel ?? 'Confirmed once accepted'}</dd>
         </div>
 
         <div className="flex items-center justify-between gap-3 border-t border-rule pt-3">

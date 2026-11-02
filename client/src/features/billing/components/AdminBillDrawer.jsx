@@ -103,7 +103,7 @@ export function AdminBillDrawer({
                       {copied ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
                     </button>
                   </div>
-                  <span className="text-[11px] text-body-faint">
+                  <span className="text-[0.8rem] text-body-faint">
                     Issued {new Date(bill.billDate).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                   </span>
                 </div>
@@ -137,7 +137,7 @@ export function AdminBillDrawer({
                 <div className="flex items-center justify-between rounded-2xl border border-rule bg-card p-4">
                   <div className="flex flex-col gap-0.5">
                     <span className="text-xs font-semibold text-body-muted">Payment Settlement</span>
-                    <span className="text-[11px] text-body-faint">
+                    <span className="text-[0.8rem] text-body-faint">
                       {bill.paymentStatus === 'PAID'
                         ? 'This transaction is completely paid and settled.'
                         : 'Awaiting customer or staff payment settlement.'}
@@ -211,7 +211,7 @@ export function AdminBillDrawer({
                             <span className="font-semibold text-body truncate">
                               {item.menuItem?.name || 'Menu Item'}
                             </span>
-                            <span className="text-[11px] text-body-faint">
+                            <span className="text-[0.8rem] text-body-faint">
                               {item.quantity} × {money(item.unitPrice)}
                             </span>
                           </div>

@@ -234,7 +234,7 @@ export default function WaiterOrdersPage() {
             >
               <span>{tab.label}</span>
               <span
-                className={`rounded-full px-1.5 py-0.2 text-[0.65rem] font-bold ${
+                className={`rounded-full px-1.5 py-0.2 text-[0.78rem] font-bold ${
                   isActive
                     ? 'bg-white/20 text-white'
                     : tab.highlight && count > 0
@@ -358,7 +358,7 @@ export default function WaiterOrdersPage() {
                         </strong>
                       </span>
                       {prepDue && (
-                        <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[0.65rem] font-bold text-charcoal">
+                        <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[0.78rem] font-bold text-charcoal">
                           Prep due
                         </span>
                       )}
@@ -395,7 +395,7 @@ export default function WaiterOrdersPage() {
 
                 {/* Card Footer: Timing & Service Actions */}
                 <div className="mt-4 border-t border-rule pt-3">
-                  <div className="flex items-center justify-between text-[0.7rem] text-body-faint">
+                  <div className="flex items-center justify-between text-[0.82rem] text-body-faint">
                     <span className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
                       {waited}m ago · {money(orderGrandTotal(order))}

@@ -13,7 +13,7 @@ export function TopNav({ onOpenMobileSidebar }) {
   const title = useCurrentPageTitle()
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 flex-none items-center gap-4 border-b border-border bg-paper/80 px-4 backdrop-blur lg:px-8">
+    <header className="sticky top-0 z-20 flex h-24 flex-none items-center gap-4 border-b border-border bg-paper/80 px-4 backdrop-blur lg:px-8">
       <button
         onClick={onOpenMobileSidebar}
         aria-label="Open sidebar"

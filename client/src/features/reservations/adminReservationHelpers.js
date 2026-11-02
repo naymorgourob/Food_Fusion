@@ -70,7 +70,8 @@ export function filterReservations(reservations, { search, status, date, guests,
   return reservations.filter((reservation) => {
     if (query) {
       const matchesQuery =
-        reservation.customerName.toLowerCase().includes(query) || reservation.customerPhone.includes(query)
+        reservation.customerName.toLowerCase().includes(query) ||
+        reservation.customerPhone.includes(query)
       if (!matchesQuery) return false
     }
     if (status && reservation.status !== status) return false
@@ -93,8 +94,10 @@ function dateTimeValue(reservation) {
 
 export function sortReservations(reservations, sortBy) {
   const list = [...reservations]
-  if (sortBy === 'newest-booked') return list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-  if (sortBy === 'oldest-booked') return list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+  if (sortBy === 'newest-booked')
+    return list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+  if (sortBy === 'oldest-booked')
+    return list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
   if (sortBy === 'guests-desc') return list.sort((a, b) => b.guestCount - a.guestCount)
   return list.sort((a, b) => dateTimeValue(a) - dateTimeValue(b)) // upcoming (soonest first)
 }

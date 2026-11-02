@@ -19,7 +19,7 @@ export function BarChart({
     return (
       <div className="flex h-56 flex-col items-center justify-center rounded-2xl border border-dashed border-rule bg-canvas/40 text-center">
         <p className="text-xs font-medium text-body-muted">{emptyMessage}</p>
-        <span className="mt-1 text-[11px] text-body-faint">Try adjusting your date or filter range</span>
+        <span className="mt-1 text-[0.8rem] text-body-faint">Try adjusting your date or filter range</span>
       </div>
     )
   }
@@ -98,7 +98,7 @@ export function BarChart({
                   x={x + barWidth / 2}
                   y={y - 6}
                   textAnchor="middle"
-                  className="fill-body text-[11px] font-bold"
+                  className="fill-body text-[0.8rem] font-bold"
                 >
                   {formatValue(point.value)}
                 </text>
@@ -110,7 +110,7 @@ export function BarChart({
                   x={x + barWidth / 2}
                   y={HEIGHT - 8}
                   textAnchor="middle"
-                  className="fill-body-faint text-[10px] font-medium"
+                  className="fill-body-faint text-[0.75rem] font-medium"
                 >
                   {point.shortLabel ?? point.label}
                 </text>
@@ -130,7 +130,7 @@ export function BarChart({
           }}
         >
           <div className="flex flex-col items-center">
-            <span className="text-[10px] font-semibold text-body-muted">
+            <span className="text-[0.75rem] font-semibold text-body-muted">
               {hoveredBar.shortLabel ?? hoveredBar.label}
             </span>
             <span className="font-display text-xs font-bold text-body">

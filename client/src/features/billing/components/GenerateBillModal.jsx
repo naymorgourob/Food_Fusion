@@ -226,11 +226,11 @@ export function GenerateBillModal({ isOpen, onClose, eligibleOrders = [], onGene
                             {selectedOrder.customer?.fullName || 'Guest Customer'}
                           </span>
                         </div>
-                        <span className="rounded-md border border-rule bg-card px-2 py-0.5 text-[11px] font-semibold text-body-muted">
+                        <span className="rounded-md border border-rule bg-card px-2 py-0.5 text-[0.8rem] font-semibold text-body-muted">
                           {selectedOrder.orderType?.replace(/_/g, ' ') || 'DINE IN'}
                         </span>
                       </div>
-                      <div className="flex items-center justify-between text-body-muted border-t border-rule/60 pt-2 text-[11px]">
+                      <div className="flex items-center justify-between text-body-muted border-t border-rule/60 pt-2 text-[0.8rem]">
                         <span>Order Total (Items subtotal)</span>
                         <span className="font-mono font-bold text-body">
                           {money(selectedOrder.totalAmount)}
@@ -261,7 +261,7 @@ export function GenerateBillModal({ isOpen, onClose, eligibleOrders = [], onGene
                       </div>
                       {/* Presets */}
                       <div className="flex items-center gap-1.5 pt-1">
-                        <span className="text-[10px] uppercase font-semibold tracking-wider text-body-faint">
+                        <span className="text-[0.75rem] uppercase font-semibold tracking-wider text-body-faint">
                           Presets:
                         </span>
                         {VAT_PRESETS.map((pct) => (
@@ -271,7 +271,7 @@ export function GenerateBillModal({ isOpen, onClose, eligibleOrders = [], onGene
                             onClick={() =>
                               setForm((curr) => ({ ...curr, vatPercent: String(pct) }))
                             }
-                            className={`rounded-md px-1.5 py-0.5 text-[10px] font-semibold transition-colors ${
+                            className={`rounded-md px-1.5 py-0.5 text-[0.75rem] font-semibold transition-colors ${
                               Number(form.vatPercent) === pct
                                 ? 'bg-brand-500 text-white shadow-xs'
                                 : 'bg-canvas-2 border border-rule text-body-muted hover:text-body'
@@ -302,7 +302,7 @@ export function GenerateBillModal({ isOpen, onClose, eligibleOrders = [], onGene
                           ৳
                         </span>
                       </div>
-                      <span className="block text-[10px] text-body-faint pt-1">
+                      <span className="block text-[0.75rem] text-body-faint pt-1">
                         Applied directly against the final grand total
                       </span>
                     </div>

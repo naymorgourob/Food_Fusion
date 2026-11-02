@@ -83,16 +83,22 @@ export function CustomerReceiptModal({ bill, isOpen, onClose }) {
             <div className="flex flex-col gap-6 pt-4 text-xs font-sans">
               {/* Restaurant Branding Header */}
               <div className="flex flex-col items-center text-center gap-1">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-700 text-white font-display text-base font-bold shadow-sm">
-                  F
-                </span>
-                <h1 id="receipt-title" className="font-display text-xl font-bold text-body tracking-tight mt-1">
+                <img
+                  src="/brand/logo-mark.png"
+                  alt=""
+                  aria-hidden
+                  className="h-10 w-10 flex-none rounded-full object-cover shadow-md ring-1 ring-gold-300/50"
+                />
+                <h1
+                  id="receipt-title"
+                  className="font-display text-xl font-bold text-body tracking-tight mt-1"
+                >
                   FoodFusion
                 </h1>
-                <p className="text-[0.7rem] text-body-muted uppercase tracking-widest">
+                <p className="text-[0.82rem] text-body-muted uppercase tracking-widest">
                   Fine Dining &amp; Cuisine
                 </p>
-                <p className="text-[0.7rem] text-body-faint">
+                <p className="text-[0.82rem] text-body-faint">
                   123 Gourmet Ave, Food City · +1 (555) 123-4567
                 </p>
               </div>
@@ -115,7 +121,11 @@ export function CustomerReceiptModal({ bill, isOpen, onClose }) {
                       month: 'short',
                       day: 'numeric',
                     })}{' '}
-                    · {new Date(bill.billDate).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                    ·{' '}
+                    {new Date(bill.billDate).toLocaleTimeString([], {
+                      hour: 'numeric',
+                      minute: '2-digit',
+                    })}
                   </span>
                 </div>
                 {customer?.fullName && (
@@ -150,7 +160,7 @@ export function CustomerReceiptModal({ bill, isOpen, onClose }) {
                     <div key={it.id} className="flex justify-between items-start text-body-muted">
                       <div className="flex flex-col pr-2">
                         <span className="text-body font-medium">{it.menuItem?.name || 'Dish'}</span>
-                        <span className="text-[0.65rem] text-body-faint">
+                        <span className="text-[0.78rem] text-body-faint">
                           {money(it.unitPrice)} × {it.quantity}
                         </span>
                       </div>
@@ -186,9 +196,9 @@ export function CustomerReceiptModal({ bill, isOpen, onClose }) {
               </div>
 
               {/* Footer Note */}
-              <div className="flex flex-col items-center text-center gap-1 pt-3 border-t border-dashed border-rule text-body-faint text-[0.7rem]">
+              <div className="flex flex-col items-center text-center gap-1 pt-3 border-t border-dashed border-rule text-body-faint text-[0.82rem]">
                 <p>Thank you for dining with us at FoodFusion.</p>
-                <p className="italic text-[0.65rem]">We look forward to serving you again soon.</p>
+                <p className="italic text-[0.78rem]">We look forward to serving you again soon.</p>
               </div>
             </div>
           </motion.div>
@@ -197,4 +207,3 @@ export function CustomerReceiptModal({ bill, isOpen, onClose }) {
     </AnimatePresence>
   )
 }
-

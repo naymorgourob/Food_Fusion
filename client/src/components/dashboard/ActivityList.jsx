@@ -17,7 +17,7 @@ export function ActivityList({ title, items }) {
               </div>
               <div className="flex flex-col items-end gap-1">
                 <span
-                  className={`rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                  className={`rounded-md border px-2 py-0.5 text-[0.75rem] font-bold uppercase tracking-wider ${
                     STATUS_STYLES[item.status] ?? STATUS_STYLES.default
                   }`}
                 >

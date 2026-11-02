@@ -1,5 +1,5 @@
-import { Heart, Plus, UtensilsCrossed, Star } from 'lucide-react'
-import { getImageUrl } from '@/constants'
+import { Heart, Plus, Star } from 'lucide-react'
+import { FullPhoto } from '@/features/menu/components/FullPhoto'
 import { money } from '@/utils/format'
 
 function pseudoRating(id) {
@@ -16,7 +16,6 @@ export function CustomerFavoriteCard({
   onSelect,
   onOrder,
 }) {
-  const image = getImageUrl(dish.imageUrl)
   const isAvailable = dish.isAvailable !== false
 
   return (
@@ -26,18 +25,7 @@ export function CustomerFavoriteCard({
     >
       {/* Image Media Area */}
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-canvas-2">
-        {image ? (
-          <img
-            src={image}
-            alt={dish.name}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-900/30 via-canvas-2 to-canvas-2">
-            <UtensilsCrossed className="h-10 w-10 text-brand-400/40" strokeWidth={1.5} />
-          </div>
-        )}
+        <FullPhoto dish={dish} zoomOnHover />
 
         {/* Gradient Scrim for Contrast */}
         <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-transparent to-black/30 pointer-events-none" />
@@ -45,12 +33,12 @@ export function CustomerFavoriteCard({
         {/* Category & Status Badges (Top Left) */}
         <div className="absolute top-3 left-3 flex flex-wrap items-center gap-1.5 pointer-events-none">
           {dish.category?.name && (
-            <span className="rounded-full bg-charcoal/70 px-2.5 py-0.5 text-[0.6875rem] font-medium text-white/90 backdrop-blur-md border border-white/10">
+            <span className="rounded-full bg-charcoal/70 px-2.5 py-0.5 text-[0.8rem] font-medium text-white/90 backdrop-blur-md border border-white/10">
               {dish.category.name}
             </span>
           )}
           {!isAvailable && (
-            <span className="rounded-full bg-red-950/85 px-2.5 py-0.5 text-[0.6875rem] font-medium text-red-200 backdrop-blur-md border border-red-500/30">
+            <span className="rounded-full bg-red-950/85 px-2.5 py-0.5 text-[0.8rem] font-medium text-red-200 backdrop-blur-md border border-red-500/30">
               Unavailable
             </span>
           )}
@@ -64,7 +52,9 @@ export function CustomerFavoriteCard({
             onToggleFavorite?.(dish.id)
           }}
           disabled={isPending}
-          aria-label={isFavorite ? `Remove ${dish.name} from favorites` : `Add ${dish.name} to favorites`}
+          aria-label={
+            isFavorite ? `Remove ${dish.name} from favorites` : `Add ${dish.name} to favorites`
+          }
           title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
           className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-charcoal/65 text-white backdrop-blur-md border border-white/15 transition-all hover:scale-110 hover:bg-charcoal/90 disabled:opacity-60 shadow-sm active:scale-95"
         >
@@ -98,7 +88,7 @@ export function CustomerFavoriteCard({
         {/* Price & Primary Action */}
         <div className="flex items-center justify-between gap-3 pt-1 border-t border-rule/50">
           <div className="flex flex-col">
-            <span className="text-[0.65rem] uppercase tracking-wider text-body-muted">Price</span>
+            <span className="text-[0.78rem] uppercase tracking-wider text-body-muted">Price</span>
             <span className="font-display text-base font-bold text-brand-700 dark:text-brand-400">
               {money(dish.price)}
             </span>
@@ -118,7 +108,7 @@ export function CustomerFavoriteCard({
               <span>Order</span>
             </button>
           ) : (
-            <span className="rounded-lg bg-canvas-2 px-2.5 py-1 text-[0.7rem] font-medium text-body-muted border border-rule">
+            <span className="rounded-lg bg-canvas-2 px-2.5 py-1 text-[0.82rem] font-medium text-body-muted border border-rule">
               Unavailable
             </span>
           )}
@@ -127,4 +117,3 @@ export function CustomerFavoriteCard({
     </article>
   )
 }
-

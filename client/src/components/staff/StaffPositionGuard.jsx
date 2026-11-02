@@ -25,4 +25,3 @@ export function StaffPositionGuard({ allowedWorkspace, children }) {
 
   return children || <Outlet />
 }
-

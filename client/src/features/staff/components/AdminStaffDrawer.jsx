@@ -298,7 +298,7 @@ export function AdminStaffDrawer({
                             <span className="font-semibold text-body">
                               {orderNo(order.orderNumber)}
                             </span>
-                            <span className="text-[11px] text-body-faint">
+                            <span className="text-[0.8rem] text-body-faint">
                               {order.orderType} · {new Date(order.createdAt).toLocaleDateString()}
                             </span>
                           </div>
@@ -307,7 +307,7 @@ export function AdminStaffDrawer({
                               {money(order.totalAmount)}
                             </span>
                             <span
-                              className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                              className={`rounded-full px-2 py-0.5 text-[0.75rem] font-bold ${
                                 ORDER_STATUS_STYLES[order.status] ?? 'bg-surface-2 text-ink-muted'
                               }`}
                             >

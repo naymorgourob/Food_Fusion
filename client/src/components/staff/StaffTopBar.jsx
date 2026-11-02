@@ -60,7 +60,7 @@ export function StaffTopBar({ onOpenMobileSidebar, notifications = [], workspace
 
   return (
     <header className="sticky top-0 z-30 border-b border-rule bg-canvas/80 backdrop-blur-xl">
-      <div className="flex items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6 lg:px-8">
+      <div className="flex h-24 items-center gap-3 px-4 sm:gap-4 sm:px-6 lg:px-8">
         <button
           onClick={onOpenMobileSidebar}
           aria-label="Open menu"
@@ -81,7 +81,10 @@ export function StaffTopBar({ onOpenMobileSidebar, notifications = [], workspace
           </span>
         </div>
 
-        <form onSubmit={handleSearch} className="ml-auto flex min-w-0 flex-1 justify-end lg:max-w-sm">
+        <form
+          onSubmit={handleSearch}
+          className="ml-auto flex min-w-0 flex-1 justify-end lg:max-w-sm"
+        >
           <label htmlFor="staff-search" className="sr-only">
             Search orders
           </label>
@@ -121,7 +124,9 @@ export function StaffTopBar({ onOpenMobileSidebar, notifications = [], workspace
                   <p className="font-display text-sm font-semibold text-body">Notifications</p>
                 </div>
                 {notifications.length === 0 ? (
-                  <p className="px-4 py-6 text-center text-sm text-body-faint">Nothing new right now.</p>
+                  <p className="px-4 py-6 text-center text-sm text-body-faint">
+                    Nothing new right now.
+                  </p>
                 ) : (
                   <ul className="max-h-80 divide-y divide-rule overflow-y-auto">
                     {notifications.map((item) => (
@@ -131,12 +136,16 @@ export function StaffTopBar({ onOpenMobileSidebar, notifications = [], workspace
                           onClick={() => setNotifOpen(false)}
                           className="flex gap-3 px-4 py-3 transition-colors hover:bg-canvas-2"
                         >
-                          <span className={`mt-0.5 flex h-8 w-8 flex-none items-center justify-center rounded-full ${item.tone}`}>
+                          <span
+                            className={`mt-0.5 flex h-8 w-8 flex-none items-center justify-center rounded-full ${item.tone}`}
+                          >
                             <item.icon className="h-4 w-4" />
                           </span>
                           <span className="flex min-w-0 flex-col">
                             <span className="text-sm font-medium text-body">{item.title}</span>
-                            <span className="truncate text-xs text-body-faint">{item.description}</span>
+                            <span className="truncate text-xs text-body-faint">
+                              {item.description}
+                            </span>
                           </span>
                         </Link>
                       </li>

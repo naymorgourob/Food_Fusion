@@ -1,5 +1,10 @@
 import { validateGenerateBill, validatePaymentStatus } from '../validators/bill.validator.js'
-import { listBills, getBillById, generateBill, updatePaymentStatus } from '../services/bill.service.js'
+import {
+  listBills,
+  getBillById,
+  generateBill,
+  updatePaymentStatus,
+} from '../services/bill.service.js'
 import { sendSuccess } from '../utils/ApiResponse.js'
 import { ApiError } from '../utils/ApiError.js'
 

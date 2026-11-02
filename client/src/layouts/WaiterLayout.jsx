@@ -46,7 +46,7 @@ export function WaiterShell({ children }) {
 
       <div
         className={`flex min-h-screen flex-col transition-all duration-300 ${
-          collapsed ? 'lg:pl-[5.25rem]' : 'lg:pl-64'
+          collapsed ? 'lg:pl-[5.25rem]' : 'lg:pl-80'
         }`}
       >
         <StaffTopBar
@@ -71,4 +71,3 @@ export function WaiterShell({ children }) {
 export default function WaiterLayout() {
   return <WaiterShell>{(context) => <Outlet context={context} />}</WaiterShell>
 }
-

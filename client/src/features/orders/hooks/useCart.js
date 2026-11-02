@@ -88,7 +88,9 @@ export function useCart(initialQuantities = {}) {
 
   const setNotes = useCallback((menuItemId, notes) => {
     setLines((current) =>
-      current[menuItemId] ? { ...current, [menuItemId]: { ...current[menuItemId], notes } } : current,
+      current[menuItemId]
+        ? { ...current, [menuItemId]: { ...current[menuItemId], notes } }
+        : current,
     )
   }, [])
 

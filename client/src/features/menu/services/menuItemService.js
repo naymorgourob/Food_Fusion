@@ -13,13 +13,31 @@ export async function fetchMenuItemById(id) {
 // Always sent as multipart/form-data — matches the multer.single('image')
 // middleware on the server regardless of whether a new photo is attached
 // (editing without changing the photo just omits the `image` field).
-function buildFormData({ name, description, price, prepTimeMinutes, isAvailable, categoryId }, imageFile) {
+function buildFormData(
+  {
+    name,
+    description,
+    price,
+    prepTimeMinutes,
+    isAvailable,
+    isSpicy,
+    isChefPick,
+    coffeeStrength,
+    milkLevel,
+    categoryId,
+  },
+  imageFile,
+) {
   const formData = new FormData()
   formData.append('name', name)
   formData.append('description', description ?? '')
   formData.append('price', price)
   formData.append('prepTimeMinutes', prepTimeMinutes ?? '')
   formData.append('isAvailable', String(isAvailable))
+  formData.append('isSpicy', String(Boolean(isSpicy)))
+  formData.append('isChefPick', String(Boolean(isChefPick)))
+  formData.append('coffeeStrength', coffeeStrength ?? '')
+  formData.append('milkLevel', milkLevel ?? '')
   formData.append('categoryId', categoryId)
   if (imageFile) formData.append('image', imageFile)
   return formData

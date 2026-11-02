@@ -1,10 +1,24 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, UserRound, Clock, MapPin, Phone, ScrollText, CalendarClock, ChefHat, Receipt } from 'lucide-react'
+import {
+  X,
+  UserRound,
+  Clock,
+  MapPin,
+  Phone,
+  ScrollText,
+  CalendarClock,
+  ChefHat,
+  Receipt,
+} from 'lucide-react'
 import { OrderStatusBadge } from '@/features/orders/components/OrderStatusBadge'
 import { PaymentStatusBadge } from '@/features/orders/components/PaymentStatusBadge'
 import { AdminOrderTimeline } from '@/features/orders/components/AdminOrderTimeline'
-import { ORDER_STATUS_LABELS, orderGrandTotal, getScheduledDineInTimes } from '@/features/orders/constants'
+import {
+  ORDER_STATUS_LABELS,
+  orderGrandTotal,
+  getScheduledDineInTimes,
+} from '@/features/orders/constants'
 import { ORDER_TYPE_ICONS } from '@/features/orders/staffOrderHelpers'
 import { getImageUrl } from '@/constants'
 import { orderNo, money } from '@/utils/format'
@@ -70,8 +84,12 @@ export function AdminOrderDrawer({
   // Lazy initializers, not an effect: the parent remounts this drawer with
   // key={order.id} whenever a different order is opened, so these only
   // ever need to be set once per mount.
-  const [readyTimeInput, setReadyTimeInput] = useState(() => toLocalInputValue(order?.estimatedReadyTime))
-  const [deliveryTimeInput, setDeliveryTimeInput] = useState(() => toLocalInputValue(order?.estimatedDeliveryTime))
+  const [readyTimeInput, setReadyTimeInput] = useState(() =>
+    toLocalInputValue(order?.estimatedReadyTime),
+  )
+  const [deliveryTimeInput, setDeliveryTimeInput] = useState(() =>
+    toLocalInputValue(order?.estimatedDeliveryTime),
+  )
 
   useEffect(() => {
     if (!isOpen) return undefined
@@ -98,7 +116,9 @@ export function AdminOrderDrawer({
     if (order.orderType !== 'DELIVERY') {
       payload.estimatedReadyTime = readyTimeInput ? new Date(readyTimeInput).toISOString() : null
     } else {
-      payload.estimatedDeliveryTime = deliveryTimeInput ? new Date(deliveryTimeInput).toISOString() : null
+      payload.estimatedDeliveryTime = deliveryTimeInput
+        ? new Date(deliveryTimeInput).toISOString()
+        : null
     }
     onUpdateEstimatedTime(payload)
   }
@@ -131,7 +151,9 @@ export function AdminOrderDrawer({
             <header className="flex flex-none items-center justify-between border-b border-rule px-5 py-4">
               <div className="flex items-center gap-2.5">
                 <TypeIcon className="h-4 w-4 text-brand-700 dark:text-brand-400" />
-                <h2 className="font-display text-lg font-semibold text-body">{orderNo(order.orderNumber)}</h2>
+                <h2 className="font-display text-lg font-semibold text-body">
+                  {orderNo(order.orderNumber)}
+                </h2>
                 <OrderStatusBadge status={order.status} />
               </div>
               <button
@@ -167,21 +189,36 @@ export function AdminOrderDrawer({
                   {/* --- Payment ---------------------------------------- */}
                   <section className="flex items-center justify-between gap-4 rounded-2xl border border-rule bg-card p-4">
                     <Row icon={Receipt} label="Payment">
-                      {order.bill ? `Invoice ${orderNo(order.bill.billNumber)}` : 'No invoice generated yet'}
+                      {order.bill
+                        ? `Invoice ${orderNo(order.bill.billNumber)}`
+                        : 'No invoice generated yet'}
                     </Row>
                     <PaymentStatusBadge bill={order.bill} />
                   </section>
 
                   <section className="flex flex-col gap-3 rounded-2xl border border-gold-300 bg-gold-100/40 p-4 dark:border-gold-700 dark:bg-gold-100/5">
-                    <span className="text-xs font-semibold tracking-wide text-gold-700 uppercase dark:text-gold-300">Advance payment proof</span>
-                    <Row icon={Receipt} label="Advance amount">{money(order.advanceAmount ?? 0)}</Row>
-                    <Row icon={Receipt} label="Transaction / Reference ID">{order.paymentReference}</Row>
+                    <span className="text-xs font-semibold tracking-wide text-gold-700 uppercase dark:text-gold-300">
+                      Advance payment proof
+                    </span>
+                    <Row icon={Receipt} label="Advance amount">
+                      {money(order.advanceAmount ?? 0)}
+                    </Row>
+                    <Row icon={Receipt} label="Transaction / Reference ID">
+                      {order.paymentReference}
+                    </Row>
                     {order.paymentProofImage && (
-                      <a href={getImageUrl(`/uploads/payment/${order.paymentProofImage}`)} target="_blank" rel="noreferrer" className="text-sm font-semibold text-brand-700 underline dark:text-brand-400">
+                      <a
+                        href={getImageUrl(`/uploads/payment/${order.paymentProofImage}`)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sm font-semibold text-brand-700 underline dark:text-brand-400"
+                      >
                         View uploaded payment screenshot
                       </a>
                     )}
-                    {!order.paymentReference && !order.paymentProofImage && <span className="text-sm text-red-600">No payment proof submitted</span>}
+                    {!order.paymentReference && !order.paymentProofImage && (
+                      <span className="text-sm text-red-600">No payment proof submitted</span>
+                    )}
                   </section>
 
                   {order.orderType === 'DELIVERY' && (
@@ -213,10 +250,16 @@ export function AdminOrderDrawer({
                         Scheduled dine-in
                       </span>
                       <Row icon={Clock} label="Arrival">
-                        {scheduled.arrival.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                        {scheduled.arrival.toLocaleTimeString([], {
+                          hour: 'numeric',
+                          minute: '2-digit',
+                        })}
                       </Row>
                       <Row icon={ChefHat} label="Kitchen starts">
-                        {scheduled.prepStartsAt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                        {scheduled.prepStartsAt.toLocaleTimeString([], {
+                          hour: 'numeric',
+                          minute: '2-digit',
+                        })}
                       </Row>
                       <Row icon={ScrollText} label="Guests">
                         {order.guestCount}
@@ -238,10 +281,15 @@ export function AdminOrderDrawer({
 
                   {/* --- Items ------------------------------------------ */}
                   <section className="flex flex-col gap-2">
-                    <h3 className="text-xs font-semibold tracking-wide text-body-faint uppercase">Items</h3>
+                    <h3 className="text-xs font-semibold tracking-wide text-body-faint uppercase">
+                      Items
+                    </h3>
                     <ul className="flex flex-col gap-2 rounded-2xl border border-rule bg-card p-4">
                       {order.items.map((item) => (
-                        <li key={item.id} className="flex items-center justify-between gap-3 text-sm">
+                        <li
+                          key={item.id}
+                          className="flex items-center justify-between gap-3 text-sm"
+                        >
                           <span className="text-body">
                             {item.quantity}× {item.menuItem.name}
                           </span>
@@ -253,7 +301,10 @@ export function AdminOrderDrawer({
 
                   {/* --- Status --------------------------------------- */}
                   <section className="flex flex-col gap-2">
-                    <label htmlFor="admin-order-status" className="text-xs font-semibold tracking-wide text-body-faint uppercase">
+                    <label
+                      htmlFor="admin-order-status"
+                      className="text-xs font-semibold tracking-wide text-body-faint uppercase"
+                    >
                       Update status
                     </label>
                     <select
@@ -273,7 +324,10 @@ export function AdminOrderDrawer({
 
                   {/* --- Assign staff ----------------------------------- */}
                   <section className="flex flex-col gap-2">
-                    <label htmlFor="admin-order-assign" className="text-xs font-semibold tracking-wide text-body-faint uppercase">
+                    <label
+                      htmlFor="admin-order-assign"
+                      className="text-xs font-semibold tracking-wide text-body-faint uppercase"
+                    >
                       Assign staff
                     </label>
                     <select
@@ -298,7 +352,9 @@ export function AdminOrderDrawer({
                       htmlFor="admin-order-eta"
                       className="text-xs font-semibold tracking-wide text-body-faint uppercase"
                     >
-                      {order.orderType === 'DELIVERY' ? 'Estimated delivery time' : 'Estimated ready time'}
+                      {order.orderType === 'DELIVERY'
+                        ? 'Estimated delivery time'
+                        : 'Estimated ready time'}
                     </label>
                     <input
                       id="admin-order-eta"
@@ -323,7 +379,9 @@ export function AdminOrderDrawer({
 
                 {/* --- Right: timeline ------------------------------- */}
                 <div className="flex flex-col gap-2">
-                  <h3 className="text-xs font-semibold tracking-wide text-body-faint uppercase">Order timeline</h3>
+                  <h3 className="text-xs font-semibold tracking-wide text-body-faint uppercase">
+                    Order timeline
+                  </h3>
                   <div className="rounded-2xl border border-rule bg-card p-4">
                     <AdminOrderTimeline order={order} />
                   </div>

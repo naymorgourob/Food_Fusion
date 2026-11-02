@@ -1,7 +1,7 @@
 import { Outlet, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Star, ArrowLeft } from 'lucide-react'
-import { HERO_IMAGE, TESTIMONIALS } from '@/pages/landing/content'
+import { EVENING_ROOM_IMAGE, TESTIMONIALS } from '@/pages/landing/content'
 import { ROUTES } from '@/constants'
 
 /**
@@ -23,20 +23,36 @@ export default function AuthLayout() {
     <div className="grid min-h-screen bg-canvas font-sans lg:grid-cols-2">
       {/* --- Left: brand panel --------------------------------------- */}
       <div className="relative isolate hidden overflow-hidden lg:block">
-        <img src={HERO_IMAGE.src} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover" />
+        <img
+          src={EVENING_ROOM_IMAGE.src}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full object-cover object-[72%_center]"
+        />
+        {/* The photo is already dark, so only light shades are added: top and
+            bottom for the logo and testimonial, and the left for the headline. */}
         <span
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-br from-brand-900/95 via-brand-900/85 to-brand-800/70"
+          className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/10 to-black/70"
+        />
+        <span
+          aria-hidden
+          className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent"
         />
 
         <div className="relative flex h-full flex-col justify-between p-10 xl:p-14">
           <Link to={ROUTES.HOME} className="flex items-center gap-2.5">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 font-display text-base font-semibold text-gold-300 ring-1 ring-gold-500/40">
-              F
-            </span>
+            <img
+              src="/brand/logo-mark.png"
+              alt=""
+              aria-hidden
+              className="h-[4.5rem] w-[4.5rem] flex-none rounded-full object-cover shadow-lg ring-2 ring-gold-300/60"
+            />
             <span className="flex flex-col leading-none">
-              <span className="font-display text-lg font-semibold text-white">FoodFusion</span>
-              <span className="text-[0.6rem] tracking-[0.2em] text-gold-300 uppercase">Fine Dining</span>
+              <span className="font-display text-2xl font-semibold text-white">FoodFusion</span>
+              <span className="text-[0.72rem] tracking-[0.2em] text-gold-300 uppercase">
+                Fine Dining
+              </span>
             </span>
           </Link>
 
@@ -66,10 +82,15 @@ export default function AuthLayout() {
               &ldquo;{testimonial.quote}&rdquo;
             </blockquote>
             <figcaption className="mt-3 flex items-center gap-2.5">
-              <img src={testimonial.avatar} alt="" className="h-8 w-8 rounded-full object-cover" />
+              <span
+                aria-hidden
+                className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-white/15 font-display text-sm font-semibold text-gold-300 ring-1 ring-gold-300/60"
+              >
+                {testimonial.name.charAt(0)}
+              </span>
               <span className="flex flex-col leading-tight">
                 <span className="text-xs font-semibold text-white">{testimonial.name}</span>
-                <span className="text-[0.7rem] text-white/55">{testimonial.role}</span>
+                <span className="text-[0.82rem] text-white/55">{testimonial.role}</span>
               </span>
             </figcaption>
           </figure>

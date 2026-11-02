@@ -7,7 +7,7 @@ import { TABLE_STATUS_CONFIG } from '@/features/tables/tableHelpers'
 export function TableStatusBadge({ status, size = 'sm' }) {
   const config = TABLE_STATUS_CONFIG[status] ?? TABLE_STATUS_CONFIG.INACTIVE
 
-  const sizeClass = size === 'lg' ? 'px-3 py-1.5 text-xs' : 'px-2.5 py-1 text-[0.65rem]'
+  const sizeClass = size === 'lg' ? 'px-3 py-1.5 text-xs' : 'px-2.5 py-1 text-[0.78rem]'
 
   return (
     <span className={`inline-flex items-center gap-1.5 rounded-full font-bold ${sizeClass} ${config.badgeClass}`}>

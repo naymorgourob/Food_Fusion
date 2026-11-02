@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Clock, Pencil, Trash2, UtensilsCrossed, Tag } from 'lucide-react'
-import { getImageUrl } from '@/constants'
+import { X, Clock, Pencil, Trash2, Tag } from 'lucide-react'
+import { FullPhoto } from '@/features/menu/components/FullPhoto'
 import { money } from '@/utils/format'
 
 /**
@@ -31,7 +31,6 @@ export function AdminDishDetailModal({ dish, isOpen, onClose, onEdit, onDelete }
 
   if (!dish) return null
 
-  const image = getImageUrl(dish.imageUrl)
   const unavailable = !dish.isAvailable
 
   return (
@@ -60,13 +59,7 @@ export function AdminDishDetailModal({ dish, isOpen, onClose, onEdit, onDelete }
             className="relative flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl bg-card shadow-2xl sm:rounded-3xl"
           >
             <div className="relative aspect-[16/10] flex-none overflow-hidden bg-canvas-2">
-              {image ? (
-                <img src={image} alt={dish.name} className="h-full w-full object-cover" />
-              ) : (
-                <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-50 to-canvas-2 dark:from-brand-900/50 dark:to-canvas-2">
-                  <UtensilsCrossed className="h-12 w-12 text-brand-200 dark:text-brand-400/50" strokeWidth={1.5} />
-                </span>
-              )}
+              <FullPhoto dish={dish} />
 
               <button
                 type="button"
@@ -78,7 +71,7 @@ export function AdminDishDetailModal({ dish, isOpen, onClose, onEdit, onDelete }
               </button>
 
               {dish.category?.name && (
-                <span className="absolute bottom-3 left-4 flex items-center gap-1.5 rounded-full bg-charcoal/75 px-2.5 py-1 text-[0.65rem] font-semibold text-white backdrop-blur">
+                <span className="absolute bottom-3 left-4 flex items-center gap-1.5 rounded-full bg-charcoal/75 px-2.5 py-1 text-[0.78rem] font-semibold text-white backdrop-blur">
                   <Tag className="h-3 w-3" />
                   {dish.category.name}
                 </span>
@@ -87,7 +80,10 @@ export function AdminDishDetailModal({ dish, isOpen, onClose, onEdit, onDelete }
 
             <div className="flex-1 overflow-y-auto p-6">
               <div className="flex items-start justify-between gap-4">
-                <h2 id="admin-dish-modal-title" className="font-display text-2xl font-semibold text-body">
+                <h2
+                  id="admin-dish-modal-title"
+                  className="font-display text-2xl font-semibold text-body"
+                >
                   {dish.name}
                 </h2>
                 <span className="font-display text-2xl font-semibold whitespace-nowrap text-brand-700 dark:text-brand-400">

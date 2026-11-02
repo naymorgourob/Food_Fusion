@@ -24,16 +24,21 @@ const SOCIALS = [
 /** Section 14 — footer. Deep emerald, so the page closes on the brand colour. */
 export function Footer() {
   return (
-    <footer id="contact" className="scroll-mt-24 bg-brand-900 text-white">
+    <footer id="contact" className="scroll-mt-28 bg-brand-900 text-white">
       <Container className="grid gap-12 py-16 sm:grid-cols-2 lg:grid-cols-4 lg:py-20">
         <div className="flex flex-col gap-5 sm:col-span-2 lg:col-span-1">
           <Link to={ROUTES.HOME} className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 font-display text-sm font-semibold text-gold-300 ring-1 ring-gold-500/40">
-              F
-            </span>
+            <img
+              src="/brand/logo-mark.png"
+              alt=""
+              aria-hidden
+              className="h-[4.5rem] w-[4.5rem] flex-none rounded-full object-cover shadow-lg ring-2 ring-gold-300/60"
+            />
             <span className="flex flex-col leading-none">
-              <span className="font-display text-lg font-semibold text-white">FoodFusion</span>
-              <span className="text-[0.6rem] tracking-[0.2em] text-gold-300 uppercase">Fine Dining</span>
+              <span className="font-display text-2xl font-semibold text-white">FoodFusion</span>
+              <span className="mt-1 text-[0.85rem] tracking-[0.22em] text-gold-300 uppercase">
+                Fine Dining
+              </span>
             </span>
           </Link>
           <p className="max-w-xs text-sm leading-relaxed text-white/65">
@@ -67,7 +72,10 @@ export function Footer() {
               {link.label}
             </a>
           ))}
-          <Link to={ROUTES.LOGIN} className="text-sm text-white/65 transition-colors hover:text-gold-300">
+          <Link
+            to={ROUTES.LOGIN}
+            className="text-sm text-white/65 transition-colors hover:text-gold-300"
+          >
             Login
           </Link>
         </div>

@@ -45,7 +45,7 @@ function KpiCard({ icon: Icon, label, value, to, subtext, tone = 'brand' }) {
       <div className="flex min-w-0 flex-col">
         <span className="font-display text-2xl font-bold text-body">{value}</span>
         <span className="truncate text-xs font-semibold text-body-muted">{label}</span>
-        {subtext && <span className="truncate text-[0.7rem] text-body-faint">{subtext}</span>}
+        {subtext && <span className="truncate text-[0.82rem] text-body-faint">{subtext}</span>}
       </div>
     </Card>
   )
@@ -269,7 +269,7 @@ export default function ChefDashboardPage() {
                         {orderNo(order.orderNumber)}
                       </span>
                       <span
-                        className={`rounded-full px-2 py-0.5 text-[0.65rem] font-bold ${
+                        className={`rounded-full px-2 py-0.5 text-[0.78rem] font-bold ${
                           order.status === 'PENDING'
                             ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300'
                             : 'bg-brand-50 text-brand-700 dark:bg-brand-950/40 dark:text-brand-300'
@@ -287,12 +287,12 @@ export default function ChefDashboardPage() {
                         </li>
                       ))}
                       {order.items.length > 2 && (
-                        <li className="text-[0.7rem] text-body-faint">+{order.items.length - 2} more items</li>
+                        <li className="text-[0.82rem] text-body-faint">+{order.items.length - 2} more items</li>
                       )}
                     </ul>
                   </div>
 
-                  <div className="flex items-center justify-between border-t border-rule pt-2 text-[0.7rem] text-body-faint">
+                  <div className="flex items-center justify-between border-t border-rule pt-2 text-[0.82rem] text-body-faint">
                     <span className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
                       Waited {waited}m
@@ -329,7 +329,7 @@ export default function ChefDashboardPage() {
                       {orderNo(order.orderNumber)}
                     </span>
                     {prepDue && (
-                      <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[0.65rem] font-bold text-charcoal">
+                      <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[0.78rem] font-bold text-charcoal">
                         Start prep now
                       </span>
                     )}
@@ -369,12 +369,12 @@ export default function ChefDashboardPage() {
               <Card key={item.id} className="p-3 flex items-center justify-between">
                 <div className="flex flex-col">
                   <span className="font-medium text-xs text-body">{item.itemName}</span>
-                  <span className="text-[0.7rem] text-body-faint">
+                  <span className="text-[0.82rem] text-body-faint">
                     Current: <strong className="text-body">{Number(item.quantity)} {item.unit}</strong> (Min: {Number(item.minStockLevel)})
                   </span>
                 </div>
                 <span
-                  className={`rounded-full px-2 py-0.5 text-[0.65rem] font-bold ${
+                  className={`rounded-full px-2 py-0.5 text-[0.78rem] font-bold ${
                     item.status === 'OUT_OF_STOCK'
                       ? 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300'
                       : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'

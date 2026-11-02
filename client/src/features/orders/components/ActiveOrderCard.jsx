@@ -48,7 +48,8 @@ export function ActiveOrderCard({ order }) {
 
   // estimatedDeliveryTime is "arrives with the customer"; estimatedReadyTime
   // is "leaves the kitchen" — delivery cares about the former.
-  const etaIso = order.orderType === 'DELIVERY' ? order.estimatedDeliveryTime : order.estimatedReadyTime
+  const etaIso =
+    order.orderType === 'DELIVERY' ? order.estimatedDeliveryTime : order.estimatedReadyTime
   const etaMinutes = minutesUntil(etaIso)
 
   return (
@@ -135,7 +136,9 @@ export function ActiveOrderCard({ order }) {
               >
                 {done ? <Check className="h-4 w-4" /> : <StepIcon className="h-4 w-4" />}
               </span>
-              <span className={`text-[0.7rem] leading-tight ${done || current ? 'text-white' : 'text-white/45'}`}>
+              <span
+                className={`text-[0.82rem] leading-tight ${done || current ? 'text-white' : 'text-white/45'}`}
+              >
                 {ORDER_STATUS_LABELS[step]}
               </span>
             </li>
@@ -151,7 +154,9 @@ export function ActiveOrderCard({ order }) {
             </span>
             <span className="flex flex-col leading-tight">
               <span className="text-sm font-semibold">{order.assignedStaff.fullName}</span>
-              <span className="text-xs text-white/60">{order.assignedStaff.position ?? 'Your server'}</span>
+              <span className="text-xs text-white/60">
+                {order.assignedStaff.position ?? 'Your server'}
+              </span>
             </span>
           </div>
         ) : (

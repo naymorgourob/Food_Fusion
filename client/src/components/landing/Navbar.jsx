@@ -52,28 +52,33 @@ export function Navbar() {
       }`}
     >
       <nav className="mx-auto flex w-full max-w-7xl items-center justify-between gap-6 px-5 py-4 sm:px-8">
-        <Link to={ROUTES.HOME} className="group flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-700 font-display text-sm font-semibold text-white ring-1 ring-gold-500/40 transition-transform group-hover:scale-105">
-            F
-          </span>
+        <Link to={ROUTES.HOME} className="group flex items-center gap-3.5">
+          <img
+            src="/brand/logo-mark.png"
+            alt=""
+            aria-hidden
+            className="h-[4.5rem] w-[4.5rem] flex-none rounded-full object-cover shadow-lg ring-2 ring-gold-300/60 transition-transform group-hover:scale-105"
+          />
           <span className="flex flex-col leading-none">
-            <span className={`font-display text-lg font-semibold ${solid ? 'text-body' : 'text-white'}`}>
+            <span
+              className={`font-display text-2xl font-semibold ${solid ? 'text-body' : 'text-white'}`}
+            >
               FoodFusion
             </span>
             <span
-              className={`text-[0.6rem] tracking-[0.2em] uppercase ${solid ? 'text-gold-700 dark:text-gold-300' : 'text-gold-300'}`}
+              className={`mt-1 text-[0.85rem] tracking-[0.22em] uppercase ${solid ? 'text-gold-700 dark:text-gold-300' : 'text-gold-300'}`}
             >
               Fine Dining
             </span>
           </span>
         </Link>
 
-        <div className="hidden items-center gap-8 lg:flex">
+        <div className="hidden items-center gap-9 lg:flex">
           {NAV_LINKS.map((link) => (
             <a
               key={link.label}
               href={link.href}
-              className={`text-sm font-medium transition-colors ${linkClasses}`}
+              className={`text-base font-medium transition-colors ${linkClasses}`}
             >
               {link.label}
             </a>
@@ -87,16 +92,16 @@ export function Navbar() {
           <a
             href="#menu"
             aria-label="Search the menu"
-            className={`flex h-9 w-9 items-center justify-center rounded-full transition-colors ${iconClasses}`}
+            className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${iconClasses}`}
           >
-            <Search className="h-4 w-4" />
+            <Search className="h-5 w-5" />
           </a>
           <Link
             to={user?.role === USER_ROLES.CUSTOMER ? `${ROUTES.ORDERS}/new` : ROUTES.LOGIN}
             aria-label="Your order"
-            className={`relative flex h-9 w-9 items-center justify-center rounded-full transition-colors ${iconClasses}`}
+            className={`relative flex h-10 w-10 items-center justify-center rounded-full transition-colors ${iconClasses}`}
           >
-            <ShoppingBag className="h-4 w-4" />
+            <ShoppingBag className="h-5 w-5" />
             <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-gold-500 ring-2 ring-canvas" />
           </Link>
 
@@ -140,11 +145,9 @@ export function Navbar() {
 function AuthActions({ user, logout, solid, stacked }) {
   const navigate = useNavigate()
   const layout = stacked ? 'flex flex-col gap-2' : 'flex items-center gap-2'
-  const quiet = solid
-    ? 'text-body-muted hover:text-body'
-    : 'text-white/85 hover:text-white'
+  const quiet = solid ? 'text-body-muted hover:text-body' : 'text-white/85 hover:text-white'
   const solidButton =
-    'rounded-full bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-800'
+    'rounded-full bg-brand-700 px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-brand-800'
 
   function handleLogout() {
     logout()
@@ -155,14 +158,17 @@ function AuthActions({ user, logout, solid, stacked }) {
     const isAdmin = user.role === USER_ROLES.ADMIN
     return (
       <div className={layout}>
-        <Link to={getHomeRouteForRole(user.role, user)} className={`px-3 text-sm font-medium ${quiet}`}>
+        <Link
+          to={getHomeRouteForRole(user.role, user)}
+          className={`px-3 text-base font-medium ${quiet}`}
+        >
           Dashboard
         </Link>
         {/* Admin has a dedicated dashboard profile page; Staff/Customer use
             their account page instead. */}
         <Link
           to={isAdmin ? '/dashboard/profile' : ROUTES.ACCOUNT}
-          className={`px-3 text-sm font-medium ${quiet}`}
+          className={`px-3 text-base font-medium ${quiet}`}
         >
           Profile
         </Link>
@@ -175,7 +181,7 @@ function AuthActions({ user, logout, solid, stacked }) {
 
   return (
     <div className={layout}>
-      <Link to={ROUTES.LOGIN} className={`px-3 text-sm font-medium ${quiet}`}>
+      <Link to={ROUTES.LOGIN} className={`px-3 text-base font-medium ${quiet}`}>
         Login
       </Link>
       <Link to={ROUTES.REGISTER} className={solidButton}>

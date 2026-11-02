@@ -60,12 +60,20 @@ export function PasswordStrengthMeter({ password }) {
       </p>
 
       <ul className="flex flex-col gap-1 text-xs">
-        <li className={`flex items-center gap-1.5 ${meetsMinimum ? 'text-brand-700 dark:text-brand-400' : 'text-body-faint'}`}>
+        <li
+          className={`flex items-center gap-1.5 ${meetsMinimum ? 'text-brand-700 dark:text-brand-400' : 'text-body-faint'}`}
+        >
           {password.length >= 8 ? <Check className="h-3.5 w-3.5" /> : <X className="h-3.5 w-3.5" />}
           At least 8 characters
         </li>
-        <li className={`flex items-center gap-1.5 ${hasLetter && hasDigit ? 'text-brand-700 dark:text-brand-400' : 'text-body-faint'}`}>
-          {hasLetter && hasDigit ? <Check className="h-3.5 w-3.5" /> : <X className="h-3.5 w-3.5" />}
+        <li
+          className={`flex items-center gap-1.5 ${hasLetter && hasDigit ? 'text-brand-700 dark:text-brand-400' : 'text-body-faint'}`}
+        >
+          {hasLetter && hasDigit ? (
+            <Check className="h-3.5 w-3.5" />
+          ) : (
+            <X className="h-3.5 w-3.5" />
+          )}
           A mix of letters and numbers
         </li>
       </ul>

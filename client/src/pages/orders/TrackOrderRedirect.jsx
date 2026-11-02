@@ -3,7 +3,14 @@ import { useOrders } from '@/features/orders/hooks/useOrders'
 import { Skeleton } from '@/components/customer/ui'
 import { ROUTES } from '@/constants'
 
-const ACTIVE_STATUSES = new Set(['PENDING', 'ACCEPTED', 'PREPARING', 'READY', 'ON_THE_WAY', 'SERVED'])
+const ACTIVE_STATUSES = new Set([
+  'PENDING',
+  'ACCEPTED',
+  'PREPARING',
+  'READY',
+  'ON_THE_WAY',
+  'SERVED',
+])
 
 export default function TrackOrderRedirect() {
   const outlet = useOutletContext()
@@ -34,4 +41,3 @@ export default function TrackOrderRedirect() {
   // 3. If the customer has never placed any order, navigate to My Orders
   return <Navigate to={ROUTES.ORDERS} replace />
 }
-

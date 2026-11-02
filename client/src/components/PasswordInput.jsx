@@ -10,7 +10,15 @@ import { FIELD, FIELD_ERROR } from '@/components/authFieldStyles'
  * between them. `hasError` swaps the border to red without duplicating
  * the whole class string at each call site.
  */
-export function PasswordInput({ id, name, value, onChange, placeholder, autoComplete, hasError = false }) {
+export function PasswordInput({
+  id,
+  name,
+  value,
+  onChange,
+  placeholder,
+  autoComplete,
+  hasError = false,
+}) {
   const [visible, setVisible] = useState(false)
 
   return (

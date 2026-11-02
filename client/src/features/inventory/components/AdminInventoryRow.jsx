@@ -77,7 +77,7 @@ export function AdminInventoryRow({ item, onEdit, onDelete }) {
         {/* Quantity and Progress Bar */}
         <div className="flex flex-col gap-1 w-32 sm:w-40">
           <div className="flex items-baseline justify-between text-xs">
-            <span className="text-[11px] text-body-muted">Available:</span>
+            <span className="text-[0.8rem] text-body-muted">Available:</span>
             <span className="font-display text-sm font-bold text-body">
               {qty} <span className="text-xs font-medium text-body-muted">{unitLabel}</span>
             </span>

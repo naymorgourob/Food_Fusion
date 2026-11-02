@@ -1,4 +1,13 @@
-import { MapPin, Phone, Clock, Users, UtensilsCrossed, Bike, ShoppingBag, ChefHat } from 'lucide-react'
+import {
+  MapPin,
+  Phone,
+  Clock,
+  Users,
+  UtensilsCrossed,
+  Bike,
+  ShoppingBag,
+  ChefHat,
+} from 'lucide-react'
 import { getScheduledDineInTimes } from '@/features/orders/constants'
 
 /**
@@ -79,7 +88,8 @@ export function TrackingFulfilment({ order }) {
               {order.deliveryPhone}
             </Row>
             <Row icon={Clock} label="Estimated arrival">
-              {formatDateTime(order.estimatedDeliveryTime) ?? 'Confirmed once your order is accepted'}
+              {formatDateTime(order.estimatedDeliveryTime) ??
+                'Confirmed once your order is accepted'}
             </Row>
           </>
         )}
@@ -112,7 +122,9 @@ export function TrackingFulfilment({ order }) {
                   {formatClock(scheduled.readyAt)}
                 </Row>
                 <Row icon={Users} label="Guests">
-                  {order.guestCount ? `${order.guestCount} ${order.guestCount === 1 ? 'guest' : 'guests'}` : null}
+                  {order.guestCount
+                    ? `${order.guestCount} ${order.guestCount === 1 ? 'guest' : 'guests'}`
+                    : null}
                 </Row>
               </>
             ) : (

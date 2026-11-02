@@ -64,7 +64,15 @@ export function SkeletonCard({ lines = 3 }) {
  * built from the design tokens rather than an image file — it themes
  * correctly in dark mode and adds nothing to the bundle.
  */
-export function EmptyState({ icon: Icon, title, description, actionLabel, to, onAction, compact = false }) {
+export function EmptyState({
+  icon: Icon,
+  title,
+  description,
+  actionLabel,
+  to,
+  onAction,
+  compact = false,
+}) {
   return (
     <div
       className={`flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-rule bg-card/50 text-center ${
@@ -80,7 +88,8 @@ export function EmptyState({ icon: Icon, title, description, actionLabel, to, on
         <p className="font-display text-base font-semibold text-body">{title}</p>
         {description && <p className="max-w-xs text-sm text-body-muted">{description}</p>}
       </div>
-      {actionLabel && (to || onAction) &&
+      {actionLabel &&
+        (to || onAction) &&
         (onAction ? (
           <button
             type="button"

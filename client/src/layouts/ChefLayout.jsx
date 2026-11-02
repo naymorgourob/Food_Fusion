@@ -42,7 +42,7 @@ export function ChefShell({ children }) {
 
       <div
         className={`flex min-h-screen flex-col transition-all duration-300 ${
-          collapsed ? 'lg:pl-[5.25rem]' : 'lg:pl-64'
+          collapsed ? 'lg:pl-[5.25rem]' : 'lg:pl-80'
         }`}
       >
         <StaffTopBar
@@ -62,4 +62,3 @@ export function ChefShell({ children }) {
 export default function ChefLayout() {
   return <ChefShell>{(context) => <Outlet context={context} />}</ChefShell>
 }
-

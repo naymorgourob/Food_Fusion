@@ -10,7 +10,8 @@ const REASONS = [
   {
     icon: ChefHat,
     title: 'Expert Chefs',
-    description: 'A brigade trained in classical technique, cooking a menu that changes with the season.',
+    description:
+      'A brigade trained in classical technique, cooking a menu that changes with the season.',
   },
   {
     icon: Bike,

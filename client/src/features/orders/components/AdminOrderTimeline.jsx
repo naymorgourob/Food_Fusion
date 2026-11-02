@@ -103,14 +103,22 @@ export function AdminOrderTimeline({ order }) {
                         : 'bg-canvas-2 text-body-faint'
                 }`}
               >
-                {done && !isCancelledRow ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : <Icon className="h-3.5 w-3.5" />}
+                {done && !isCancelledRow ? (
+                  <Check className="h-3.5 w-3.5" strokeWidth={3} />
+                ) : (
+                  <Icon className="h-3.5 w-3.5" />
+                )}
               </span>
             </span>
 
             <div className="flex min-w-0 flex-1 flex-col gap-0.5 pt-0.5">
               <span
                 className={`text-sm font-semibold ${
-                  isCancelledRow ? 'text-red-600 dark:text-red-300' : done || current ? 'text-body' : 'text-body-faint'
+                  isCancelledRow
+                    ? 'text-red-600 dark:text-red-300'
+                    : done || current
+                      ? 'text-body'
+                      : 'text-body-faint'
                 }`}
               >
                 {label}

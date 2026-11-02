@@ -19,7 +19,10 @@ import { TrackingTimeline } from '@/features/orders/components/TrackingTimeline'
 import { TrackingSummary } from '@/features/orders/components/TrackingSummary'
 import { TrackingFulfilment } from '@/features/orders/components/TrackingFulfilment'
 import { TrackingActivity } from '@/features/orders/components/TrackingActivity'
-import { OrderCompletedPanel, OrderCancelledPanel } from '@/features/orders/components/TrackingOutcome'
+import {
+  OrderCompletedPanel,
+  OrderCancelledPanel,
+} from '@/features/orders/components/TrackingOutcome'
 import { EmptyState, Skeleton } from '@/components/customer/ui'
 import * as orderService from '@/features/orders/services/orderService'
 import { ROUTES } from '@/constants'

@@ -13,7 +13,7 @@ export function useMenuItems(params) {
   // Destructured to primitive values on purpose: `params` is a new object
   // reference every render, which would otherwise retrigger this effect
   // every render and refetch in a loop.
-  const { search, categoryId, isAvailable, categoryStatus, sortBy, page, pageSize } = params
+  const { search, categoryId, isAvailable, categoryStatus, tag, sortBy, page, pageSize } = params
 
   useEffect(() => {
     let cancelled = false
@@ -22,7 +22,16 @@ export function useMenuItems(params) {
       setIsLoading(true)
       setError(null)
       try {
-        const result = await fetchMenuItems({ search, categoryId, isAvailable, categoryStatus, sortBy, page, pageSize })
+        const result = await fetchMenuItems({
+          search,
+          categoryId,
+          isAvailable,
+          categoryStatus,
+          tag,
+          sortBy,
+          page,
+          pageSize,
+        })
         if (!cancelled) {
           setItems(result.items)
           setPagination(result.pagination)
@@ -38,7 +47,7 @@ export function useMenuItems(params) {
     return () => {
       cancelled = true
     }
-  }, [search, categoryId, isAvailable, categoryStatus, sortBy, page, pageSize, refetchIndex])
+  }, [search, categoryId, isAvailable, categoryStatus, tag, sortBy, page, pageSize, refetchIndex])
 
   const refetch = useCallback(() => setRefetchIndex((index) => index + 1), [])
 

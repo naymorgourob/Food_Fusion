@@ -33,18 +33,27 @@ export function AdminOrderRow({ order, onView, onCancel }) {
       className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-2xl border border-rule bg-card p-4 transition-shadow hover:shadow-md hover:shadow-brand-900/5"
     >
       <div className="flex min-w-[7.5rem] flex-col">
-        <span className="font-display text-sm font-semibold text-body">{orderNo(order.orderNumber)}</span>
+        <span className="font-display text-sm font-semibold text-body">
+          {orderNo(order.orderNumber)}
+        </span>
         <span className="text-xs text-body-faint">
-          {new Date(order.createdAt).toLocaleString([], { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })}
+          {new Date(order.createdAt).toLocaleString([], {
+            day: 'numeric',
+            month: 'short',
+            hour: 'numeric',
+            minute: '2-digit',
+          })}
         </span>
       </div>
 
-      <span className="min-w-[8rem] truncate text-sm text-body-muted">{order.customer.fullName}</span>
+      <span className="min-w-[8rem] truncate text-sm text-body-muted">
+        {order.customer.fullName}
+      </span>
 
       <div className="flex items-center gap-1.5">
         <OrderTypeBadge orderType={order.orderType} />
         {isScheduledPrepDue(order) && (
-          <span className="flex items-center gap-1 rounded-full bg-gold-100 px-2 py-0.5 text-[0.65rem] font-semibold text-gold-700 dark:bg-gold-100/10 dark:text-gold-300">
+          <span className="flex items-center gap-1 rounded-full bg-gold-100 px-2 py-0.5 text-[0.78rem] font-semibold text-gold-700 dark:bg-gold-100/10 dark:text-gold-300">
             <ChefHat className="h-3 w-3" /> Start prep
           </span>
         )}
@@ -55,7 +64,9 @@ export function AdminOrderRow({ order, onView, onCancel }) {
         {itemCount} item{itemCount === 1 ? '' : 's'}
       </span>
 
-      <span className="font-display text-sm font-semibold text-body">{money(orderGrandTotal(order))}</span>
+      <span className="font-display text-sm font-semibold text-body">
+        {money(orderGrandTotal(order))}
+      </span>
 
       <PaymentStatusBadge bill={order.bill} />
 

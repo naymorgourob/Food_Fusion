@@ -24,31 +24,36 @@ enum UserRole {
 // share one table since Customer needs no extra fields, and Staff-only fields
 // would be added to a separate StaffProfile model in a later part, not here).
 model User {
-  id           String   @id @default(cuid())
-  fullName     String   @map("full_name")
-  email        String   @unique
-  phone        String
-  password     String
-  role         UserRole @default(CUSTOMER)
+  id                  String               @id @default(cuid())
+  fullName            String               @map("full_name")
+  email               String               @unique
+  phone               String
+  password            String
+  role                UserRole             @default(CUSTOMER)
   // Staff-only in practice (job title, e.g. "Waiter", "Chef"); null for
   // Admin/Customer. A single nullable column here — not a separate
   // StaffProfile table — since it's the only field Staff needs that
   // Customer/Admin don't (Part 14: Customer & Staff Management).
-  position     String?  @map("position")
-  profileImage String?  @map("profile_image")
-  isActive     Boolean  @default(true) @map("is_active")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-  reservations Reservation[]
-  orders       Order[]
+  position            String?              @map("position")
+  // Staff-only: agreed monthly salary, used to pre-fill payroll.
+  monthlySalary       Decimal?             @map("monthly_salary") @db.Decimal(10, 2)
+  profileImage        String?              @map("profile_image")
+  isActive            Boolean              @default(true) @map("is_active")
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+  reservations        Reservation[]
+  orders              Order[]
   // Orders this Staff member is assigned to (Part 18) — named relation
   // since User already relates to Order once as "customer"; Prisma needs
   // the second relation disambiguated.
-  assignedOrders Order[] @relation("AssignedOrders")
+  assignedOrders      Order[]              @relation("AssignedOrders")
   // Part 18.1 — Customer-only in practice.
   loyaltyTransactions LoyaltyTransaction[]
   favorites           FavoriteMenuItem[]
   inventoryUsages     InventoryUsage[]
+  payments            Payment[]
+  salaryPayments      SalaryPayment[]      @relation("SalaryPaidTo")
+  salaryPaymentsMade  SalaryPayment[]      @relation("SalaryPaidBy")
 
   @@map("users")
 }
@@ -72,18 +77,32 @@ model Category {
 // A sellable menu item. price is Decimal, never Float — see
 // docs/02-database-design.md Step 15 (#1): floating-point currency is a
 // classic, avoidable source of receipts that don't add up.
+enum MilkLevel {
+  NONE
+  LITTLE
+  MORE
+  FOAM
+}
+
 model Food {
-  id              String   @id @default(cuid())
+  id              String             @id @default(cuid())
   name            String
   description     String?
-  price           Decimal  @db.Decimal(10, 2)
-  imageUrl        String?  @map("image_url")
-  isAvailable     Boolean  @default(true) @map("is_available")
-  prepTimeMinutes Int?     @map("prep_time_minutes")
-  categoryId      String   @map("category_id")
-  category        Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  price           Decimal            @db.Decimal(10, 2)
+  imageUrl        String?            @map("image_url")
+  isAvailable     Boolean            @default(true) @map("is_available")
+  prepTimeMinutes Int?               @map("prep_time_minutes")
+  // Menu-card markers: the chili and the star printed beside a dish.
+  isSpicy         Boolean            @default(false) @map("is_spicy")
+  isChefPick      Boolean            @default(false) @map("is_chef_pick")
+  // Coffee-menu guide: strength 1 (mild) to 3 (strong), and how much milk.
+  // Both optional; only meaningful for drinks.
+  coffeeStrength  Int?               @map("coffee_strength")
+  milkLevel       MilkLevel?         @map("milk_level")
+  categoryId      String             @map("category_id")
+  category        Category           @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
   orderItems      OrderItem[]
   favoritedBy     FavoriteMenuItem[]
 
@@ -105,11 +124,13 @@ model Table {
   status             TableStatus   @default(AVAILABLE)
   description        String?
   windowSidePosition String        @default("Interior") @map("window_side_position")
-  reservationCost    Decimal       @default(0) @db.Decimal(10, 2) @map("reservation_cost")
+  reservationCost    Decimal       @default(0) @map("reservation_cost") @db.Decimal(10, 2)
+  // Photo of the table and its surroundings, shown before booking.
+  imageUrl           String?       @map("image_url")
   createdAt          DateTime      @default(now()) @map("created_at")
   updatedAt          DateTime      @updatedAt @map("updated_at")
-  reservations Reservation[]
-  orders       Order[]
+  reservations       Reservation[]
+  orders             Order[]
 
   @@map("tables")
 }
@@ -139,31 +160,40 @@ enum ReservationOccasion {
 // customerId is what enforces "customers can only view their own" —
 // see reservation.service.js.
 model Reservation {
-  id              String            @id @default(cuid())
-  customerId      String            @map("customer_id")
-  customerName    String            @map("customer_name")
-  customerPhone   String            @map("customer_phone")
-  tableId         String            @map("table_id")
-  guestCount      Int               @map("guest_count")
-  reservationDate DateTime          @db.Date @map("reservation_date")
-  reservationTime String            @map("reservation_time")
-  durationMinutes Int               @default(120) @map("duration_minutes")
-  specialRequest  String?           @map("special_request")
+  id                 String               @id @default(cuid())
+  customerId         String               @map("customer_id")
+  customerName       String               @map("customer_name")
+  customerPhone      String               @map("customer_phone")
+  tableId            String               @map("table_id")
+  guestCount         Int                  @map("guest_count")
+  reservationDate    DateTime             @map("reservation_date") @db.Date
+  reservationTime    String               @map("reservation_time")
+  durationMinutes    Int                  @default(120) @map("duration_minutes")
+  specialRequest     String?              @map("special_request")
   // Part 18.1 — optional; occasionNote only carries meaning when
   // occasion is OTHER, but isn't constrained to it at the DB level.
-  occasion        ReservationOccasion? @map("occasion")
-  occasionNote    String?              @map("occasion_note")
-  totalAmount     Decimal              @default(0) @db.Decimal(10, 2) @map("total_amount")
-  advanceAmount   Decimal              @default(0) @db.Decimal(10, 2) @map("advance_amount")
-  paymentReference String?             @map("payment_reference")
-  paymentProofImage String?            @map("payment_proof_image")
-  paymentSubmittedAt DateTime?         @map("payment_submitted_at")
-  status          ReservationStatus @default(PENDING)
-  createdAt       DateTime          @default(now()) @map("created_at")
-  updatedAt       DateTime          @updatedAt @map("updated_at")
+  occasion           ReservationOccasion? @map("occasion")
+  occasionNote       String?              @map("occasion_note")
+  totalAmount        Decimal              @default(0) @map("total_amount") @db.Decimal(10, 2)
+  advanceAmount      Decimal              @default(0) @map("advance_amount") @db.Decimal(10, 2)
+  paymentReference   String?              @map("payment_reference")
+  paymentProofImage  String?              @map("payment_proof_image")
+  paymentSubmittedAt DateTime?            @map("payment_submitted_at")
+  // True once the advance was paid through the online gateway (verified
+  // with SSLCommerz), as opposed to a manually submitted proof.
+  advancePaid        Boolean              @default(false) @map("advance_paid")
+  status             ReservationStatus    @default(PENDING)
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @updatedAt @map("updated_at")
 
-  customer User  @relation(fields: [customerId], references: [id])
-  table    Table @relation(fields: [tableId], references: [id], onDelete: Restrict)
+  // Set when the booking was made from a dine-in order at checkout, so
+  // the table hold follows the order (cancelled/completed with it).
+  orderId            String?              @unique @map("order_id")
+
+  customer User      @relation(fields: [customerId], references: [id])
+  table    Table     @relation(fields: [tableId], references: [id], onDelete: Restrict)
+  order    Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  payments Payment[]
 
   @@index([customerId])
   @@index([tableId])
@@ -205,7 +235,7 @@ model Order {
   orderNumber Int         @unique @default(autoincrement()) @map("order_number")
   customerId  String      @map("customer_id")
   tableId     String?     @map("table_id")
-  totalAmount Decimal     @db.Decimal(10, 2) @map("total_amount")
+  totalAmount Decimal     @map("total_amount") @db.Decimal(10, 2)
   status      OrderStatus @default(PENDING)
   createdAt   DateTime    @default(now()) @map("created_at")
   updatedAt   DateTime    @updatedAt @map("updated_at")
@@ -218,7 +248,7 @@ model Order {
   // Delivery-only
   deliveryAddress       String?   @map("delivery_address")
   deliveryPhone         String?   @map("delivery_phone")
-  deliveryCharge        Decimal?  @db.Decimal(10, 2) @map("delivery_charge")
+  deliveryCharge        Decimal?  @map("delivery_charge") @db.Decimal(10, 2)
   estimatedDeliveryTime DateTime? @map("estimated_delivery_time")
 
   // Takeaway-only: when the customer wants to collect it
@@ -243,12 +273,13 @@ model Order {
   // on the order itself so the discount is auditable later even if the
   // point value in Settings changes. loyaltyDiscount is the currency
   // amount those points were worth at the time.
-  pointsRedeemed  Int     @default(0) @map("points_redeemed")
-  loyaltyDiscount Decimal @default(0) @db.Decimal(10, 2) @map("loyalty_discount")
-  advanceAmount   Decimal @default(0) @db.Decimal(10, 2) @map("advance_amount")
-  paymentReference String? @map("payment_reference")
-  paymentProofImage String? @map("payment_proof_image")
+  pointsRedeemed     Int       @default(0) @map("points_redeemed")
+  loyaltyDiscount    Decimal   @default(0) @map("loyalty_discount") @db.Decimal(10, 2)
+  advanceAmount      Decimal   @default(0) @map("advance_amount") @db.Decimal(10, 2)
+  paymentReference   String?   @map("payment_reference")
+  paymentProofImage  String?   @map("payment_proof_image")
   paymentSubmittedAt DateTime? @map("payment_submitted_at")
+  advancePaid        Boolean   @default(false) @map("advance_paid")
 
   // --- Order Timeline (Part 18) ---
   // Each set exactly once, the first time the order transitions into that
@@ -262,18 +293,21 @@ model Order {
   completedAt DateTime? @map("completed_at")
   cancelledAt DateTime? @map("cancelled_at")
 
-  customer User        @relation(fields: [customerId], references: [id])
+  customer            User                 @relation(fields: [customerId], references: [id])
   // Optional, unlike Reservation.table: a takeaway order has no table at
   // all. SetNull (not Restrict) — if a table is ever deleted, past orders
   // should just lose the reference, not block the deletion.
-  table    Table?      @relation(fields: [tableId], references: [id], onDelete: SetNull)
-  items    OrderItem[]
-  bill     Bill?
+  table               Table?               @relation(fields: [tableId], references: [id], onDelete: SetNull)
+  items               OrderItem[]
+  bill                Bill?
   // Chef/Waiter/Delivery Staff assigned to this order — role STAFF only,
   // enforced in order.service.js, not by a DB constraint (Prisma can't
   // express "only rows where role = STAFF" in a foreign key).
-  assignedStaff User? @relation("AssignedOrders", fields: [assignedStaffId], references: [id], onDelete: SetNull)
+  assignedStaff       User?                @relation("AssignedOrders", fields: [assignedStaffId], references: [id], onDelete: SetNull)
   loyaltyTransactions LoyaltyTransaction[]
+  payments            Payment[]
+  // Table booking created alongside a dine-in order that picked a table.
+  reservation         Reservation?
 
   @@index([customerId])
   @@index([tableId])
@@ -288,7 +322,7 @@ model OrderItem {
   orderId    String   @map("order_id")
   menuItemId String   @map("menu_item_id")
   quantity   Int
-  unitPrice  Decimal  @db.Decimal(10, 2) @map("unit_price")
+  unitPrice  Decimal  @map("unit_price") @db.Decimal(10, 2)
   subtotal   Decimal  @db.Decimal(10, 2)
   createdAt  DateTime @default(now()) @map("created_at")
 
@@ -323,10 +357,10 @@ model Bill {
   orderId       String            @unique @map("order_id")
   billDate      DateTime          @default(now()) @map("bill_date")
   subtotal      Decimal           @db.Decimal(10, 2)
-  vatPercent    Decimal           @db.Decimal(5, 2) @map("vat_percent")
-  vatAmount     Decimal           @db.Decimal(10, 2) @map("vat_amount")
-  discount      Decimal           @db.Decimal(10, 2) @default(0)
-  grandTotal    Decimal           @db.Decimal(10, 2) @map("grand_total")
+  vatPercent    Decimal           @map("vat_percent") @db.Decimal(5, 2)
+  vatAmount     Decimal           @map("vat_amount") @db.Decimal(10, 2)
+  discount      Decimal           @default(0) @db.Decimal(10, 2)
+  grandTotal    Decimal           @map("grand_total") @db.Decimal(10, 2)
   paymentStatus BillPaymentStatus @default(UNPAID) @map("payment_status")
   updatedAt     DateTime          @updatedAt @map("updated_at")
 
@@ -353,31 +387,31 @@ enum InventoryUnit {
 // matching status update. It's computed on every read in
 // inventory.service.js instead.
 model InventoryItem {
-  id             String        @id @default(cuid())
-  itemName       String        @map("item_name")
-  category       String
-  unit           InventoryUnit
-  quantity       Decimal       @db.Decimal(10, 2)
-  minStockLevel  Decimal       @db.Decimal(10, 2) @map("min_stock_level")
-  createdAt      DateTime      @default(now()) @map("created_at")
-  updatedAt      DateTime      @updatedAt @map("updated_at")
-  usages         InventoryUsage[]
+  id            String           @id @default(cuid())
+  itemName      String           @map("item_name")
+  category      String
+  unit          InventoryUnit
+  quantity      Decimal          @db.Decimal(10, 2)
+  minStockLevel Decimal          @map("min_stock_level") @db.Decimal(10, 2)
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @updatedAt @map("updated_at")
+  usages        InventoryUsage[]
 
   @@map("inventory_items")
 }
 
 model InventoryUsage {
-  id                String        @id @default(cuid())
-  inventoryItemId   String        @map("inventory_item_id")
-  recordedById      String        @map("recorded_by_id")
-  quantityUsed      Decimal       @db.Decimal(10, 2) @map("quantity_used")
-  remainingQuantity Decimal       @db.Decimal(10, 2) @map("remaining_quantity")
-  usageDate         DateTime      @db.Date @map("usage_date")
+  id                String   @id @default(cuid())
+  inventoryItemId   String   @map("inventory_item_id")
+  recordedById      String   @map("recorded_by_id")
+  quantityUsed      Decimal  @map("quantity_used") @db.Decimal(10, 2)
+  remainingQuantity Decimal  @map("remaining_quantity") @db.Decimal(10, 2)
+  usageDate         DateTime @map("usage_date") @db.Date
   note              String?
-  createdAt         DateTime      @default(now()) @map("created_at")
+  createdAt         DateTime @default(now()) @map("created_at")
 
   inventoryItem InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
-  recordedBy   User          @relation(fields: [recordedById], references: [id], onDelete: Restrict)
+  recordedBy    User          @relation(fields: [recordedById], references: [id], onDelete: Restrict)
 
   @@index([inventoryItemId, usageDate])
   @@index([recordedById])
@@ -390,26 +424,26 @@ model InventoryUsage {
 // Billing (Part 13) falls back to when Admin/Staff doesn't override VAT
 // per bill — closing the seam Part 13 deliberately left open.
 model Settings {
-  id                String   @id @default("singleton")
-  restaurantName    String   @default("FoodFusion") @map("restaurant_name")
-  restaurantAddress String   @default("") @map("restaurant_address")
-  restaurantPhone   String   @default("") @map("restaurant_phone")
-  restaurantEmail   String   @default("") @map("restaurant_email")
-  vatPercentage     Decimal  @default(13) @db.Decimal(5, 2) @map("vat_percentage")
-  currencySymbol    String   @default("$") @map("currency_symbol")
+  id                String  @id @default("singleton")
+  restaurantName    String  @default("FoodFusion") @map("restaurant_name")
+  restaurantAddress String  @default("") @map("restaurant_address")
+  restaurantPhone   String  @default("") @map("restaurant_phone")
+  restaurantEmail   String  @default("") @map("restaurant_email")
+  vatPercentage     Decimal @default(13) @map("vat_percentage") @db.Decimal(5, 2)
+  currencySymbol    String  @default("$") @map("currency_symbol")
 
   // --- Loyalty configuration (Part 18.1) ---
   // Points earned per 1 unit of currency spent. Default 0.1 gives the
   // spec's example rate: 100 spent -> 10 points. Admin-editable, which is
   // the whole reason these live in Settings rather than as constants.
-  loyaltyPointsPerCurrency Decimal @default(0.1) @db.Decimal(6, 3) @map("loyalty_points_per_currency")
+  loyaltyPointsPerCurrency Decimal @default(0.1) @map("loyalty_points_per_currency") @db.Decimal(6, 3)
   // Currency each point is worth when redeemed at checkout.
-  loyaltyPointValue        Decimal @default(1) @db.Decimal(6, 3) @map("loyalty_point_value")
+  loyaltyPointValue        Decimal @default(1) @map("loyalty_point_value") @db.Decimal(6, 3)
   // One-time bonus on a customer's first completed order.
   firstOrderBonusPoints    Int     @default(50) @map("first_order_bonus_points")
 
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("settings")
 }
@@ -463,4 +497,79 @@ model FavoriteMenuItem {
   @@unique([customerId, menuItemId])
   @@index([customerId])
   @@map("favorite_menu_items")
+}
+
+// --- Online payments (SSLCommerz) ------------------------------------------
+// One row per gateway attempt. tranId is what SSLCommerz echoes back on
+// every callback; a payment only becomes PAID after the server re-checks
+// it with SSLCommerz's validation API (never on the browser redirect alone).
+enum PaymentPurpose {
+  ORDER
+  RESERVATION
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+}
+
+model Payment {
+  id            String         @id @default(cuid())
+  tranId        String         @unique @map("tran_id")
+  purpose       PaymentPurpose
+  status        PaymentStatus  @default(PENDING)
+  amount        Decimal        @db.Decimal(10, 2)
+  currency      String         @default("BDT")
+  gateway       String         @default("SSLCOMMERZ")
+  customerId    String         @map("customer_id")
+  orderId       String?        @map("order_id")
+  reservationId String?        @map("reservation_id")
+  valId         String?        @map("val_id")
+  bankTranId    String?        @map("bank_tran_id")
+  cardType      String?        @map("card_type")
+  failureReason String?        @map("failure_reason")
+  paidAt        DateTime?      @map("paid_at")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  customer    User         @relation(fields: [customerId], references: [id])
+  order       Order?       @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  reservation Reservation? @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([reservationId])
+  @@map("payments")
+}
+
+// --- Payroll ---------------------------------------------------------------
+// Salaries are paid outside the site (bank / mobile banking / cash); this
+// records each payment so admin and staff share one history. One payment
+// per staff member per month (period = "YYYY-MM").
+enum PayoutMethod {
+  BANK
+  BKASH
+  NAGAD
+  ROCKET
+  CASH
+}
+
+model SalaryPayment {
+  id        String       @id @default(cuid())
+  staffId   String       @map("staff_id")
+  period    String
+  amount    Decimal      @db.Decimal(10, 2)
+  method    PayoutMethod
+  reference String?
+  note      String?
+  paidAt    DateTime     @default(now()) @map("paid_at")
+  paidById  String       @map("paid_by_id")
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  staff  User @relation("SalaryPaidTo", fields: [staffId], references: [id], onDelete: Cascade)
+  paidBy User @relation("SalaryPaidBy", fields: [paidById], references: [id])
+
+  @@unique([staffId, period])
+  @@map("salary_payments")
 }

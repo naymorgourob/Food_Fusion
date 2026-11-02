@@ -13,7 +13,12 @@ export function StaffRootRedirect() {
   if (!user) return <Navigate to={ROUTES.LOGIN} replace />
 
   const workspace = getStaffWorkspace(user)
-  return <Navigate to={workspace === STAFF_WORKSPACES.CHEF ? ROUTES.CHEF_HOME : ROUTES.WAITER_HOME} replace />
+  return (
+    <Navigate
+      to={workspace === STAFF_WORKSPACES.CHEF ? ROUTES.CHEF_HOME : ROUTES.WAITER_HOME}
+      replace
+    />
+  )
 }
 
 export function StaffOrdersRedirect() {
@@ -35,7 +40,12 @@ export function StaffProfileRedirect() {
   if (!user) return <Navigate to={ROUTES.LOGIN} replace />
 
   const workspace = getStaffWorkspace(user)
-  return <Navigate to={workspace === STAFF_WORKSPACES.CHEF ? ROUTES.CHEF_PROFILE : ROUTES.WAITER_PROFILE} replace />
+  return (
+    <Navigate
+      to={workspace === STAFF_WORKSPACES.CHEF ? ROUTES.CHEF_PROFILE : ROUTES.WAITER_PROFILE}
+      replace
+    />
+  )
 }
 
 export function StaffSettingsRedirect() {
@@ -44,6 +54,10 @@ export function StaffSettingsRedirect() {
   if (!user) return <Navigate to={ROUTES.LOGIN} replace />
 
   const workspace = getStaffWorkspace(user)
-  return <Navigate to={workspace === STAFF_WORKSPACES.CHEF ? ROUTES.CHEF_SETTINGS : ROUTES.WAITER_SETTINGS} replace />
+  return (
+    <Navigate
+      to={workspace === STAFF_WORKSPACES.CHEF ? ROUTES.CHEF_SETTINGS : ROUTES.WAITER_SETTINGS}
+      replace
+    />
+  )
 }
-

@@ -1,4 +1,13 @@
-import { ReceiptText, ClipboardCheck, ChefHat, Utensils, Bike, PackageCheck, PartyPopper, XCircle } from 'lucide-react'
+import {
+  ReceiptText,
+  ClipboardCheck,
+  ChefHat,
+  Utensils,
+  Bike,
+  PackageCheck,
+  PartyPopper,
+  XCircle,
+} from 'lucide-react'
 
 /**
  * Shared status vocabulary for the tracking experience (UI-05).

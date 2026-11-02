@@ -35,7 +35,7 @@ export function TableStatsSummary({ tables, activeFilter, onFilterByStatus }) {
           >
             <span className="flex items-center gap-2">
               <span className={`h-2 w-2 flex-none rounded-full ${config.dotClass}`} />
-              <span className={`text-[0.65rem] font-bold uppercase tracking-wider ${isActive ? '' : 'text-body-faint'}`}>
+              <span className={`text-[0.78rem] font-bold uppercase tracking-wider ${isActive ? '' : 'text-body-faint'}`}>
                 {config.label}
               </span>
             </span>

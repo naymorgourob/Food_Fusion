@@ -189,7 +189,7 @@ export function InventoryFormModal({
                       key={cat}
                       type="button"
                       onClick={() => handleSelectCategory(cat)}
-                      className={`rounded-lg px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                      className={`rounded-lg px-2.5 py-1 text-[0.8rem] font-medium transition-colors ${
                         form.category.toLowerCase() === cat.toLowerCase()
                           ? 'bg-brand-700 text-white dark:bg-brand-600'
                           : 'border border-rule bg-canvas text-body-muted hover:border-brand-300 hover:text-body'
@@ -254,7 +254,7 @@ export function InventoryFormModal({
                   onChange={updateField('minStockLevel')}
                   className={FIELD}
                 />
-                <span className="text-[11px] text-body-faint">
+                <span className="text-[0.8rem] text-body-faint">
                   When current quantity drops below this number, the item triggers a Low Stock alert.
                 </span>
               </div>

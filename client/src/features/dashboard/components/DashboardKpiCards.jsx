@@ -105,7 +105,7 @@ export function DashboardKpiCards({
           >
             {/* Top row: Label & Icon */}
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-body-faint">
+              <span className="text-[0.8rem] font-bold uppercase tracking-wider text-body-faint">
                 {card.title}
               </span>
               <span
@@ -126,7 +126,7 @@ export function DashboardKpiCards({
             {/* Bottom Badge */}
             <div className="pt-2 border-t border-rule/50">
               <span
-                className={`inline-block rounded-md border px-2 py-0.5 text-[10px] font-semibold ${card.badgeBg}`}
+                className={`inline-block rounded-md border px-2 py-0.5 text-[0.75rem] font-semibold ${card.badgeBg}`}
               >
                 {card.badge}
               </span>

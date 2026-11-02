@@ -150,7 +150,7 @@ export function AdminCustomerDrawer({ customer, isOpen, onClose, onToggleStatus,
                   </h2>
                   <div className="mt-0.5 flex items-center gap-2">
                     <CustomerStatusBadge isActive={displayData.isActive} />
-                    <span className="text-[11px] text-body-faint">
+                    <span className="text-[0.8rem] text-body-faint">
                       Joined {new Date(displayData.createdAt).toLocaleDateString([], { month: 'short', year: 'numeric' })}
                     </span>
                   </div>
@@ -214,7 +214,7 @@ export function AdminCustomerDrawer({ customer, isOpen, onClose, onToggleStatus,
                 {/* --- Activity stats ------------------------------------- */}
                 <div className="grid grid-cols-3 gap-3">
                   <div className="flex flex-col gap-1 rounded-xl border border-rule bg-card p-3 text-center">
-                    <span className="flex items-center justify-center gap-1 text-[11px] font-semibold text-body-muted">
+                    <span className="flex items-center justify-center gap-1 text-[0.8rem] font-semibold text-body-muted">
                       <ShoppingBag className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
                       Orders
                     </span>
@@ -224,7 +224,7 @@ export function AdminCustomerDrawer({ customer, isOpen, onClose, onToggleStatus,
                   </div>
 
                   <div className="flex flex-col gap-1 rounded-xl border border-rule bg-card p-3 text-center">
-                    <span className="flex items-center justify-center gap-1 text-[11px] font-semibold text-body-muted">
+                    <span className="flex items-center justify-center gap-1 text-[0.8rem] font-semibold text-body-muted">
                       <CalendarCheck className="h-3.5 w-3.5 text-gold-600 dark:text-gold-400" />
                       Bookings
                     </span>
@@ -234,7 +234,7 @@ export function AdminCustomerDrawer({ customer, isOpen, onClose, onToggleStatus,
                   </div>
 
                   <div className="flex flex-col gap-1 rounded-xl border border-rule bg-card p-3 text-center">
-                    <span className="flex items-center justify-center gap-1 text-[11px] font-semibold text-body-muted">
+                    <span className="flex items-center justify-center gap-1 text-[0.8rem] font-semibold text-body-muted">
                       <Heart className="h-3.5 w-3.5 text-danger" />
                       Favorites
                     </span>
@@ -308,7 +308,7 @@ export function AdminCustomerDrawer({ customer, isOpen, onClose, onToggleStatus,
                               <span className="font-semibold text-body">
                                 {orderNo(order.orderNumber)}
                               </span>
-                              <span className="text-[11px] text-body-faint">
+                              <span className="text-[0.8rem] text-body-faint">
                                 {order.orderType} · {new Date(order.createdAt).toLocaleDateString()}
                               </span>
                             </div>
@@ -317,7 +317,7 @@ export function AdminCustomerDrawer({ customer, isOpen, onClose, onToggleStatus,
                                 {money(order.totalAmount)}
                               </span>
                               <span
-                                className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                                className={`rounded-full px-2 py-0.5 text-[0.75rem] font-bold ${
                                   ORDER_STATUS_STYLES[order.status] ?? 'bg-surface-2 text-ink-muted'
                                 }`}
                               >
@@ -349,13 +349,13 @@ export function AdminCustomerDrawer({ customer, isOpen, onClose, onToggleStatus,
                                 })}{' '}
                                 at {res.reservationTime}
                               </span>
-                              <span className="text-[11px] text-body-faint">
+                              <span className="text-[0.8rem] text-body-faint">
                                 {res.table ? `Table ${res.table.number}` : 'No table assigned'} ·{' '}
                                 {res.guestCount} guests
                               </span>
                             </div>
                             <span
-                              className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                              className={`rounded-full px-2 py-0.5 text-[0.75rem] font-bold ${
                                 RESERVATION_STATUS_STYLES[res.status] ?? 'bg-surface-2 text-ink-muted'
                               }`}
                             >
@@ -382,7 +382,7 @@ export function AdminCustomerDrawer({ customer, isOpen, onClose, onToggleStatus,
                               <span className="font-semibold text-body">
                                 {tx.reason || tx.type}
                               </span>
-                              <span className="text-[11px] text-body-faint">
+                              <span className="text-[0.8rem] text-body-faint">
                                 {new Date(tx.createdAt).toLocaleDateString()}
                               </span>
                             </div>

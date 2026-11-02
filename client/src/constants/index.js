@@ -3,41 +3,86 @@ export const APP_NAME = 'FoodFusion'
 // The API returns image paths as server-relative ("/uploads/menu/x.jpg"),
 // not full URLs — VITE_API_BASE_URL includes the "/api/v1" suffix, so the
 // origin has to be derived by stripping it, once, here.
-export const API_ORIGIN = new URL(import.meta.env?.VITE_API_BASE_URL || 'http://localhost:5001/api/v1').origin
+export const API_ORIGIN = new URL(
+  import.meta.env?.VITE_API_BASE_URL || 'http://localhost:5001/api/v1',
+).origin
 
 export function getImageUrl(imagePath) {
   if (!imagePath) return null
   if (/^https?:\/\//i.test(imagePath)) return imagePath
+  // Files shipped in client/public (dishes, tables…) are served by the app
+  // itself; only /uploads lives on the API.
+  if (!imagePath.startsWith('/uploads') && imagePath.startsWith('/')) return imagePath
   return `${API_ORIGIN}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`
 }
 
 const MENU_IMAGE_FALLBACKS = {
-  biryani: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?auto=format&fit=crop&w=900&q=80',
+  biryani:
+    'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?auto=format&fit=crop&w=900&q=80',
   beef: 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?auto=format&fit=crop&w=900&q=80',
   fish: 'https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=900&q=80',
-  prawn: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=900&q=80',
-  chicken: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=900&q=80',
-  dessert: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=900&q=80',
-  beverage: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=900&q=80',
-  default: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80',
+  prawn:
+    'https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=900&q=80',
+  chicken:
+    'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=900&q=80',
+  dessert:
+    'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=900&q=80',
+  beverage:
+    'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=900&q=80',
+  default:
+    'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80',
 }
 
 const BENGALI_DISH_IMAGES = {
-  'dhaka kacchi biryani': 'https://commons.wikimedia.org/wiki/Special:FilePath/Kacchi%20Biryani.jpg?width=900',
-  'beef tehari': 'https://commons.wikimedia.org/wiki/Special:FilePath/Tehari.jpg?width=900',
+  // Photos supplied for the menu, shown as-is on the dish cards.
+  'dhaka kacchi biryani': '/dishes/kacchi-biryani.jpg',
+  'royal mutton kacchi biryani': '/dishes/kacchi-biryani.jpg',
+  'fish and chips': '/dishes/fish-and-chips.jpg',
+  'buffalo wings': '/dishes/buffalo-wings.jpg',
+  'crispy calamari': '/dishes/crispy-calamari.jpg',
+  'naga wings': '/dishes/naga-wings.jpg',
+  'truffle bruschetta': '/dishes/truffle-bruschetta.jpg',
+  'dhakai crispy prawn tempura': '/dishes/prawn-tempura.jpg',
+  'beef tehari': '/dishes/beef-tehari.jpg',
   'ilish bhapa': 'https://commons.wikimedia.org/wiki/Special:FilePath/Ilish%20Bhapa.jpg?width=900',
-  'chingri malai curry': 'https://commons.wikimedia.org/wiki/Special:FilePath/Chingri%20Malai%20Curry.jpg?width=900',
-  'chicken bhuna khichuri': 'https://commons.wikimedia.org/wiki/Special:FilePath/Bhuna%20Khichuri.jpg?width=900',
-  'shorshe ilish platter': 'https://commons.wikimedia.org/wiki/Special:FilePath/Shorshe%20Ilish.jpg?width=900',
-  'begun bhaja': 'https://commons.wikimedia.org/wiki/Special:FilePath/Begun%20Bhaja.jpg?width=900',
-  'mishti doi': 'https://commons.wikimedia.org/wiki/Special:FilePath/Mishti%20Doi.jpg?width=900',
+  'chingri malai curry': '/dishes/chingri-malai-curry.jpg',
+  'chicken bhuna khichuri': '/dishes/bhuna-khichuri.jpg',
+  'shorshe ilish platter': '/dishes/shorshe-ilish.jpg',
+  'begun bhaja': '/dishes/begun-bhaja.jpg',
+  'mishti doi': '/dishes/mishti-doi.jpg',
+  'bhetki paturi': '/dishes/bhetki-paturi.jpg',
+  'bhorta platter': '/dishes/bhorta-platter.jpg',
+  'dab chingri': '/dishes/dab-chingri.jpg',
+  'seafood platter': '/dishes/seafood-platter.jpg',
+  'ginger milk tea': '/dishes/ginger-milk-tea.jpg',
+  'coffee milk bubble tea': '/dishes/coffee-boba.jpg',
+  'taro boba milk': '/dishes/taro-boba.jpg',
+  'passionfruit mocktail': '/dishes/passionfruit-mocktail.jpg',
+  'hot chocolate': '/dishes/hot-chocolate.jpg',
+  'sweet mango lassi': '/dishes/mango-lassi.jpg',
+  'mint lemonade cooler': '/dishes/mint-lemonade.jpg',
+  'caramel macchiato': '/dishes/caramel-macchiato.jpg',
+  espresso: '/dishes/espresso.jpg',
+  'iced caramel latte': '/dishes/iced-caramel-latte.jpg',
+  'hazelnut latte': '/dishes/hazelnut-latte.jpg',
+  'tres leches': '/dishes/tres-leches.jpg',
+  'classic tiramisu': '/dishes/tiramisu.jpg',
+  'warm chocolate lava cake': '/dishes/lava-cake.jpg',
+  'shahi tukra with rabri': '/dishes/shahi-tukra.jpg',
+  'signature san sebastian cake': '/dishes/san-sebastian-cake.jpg',
+  'chocolate bomb with brownie': '/dishes/chocolate-bomb.jpg',
 }
 
 export function getMenuImageUrl(dish) {
-  const dishName = String(dish?.name || '').toLowerCase().trim()
+  const dishName = String(dish?.name || '')
+    .toLowerCase()
+    .trim()
   const name = `${dishName} ${dish?.category?.name || ''}`.toLowerCase()
   const fallbackKey =
-    name.includes('biryani') || name.includes('tehari') || name.includes('rice') || name.includes('khichuri')
+    name.includes('biryani') ||
+    name.includes('tehari') ||
+    name.includes('rice') ||
+    name.includes('khichuri')
       ? 'biryani'
       : name.includes('beef') || name.includes('steak') || name.includes('lamb')
         ? 'beef'
@@ -47,9 +92,16 @@ export function getMenuImageUrl(dish) {
             ? 'prawn'
             : name.includes('chicken') || name.includes('kebab') || name.includes('wing')
               ? 'chicken'
-              : name.includes('dessert') || name.includes('cake') || name.includes('doi') || name.includes('tiramisu')
+              : name.includes('dessert') ||
+                  name.includes('cake') ||
+                  name.includes('doi') ||
+                  name.includes('tiramisu')
                 ? 'dessert'
-                : name.includes('drink') || name.includes('lemonade') || name.includes('lassi') || name.includes('latte') || name.includes('mocktail')
+                : name.includes('drink') ||
+                    name.includes('lemonade') ||
+                    name.includes('lassi') ||
+                    name.includes('latte') ||
+                    name.includes('mocktail')
                   ? 'beverage'
                   : 'default'
 
@@ -120,7 +172,9 @@ export function getHomeRouteForRole(role, user) {
   if (role === USER_ROLES.ADMIN) return ROUTES.DASHBOARD
   if (role === USER_ROLES.STAFF) {
     if (user) {
-      const pos = String(user.position || '').toLowerCase().trim()
+      const pos = String(user.position || '')
+        .toLowerCase()
+        .trim()
       const isChef =
         pos.includes('chef') ||
         pos.includes('cook') ||
@@ -190,7 +244,9 @@ export function canAccessPath(pathname, role, user) {
   if (cleanPath.startsWith('/staff')) {
     if (role !== USER_ROLES.STAFF) return false
     if (cleanPath.startsWith('/staff/chef')) {
-      const pos = String(user?.position || '').toLowerCase().trim()
+      const pos = String(user?.position || '')
+        .toLowerCase()
+        .trim()
       const isChef =
         pos.includes('chef') ||
         pos.includes('cook') ||
@@ -201,7 +257,9 @@ export function canAccessPath(pathname, role, user) {
       return isChef
     }
     if (cleanPath.startsWith('/staff/waiter')) {
-      const pos = String(user?.position || '').toLowerCase().trim()
+      const pos = String(user?.position || '')
+        .toLowerCase()
+        .trim()
       const isChef =
         pos.includes('chef') ||
         pos.includes('cook') ||
@@ -238,4 +296,3 @@ export function canAccessPath(pathname, role, user) {
 
   return false
 }
-

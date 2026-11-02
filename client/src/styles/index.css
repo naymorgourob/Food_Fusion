@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /*
  * Design tokens from docs/03-design-system.md.
@@ -15,69 +15,77 @@
   /* Inter for body/UI, Poppins for headings (font-display utility).
      Both keep the original system stack as a fallback, so the app still
      renders correctly if the webfont request fails. */
-  --font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-display: Poppins, Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --font-sans:
+    Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+  --font-display: Poppins, Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-menu: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-script: Parisienne, 'Cormorant Garamond', cursive;
+  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
 
   /* Neutral scale (warm, hue-biased toward the accent) */
-  --color-stone-50: #FAF8F6;
-  --color-stone-100: #F3EFEB;
-  --color-stone-200: #E7E0D9;
-  --color-stone-300: #D3C7BB;
-  --color-stone-400: #A99C8E;
-  --color-stone-500: #8A7D70;
-  --color-stone-600: #6B5F54;
-  --color-stone-700: #4F453C;
-  --color-stone-800: #362E27;
-  --color-stone-900: #211B16;
-  --color-stone-950: #14100D;
+  --color-stone-50: #faf8f6;
+  --color-stone-100: #f3efeb;
+  --color-stone-200: #e7e0d9;
+  --color-stone-300: #d3c7bb;
+  --color-stone-400: #a99c8e;
+  --color-stone-500: #8a7d70;
+  --color-stone-600: #6b5f54;
+  --color-stone-700: #4f453c;
+  --color-stone-800: #362e27;
+  --color-stone-900: #211b16;
+  --color-stone-950: #14100d;
 
   /* Accent — "ember" */
-  --color-ember-50: #FCEEE7;
-  --color-ember-100: #F8D5C4;
-  --color-ember-300: #E28654;
-  --color-ember-500: #A6431A;
-  --color-ember-600: #8A3614;
-  --color-ember-700: #6E2B10;
+  --color-ember-50: #fceee7;
+  --color-ember-100: #f8d5c4;
+  --color-ember-300: #e28654;
+  --color-ember-500: #a6431a;
+  --color-ember-600: #8a3614;
+  --color-ember-700: #6e2b10;
 
   /* --- Landing page palette (premium restaurant) --------------------
-   * Deep emerald + luxury gold on warm white — the fine-dining
-   * combination (deep green reads "considered", gold reads "premium"),
-   * as opposed to the red/amber of fast-casual.
+   * From the navy / linen / sand / oak moodboard: navy is the accent
+   * (buttons, active states, headings), linen and sand the surfaces, and
+   * brand-900 is a dark walnut for the sidebar, banners and scrims, so the
+   * large areas read as warm wood rather than a wall of blue. Token names (brand/gold) are kept from
+   * the original emerald-and-gold scheme so no component had to change.
    *
    * These are ADDITIVE tokens. The app-wide semantic aliases below are
    * untouched, so the dashboard, auth pages, and customer portal keep
    * their existing appearance exactly.
    *
-   * Every pairing used for text is contrast-checked — see the table in
-   * the redesign notes; the weakest shipped pairing is 4.6:1.
+   * Text pairings were re-checked for this palette: white on brand-700
+   * 13.0:1, charcoal on gold-500 8.8:1, gold-700 on light canvas 5.4:1,
+   * brand-400 on dark canvas 8.1:1; the weakest is body-faint on the
+   * light canvas at 4.9:1.
    */
 
-  /* Primary — deep emerald */
-  --color-brand-50: #ECF7F2;
-  --color-brand-100: #D2ECE1;
-  --color-brand-200: #A5D9C4;
-  --color-brand-400: #2E9B77;
-  --color-brand-600: #0F6B50;
-  --color-brand-700: #0B5D46;
-  --color-brand-800: #084736;
-  --color-brand-900: #063528;
+  /* Primary — deep navy (#233245); 900 is dark walnut, not navy */
+  --color-brand-50: #eef1f6;
+  --color-brand-100: #d7dee9;
+  --color-brand-200: #b0bdd0;
+  --color-brand-400: #9fb0c8;
+  --color-brand-600: #303f54;
+  --color-brand-700: #233245;
+  --color-brand-800: #1b2738;
+  --color-brand-900: #2b221c;
 
-  /* Accent — luxury gold. gold-700 is the darkened variant reserved for
-     gold text on light surfaces, where gold-500 would fail contrast. */
-  --color-gold-100: #FAF0D7;
-  --color-gold-300: #E8CD8A;
-  --color-gold-400: #DCBA65;
-  --color-gold-500: #C9A227;
-  --color-gold-700: #8A6D12;
+  /* Accent — warm sand (#ceb59c). gold-700 is a deep walnut reserved for
+     accent text on light surfaces, where sand would fail contrast. */
+  --color-gold-100: #f3ece4;
+  --color-gold-300: #e2d2c1;
+  --color-gold-400: #d8c3ad;
+  --color-gold-500: #ceb59c;
+  --color-gold-700: #7a5f45;
 
   /* Neutrals — warm white page, white cards, charcoal ink. */
-  --color-linen: #FBFAF7;
-  --color-linen-2: #F4F1EA;
-  --color-charcoal: #1C1B18;
-  --color-charcoal-muted: #56534C;
-  --color-charcoal-faint: #6B6860;
-  --color-hairline: #E6E2D8;
+  --color-linen: #fbfaf7;
+  --color-linen-2: #f4f1ea;
+  --color-charcoal: #1c1b18;
+  --color-charcoal-muted: #56534c;
+  --color-charcoal-faint: #6b6860;
+  --color-hairline: #e6e2d8;
 
   /* Shared surface aliases for the public site AND the customer app. Only
      these flip between light and dark (see the overrides further down) —
@@ -85,38 +93,38 @@
      mode is a value change in one place instead of a `dark:` variant on
      every element. The customer dashboard reuses the same tokens as the
      landing page so the two feel like one product. */
-  --color-canvas: #FBFAF7;
-  --color-canvas-2: #F4F1EA;
-  --color-card: #FFFFFF;
-  --color-rule: #E6E2D8;
-  --color-body: #1C1B18;
-  --color-body-muted: #56534C;
-  --color-body-faint: #6B6860;
+  --color-canvas: #f7f4ef;
+  --color-canvas-2: #ede7de;
+  --color-card: #fffdfa;
+  --color-rule: #ded6ca;
+  --color-body: #1b2230;
+  --color-body-muted: #4d5566;
+  --color-body-faint: #636b7a;
 
   /* Semantic */
   --color-success: #325736;
-  --color-success-soft: #EEF4EC;
-  --color-warning: #93600F;
-  --color-warning-soft: #FBF3E3;
-  --color-danger: #8F1E17;
-  --color-danger-soft: #FBEAEA;
-  --color-info: #204A85;
-  --color-info-soft: #EAF0F7;
+  --color-success-soft: #eef4ec;
+  --color-warning: #93600f;
+  --color-warning-soft: #fbf3e3;
+  --color-danger: #8f1e17;
+  --color-danger-soft: #fbeaea;
+  --color-info: #204a85;
+  --color-info-soft: #eaf0f7;
 
   /* Semantic aliases — the ones components actually use.
      Their VALUES are re-pointed for dark mode below; the names never change. */
-  --color-paper: #FAF8F6;
-  --color-surface: #FFFFFF;
-  --color-surface-2: #F3EFEB;
-  --color-border: #E7E0D9;
-  --color-border-strong: #D3C7BB;
-  --color-ink: #211B16;
-  --color-ink-muted: #6B5F54;
-  --color-ink-faint: #A99C8E;
-  --color-accent: #A6431A;
-  --color-accent-strong: #8A3614;
-  --color-accent-soft: #FCEEE7;
-  --color-accent-contrast: #FFFFFF;
+  --color-paper: #faf8f6;
+  --color-surface: #ffffff;
+  --color-surface-2: #f3efeb;
+  --color-border: #e7e0d9;
+  --color-border-strong: #d3c7bb;
+  --color-ink: #211b16;
+  --color-ink-muted: #6b5f54;
+  --color-ink-faint: #a99c8e;
+  --color-accent: #a6431a;
+  --color-accent-strong: #8a3614;
+  --color-accent-soft: #fceee7;
+  --color-accent-contrast: #ffffff;
 
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -126,6 +134,15 @@
   /* Type scale — generates text-display / text-h1 / ... utilities.
      Weight is applied separately via font-semibold/font-bold since Tailwind
      keeps size and weight as independent utilities. */
+  /* Tailwind's text scale, raised one step for readability site-wide
+     (defaults: xs 0.75, sm 0.875, base 1, lg 1.125, xl 1.25rem). Only
+     type sizes change; spacing and layout keep their rem values. */
+  --text-xs: 0.84rem;
+  --text-sm: 0.97rem;
+  --text-base: 1.075rem;
+  --text-lg: 1.2rem;
+  --text-xl: 1.33rem;
+
   --text-display: 2.75rem;
   --text-display--line-height: 3.25rem;
   --text-h1: 2rem;
@@ -149,78 +166,78 @@
  */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-paper: #14100D;
-    --color-surface: #1D1712;
-    --color-surface-2: #241C16;
-    --color-border: #362C23;
-    --color-border-strong: #4A3C30;
-    --color-ink: #F3EEE8;
-    --color-ink-muted: #B7A995;
-    --color-ink-faint: #7C6F60;
-    --color-accent: #E28654;
-    --color-accent-strong: #F0A876;
-    --color-accent-soft: #3B2415;
-    --color-accent-contrast: #1D1712;
+    --color-paper: #14100d;
+    --color-surface: #1d1712;
+    --color-surface-2: #241c16;
+    --color-border: #362c23;
+    --color-border-strong: #4a3c30;
+    --color-ink: #f3eee8;
+    --color-ink-muted: #b7a995;
+    --color-ink-faint: #7c6f60;
+    --color-accent: #e28654;
+    --color-accent-strong: #f0a876;
+    --color-accent-soft: #3b2415;
+    --color-accent-contrast: #1d1712;
 
-    /* Landing surfaces — dark mode. Deep green-black rather than neutral
-       black, so the emerald brand still feels present in the background. */
-    --color-canvas: #0A100D;
-    --color-canvas-2: #0F1714;
-    --color-card: #141D19;
-    --color-rule: #24302B;
-    --color-body: #F2F5F3;
-    --color-body-muted: #B4BFB9;
-    --color-body-faint: #93A099;
+    /* Landing surfaces — dark mode. Warm espresso-walnut, so large dark
+       areas feel like wood rather than blue. */
+    --color-canvas: #1b1714;
+    --color-canvas-2: #211c18;
+    --color-card: #29231e;
+    --color-rule: #3d342c;
+    --color-body: #f4efe8;
+    --color-body-muted: #cfc5b9;
+    --color-body-faint: #a99e92;
   }
 }
 
-:root[data-theme="dark"] {
-  --color-paper: #14100D;
-  --color-surface: #1D1712;
-  --color-surface-2: #241C16;
-  --color-border: #362C23;
-  --color-border-strong: #4A3C30;
-  --color-ink: #F3EEE8;
-  --color-ink-muted: #B7A995;
-  --color-ink-faint: #7C6F60;
-  --color-accent: #E28654;
-  --color-accent-strong: #F0A876;
-  --color-accent-soft: #3B2415;
-  --color-accent-contrast: #1D1712;
+:root[data-theme='dark'] {
+  --color-paper: #14100d;
+  --color-surface: #1d1712;
+  --color-surface-2: #241c16;
+  --color-border: #362c23;
+  --color-border-strong: #4a3c30;
+  --color-ink: #f3eee8;
+  --color-ink-muted: #b7a995;
+  --color-ink-faint: #7c6f60;
+  --color-accent: #e28654;
+  --color-accent-strong: #f0a876;
+  --color-accent-soft: #3b2415;
+  --color-accent-contrast: #1d1712;
 
   /* Landing surfaces — dark mode. Deep green-black rather than neutral
      black, so the emerald brand still feels present in the background. */
-  --color-canvas: #0A100D;
-  --color-canvas-2: #0F1714;
-  --color-card: #141D19;
-  --color-rule: #24302B;
-  --color-body: #F2F5F3;
-  --color-body-muted: #B4BFB9;
-  --color-body-faint: #93A099;
+  --color-canvas: #1b1714;
+  --color-canvas-2: #211c18;
+  --color-card: #29231e;
+  --color-rule: #3d342c;
+  --color-body: #f4efe8;
+  --color-body-muted: #cfc5b9;
+  --color-body-faint: #a99e92;
 }
 
-:root[data-theme="light"] {
-  --color-paper: #FAF8F6;
-  --color-surface: #FFFFFF;
-  --color-surface-2: #F3EFEB;
-  --color-border: #E7E0D9;
-  --color-border-strong: #D3C7BB;
-  --color-ink: #211B16;
-  --color-ink-muted: #6B5F54;
-  --color-ink-faint: #A99C8E;
-  --color-accent: #A6431A;
-  --color-accent-strong: #8A3614;
-  --color-accent-soft: #FCEEE7;
-  --color-accent-contrast: #FFFFFF;
+:root[data-theme='light'] {
+  --color-paper: #faf8f6;
+  --color-surface: #ffffff;
+  --color-surface-2: #f3efeb;
+  --color-border: #e7e0d9;
+  --color-border-strong: #d3c7bb;
+  --color-ink: #211b16;
+  --color-ink-muted: #6b5f54;
+  --color-ink-faint: #a99c8e;
+  --color-accent: #a6431a;
+  --color-accent-strong: #8a3614;
+  --color-accent-soft: #fceee7;
+  --color-accent-contrast: #ffffff;
 
   /* Landing surfaces — light mode (the default values above). */
-  --color-canvas: #FBFAF7;
-  --color-canvas-2: #F4F1EA;
-  --color-card: #FFFFFF;
-  --color-rule: #E6E2D8;
-  --color-body: #1C1B18;
-  --color-body-muted: #56534C;
-  --color-body-faint: #6B6860;
+  --color-canvas: #f7f4ef;
+  --color-canvas-2: #ede7de;
+  --color-card: #fffdfa;
+  --color-rule: #ded6ca;
+  --color-body: #1b2230;
+  --color-body-muted: #4d5566;
+  --color-body-faint: #636b7a;
 }
 
 @layer base {
@@ -252,6 +269,11 @@
   }
   .animate-float-slower {
     animation: ff-float 20s ease-in-out infinite reverse;
+  }
+
+  /* Idle turn of the menu hero's plates, so the food always feels alive. */
+  .animate-plate-spin {
+    animation: ff-plate-spin 60s linear infinite;
   }
 
   /* Continuous horizontal scroll (gallery / logo strips). */
@@ -306,6 +328,12 @@
   }
 }
 
+@keyframes ff-plate-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @keyframes ff-marquee {
   from {
     transform: translate3d(0, 0, 0);
@@ -322,7 +350,39 @@
   .animate-float-slow,
   .animate-float-slower,
   .animate-marquee,
+  .animate-plate-spin,
   .skeleton {
     animation: none;
   }
+}
+
+/*
+ * The blush menu panel (customer menu). Always light, whatever the app
+ * theme, like a printed menu card: the shared colour tokens are re-pointed
+ * to warm paper tones inside it, so every component that already uses
+ * bg-card / text-body / border-rule picks the palette up unchanged.
+ */
+.menu-blush {
+  --color-canvas: #e6ddd1;
+  --color-canvas-2: #eee7dd;
+  --color-card: #f6f1ea;
+  --color-rule: #d3c4b2;
+  --color-body: #1b2230;
+  --color-body-muted: #4d5566;
+  --color-body-faint: #535a67;
+  color: var(--color-body);
+}
+
+/* The linen menu paper itself, on its own layer so it can cross-fade with the
+   drinks backdrop. */
+.menu-blush-bg {
+  background-color: #e4dacc;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260' fill='none' stroke='%23fff' stroke-width='1.1' stroke-linecap='round' stroke-opacity='0.42'%3E %3Cg transform='translate%2858 62%29'%3E%3Cellipse cx='0' cy='-15' rx='8' ry='15'/%3E%3Cellipse cx='0' cy='-15' rx='8' ry='15' transform='rotate%2872%29'/%3E%3Cellipse cx='0' cy='-15' rx='8' ry='15' transform='rotate%28144%29'/%3E%3Cellipse cx='0' cy='-15' rx='8' ry='15' transform='rotate%28216%29'/%3E%3Cellipse cx='0' cy='-15' rx='8' ry='15' transform='rotate%28288%29'/%3E%3Ccircle r='4'/%3E%3C/g%3E %3Cpath d='M70 92 C 76 130%2C 60 160%2C 30 182'/%3E%3Cpath d='M62 132 C 44 124%2C 32 128%2C 24 140 C 40 146%2C 54 144%2C 62 132Z'/%3E%3Cpath d='M64 150 C 80 146%2C 92 152%2C 98 164 C 82 168%2C 70 164%2C 64 150Z'/%3E %3Cg transform='translate%28190 170%29 rotate%2820%29'%3E%3Cpath d='M0 0 C -14 -18%2C -14 -36%2C 0 -46 C 14 -36%2C 14 -18%2C 0 0Z'/%3E%3Cpath d='M0 0 C -22 -8%2C -34 -22%2C -30 -38 C -14 -34%2C -4 -20%2C 0 0Z'/%3E%3Cpath d='M0 0 C 22 -8%2C 34 -22%2C 30 -38 C 14 -34%2C 4 -20%2C 0 0Z'/%3E%3Cpath d='M0 0 L 0 38'/%3E%3Cpath d='M0 18 C 10 12%2C 20 14%2C 26 22'/%3E%3C/g%3E %3Cpath d='M150 40 C 170 30%2C 196 34%2C 210 52 C 222 68%2C 214 86%2C 198 84 C 186 82%2C 186 66%2C 198 64'/%3E%3Cpath d='M178 36 C 184 24%2C 196 20%2C 206 24'/%3E %3Cg transform='translate%28110 222%29'%3E%3Ccircle r='3'/%3E%3Ccircle cx='12' cy='-6' r='2.5'/%3E%3Ccircle cx='-10' cy='-8' r='2'/%3E%3C/g%3E %3Cpath d='M232 118 C 222 132%2C 222 146%2C 234 158 C 244 146%2C 244 132%2C 232 118Z'/%3E%3Cpath d='M233 124 L 233 176'/%3E %3Cpath d='M18 236 C 30 222%2C 48 220%2C 60 230'/%3E%3Cpath d='M36 224 C 34 212%2C 40 204%2C 50 202'/%3E %3C/svg%3E"),
+    radial-gradient(ellipse at 20% 0%, #f1eae0 0%, transparent 55%),
+    linear-gradient(180deg, #eae2d6 0%, #ddd0bf 100%);
+  background-size:
+    260px 260px,
+    100% 100%,
+    100% 100%;
 }

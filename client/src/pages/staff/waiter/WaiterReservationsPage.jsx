@@ -176,7 +176,7 @@ export default function WaiterReservationsPage() {
             >
               {tab.label}
               <span
-                className={`rounded-full px-1.5 py-0.2 text-[0.65rem] font-bold ${
+                className={`rounded-full px-1.5 py-0.2 text-[0.78rem] font-bold ${
                   filterTab === tab.id ? 'bg-white/20 text-white' : 'bg-canvas-2 text-body-muted'
                 }`}
               >
@@ -252,7 +252,7 @@ export default function WaiterReservationsPage() {
                       <span className="font-display text-base font-bold text-body">
                         {res.customerName}
                       </span>
-                      <span className="block text-[0.7rem] text-body-faint">
+                      <span className="block text-[0.82rem] text-body-faint">
                         Ref #{orderNo(res.id.slice(-6).toUpperCase())}
                       </span>
                     </div>
@@ -260,7 +260,7 @@ export default function WaiterReservationsPage() {
                     <div className="flex flex-col items-end gap-1">
                       <StatusBadge status={res.status} />
                       {isResToday && (
-                        <span className="rounded-full bg-purple-100 dark:bg-purple-950/60 px-2 py-0.2 text-[0.65rem] font-bold text-purple-700 dark:text-purple-300">
+                        <span className="rounded-full bg-purple-100 dark:bg-purple-950/60 px-2 py-0.2 text-[0.78rem] font-bold text-purple-700 dark:text-purple-300">
                           TODAY
                         </span>
                       )}
@@ -270,14 +270,14 @@ export default function WaiterReservationsPage() {
                   {/* Timing & Party Details */}
                   <div className="grid grid-cols-2 gap-2 rounded-xl bg-canvas-2 p-3 text-xs">
                     <div className="flex flex-col gap-1">
-                      <span className="text-[0.65rem] font-semibold text-body-faint uppercase">
+                      <span className="text-[0.78rem] font-semibold text-body-faint uppercase">
                         Date & Time
                       </span>
                       <span className="font-semibold text-body flex items-center gap-1.5">
                         <Clock className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400 flex-none" />
                         {formatTime(res.reservationTime)}
                       </span>
-                      <span className="text-[0.7rem] text-body-muted">
+                      <span className="text-[0.82rem] text-body-muted">
                         {new Date(res.reservationDate).toLocaleDateString([], {
                           weekday: 'short',
                           month: 'short',
@@ -287,14 +287,14 @@ export default function WaiterReservationsPage() {
                     </div>
 
                     <div className="flex flex-col gap-1">
-                      <span className="text-[0.65rem] font-semibold text-body-faint uppercase">
+                      <span className="text-[0.78rem] font-semibold text-body-faint uppercase">
                         Party & Table
                       </span>
                       <span className="font-semibold text-body flex items-center gap-1.5">
                         <Users className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400 flex-none" />
                         {res.guestCount} {res.guestCount === 1 ? 'Guest' : 'Guests'}
                       </span>
-                      <span className="text-[0.7rem] text-body-muted flex items-center gap-1">
+                      <span className="text-[0.82rem] text-body-muted flex items-center gap-1">
                         <Armchair className="h-3 w-3 flex-none" />
                         Table {res.table?.number}
                         {liveTable && (
@@ -342,7 +342,7 @@ export default function WaiterReservationsPage() {
                   {/* Special Requests */}
                   {res.specialRequest && (
                     <div className="rounded-xl border border-amber-500/20 bg-amber-50/50 dark:bg-amber-950/20 p-2.5 text-xs text-amber-900 dark:text-amber-200">
-                      <strong className="block text-[0.65rem] font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider">
+                      <strong className="block text-[0.78rem] font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider">
                         Special Request / Allergy Note
                       </strong>
                       <p className="mt-0.5 text-xs leading-relaxed">{res.specialRequest}</p>

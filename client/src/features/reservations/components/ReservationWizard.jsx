@@ -1,14 +1,26 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Check, AlertCircle, CalendarDays, Users, Armchair, MessageSquare, UtensilsCrossed, Upload } from 'lucide-react'
+import {
+  Check,
+  AlertCircle,
+  CalendarDays,
+  Users,
+  Armchair,
+  MessageSquare,
+  UtensilsCrossed,
+  Upload,
+  ShieldCheck,
+} from 'lucide-react'
 import { fetchTables } from '@/features/tables/services/tableService'
 import { createReservation } from '@/features/reservations/services/reservationService'
-import { RESERVATION_OCCASIONS } from '@/features/reservations/constants'
+import { RESERVATION_OCCASIONS, SUGGESTED_TIMES } from '@/features/reservations/constants'
 import { TablePicker } from '@/features/reservations/components/TablePicker'
 import { ReservationSummary } from '@/features/reservations/components/ReservationSummary'
 import { FIELD, LABEL, OPTIONAL } from '@/features/orders/components/fieldStyles'
 import { useAuth } from '@/hooks/useAuth'
 import { money } from '@/utils/format'
+import { ADVANCE_RATE, ADVANCE_PERCENT } from '@/constants/payments'
+import { startAdvancePayment } from '@/features/payments/services/paymentService'
 import { fetchPaymentContact } from '@/features/settings/services/settingsService'
 
 /**
@@ -43,6 +55,7 @@ const EMPTY_FORM = {
   specialRequest: '',
   occasion: '',
   occasionNote: '',
+  paymentMethod: 'ONLINE',
   paymentReference: '',
   paymentProof: null,
 }
@@ -50,7 +63,6 @@ const EMPTY_FORM = {
 // Service windows the restaurant actually runs, offered as chips so the
 // customer isn't left guessing what a valid time looks like. A free
 // <input type="time"> stays available for anything in between.
-const SUGGESTED_TIMES = ['12:00', '12:30', '13:00', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00']
 
 const GUEST_CHIPS = [1, 2, 3, 4, 5, 6, 8]
 const DURATION_OPTIONS = [30, 60, 90, 120, 180, 240]
@@ -75,7 +87,12 @@ function upcomingDays(count = 5) {
     const offset = date.getTimezoneOffset()
     days.push({
       iso: new Date(date.getTime() - offset * 60000).toISOString().slice(0, 10),
-      weekday: index === 0 ? 'Today' : index === 1 ? 'Tomorrow' : date.toLocaleDateString([], { weekday: 'short' }),
+      weekday:
+        index === 0
+          ? 'Today'
+          : index === 1
+            ? 'Tomorrow'
+            : date.toLocaleDateString([], { weekday: 'short' }),
       day: date.getDate(),
       month: date.toLocaleDateString([], { month: 'short' }),
     })
@@ -171,7 +188,9 @@ export function ReservationWizard({ onCreated }) {
   }, [form.reservationDate, form.reservationTime, form.durationMinutes])
 
   useEffect(() => {
-    fetchPaymentContact().then(setPaymentContact).catch(() => setPaymentContact(null))
+    fetchPaymentContact()
+      .then(setPaymentContact)
+      .catch(() => setPaymentContact(null))
   }, [])
 
   function update(field, value) {
@@ -187,7 +206,7 @@ export function ReservationWizard({ onCreated }) {
   const selectedTable = tables.find((table) => table.id === form.tableId) ?? null
   const durationMinutes = Number(form.durationMinutes) || 120
   const reservationCost = Number(selectedTable?.reservationCost ?? 0) * (durationMinutes / 120)
-  const advanceAmount = reservationCost * 0.2
+  const advanceAmount = reservationCost * ADVANCE_RATE
 
   const canAdvance =
     step === 0
@@ -198,9 +217,11 @@ export function ReservationWizard({ onCreated }) {
           ? Boolean(form.tableId && selectedTable && selectedTable.reservationAvailable !== false)
           : Boolean(
               form.customerName &&
-                form.customerPhone &&
-                selectedTable &&
-                (form.paymentReference.trim() || form.paymentProof),
+              form.customerPhone &&
+              selectedTable &&
+              (form.paymentMethod === 'ONLINE' ||
+                form.paymentReference.trim() ||
+                form.paymentProof),
             )
 
   async function handleSubmit(event) {
@@ -221,10 +242,21 @@ export function ReservationWizard({ onCreated }) {
       // booking; there is no column for it, so it is never submitted.
       const payload = new FormData()
       Object.entries(form).forEach(([key, value]) => {
-        if (key !== 'paymentProof' && value !== '') payload.append(key, value)
+        if (key === 'paymentProof' || value === '') return
+        // Online payers send no manual reference; the gateway verifies them.
+        if (form.paymentMethod === 'ONLINE' && key === 'paymentReference') return
+        payload.append(key, value)
       })
-      if (form.paymentProof) payload.append('paymentProof', form.paymentProof)
+      if (form.paymentMethod !== 'ONLINE' && form.paymentProof) {
+        payload.append('paymentProof', form.paymentProof)
+      }
       const reservation = await createReservation(payload)
+      if (form.paymentMethod === 'ONLINE') {
+        // Booking saved; now pay the advance on SSLCommerz's secure page.
+        const { gatewayUrl } = await startAdvancePayment('reservation', reservation.id)
+        window.location.assign(gatewayUrl)
+        return
+      }
       onCreated(reservation, { preOrder })
     } catch (error) {
       const details = error.response?.data?.details
@@ -273,8 +305,12 @@ export function ReservationWizard({ onCreated }) {
             {step === 0 && (
               <>
                 <div className="flex flex-col gap-1">
-                  <h2 className="font-display text-lg font-semibold text-body">When are you joining us?</h2>
-                  <p className="text-sm text-body-muted">Pick a day and the time you&rsquo;d like your table.</p>
+                  <h2 className="font-display text-lg font-semibold text-body">
+                    When are you joining us?
+                  </h2>
+                  <p className="text-sm text-body-muted">
+                    Pick a day and the time you&rsquo;d like your table.
+                  </p>
                 </div>
 
                 <div className="flex min-w-0 flex-col gap-2.5">
@@ -294,11 +330,13 @@ export function ReservationWizard({ onCreated }) {
                               : 'border-rule bg-card text-body-muted hover:-translate-y-0.5 hover:border-brand-200'
                           }`}
                         >
-                          <span className="text-[0.65rem] font-semibold tracking-wide uppercase">
+                          <span className="text-[0.78rem] font-semibold tracking-wide uppercase">
                             {day.weekday}
                           </span>
-                          <span className="font-display text-xl leading-none font-semibold">{day.day}</span>
-                          <span className="text-[0.65rem]">{day.month}</span>
+                          <span className="font-display text-xl leading-none font-semibold">
+                            {day.day}
+                          </span>
+                          <span className="text-[0.78rem]">{day.month}</span>
                         </button>
                       )
                     })}
@@ -316,7 +354,9 @@ export function ReservationWizard({ onCreated }) {
                     onChange={(event) => update('reservationDate', event.target.value)}
                     className={FIELD}
                   />
-                  <p className="text-xs text-body-faint">Choose your total table time below; the price updates automatically.</p>
+                  <p className="text-xs text-body-faint">
+                    Choose your total table time below; the price updates automatically.
+                  </p>
                 </div>
 
                 <div className="flex flex-col gap-2.5">
@@ -377,7 +417,9 @@ export function ReservationWizard({ onCreated }) {
                       )
                     })}
                   </div>
-                  <p className="text-xs text-body-faint">Pricing is calculated in Bangladeshi Taka based on your selected table and time.</p>
+                  <p className="text-xs text-body-faint">
+                    Pricing is calculated in Bangladeshi Taka based on your selected table and time.
+                  </p>
                 </div>
               </>
             )}
@@ -386,7 +428,9 @@ export function ReservationWizard({ onCreated }) {
             {step === 1 && (
               <>
                 <div className="flex flex-col gap-1">
-                  <h2 className="font-display text-lg font-semibold text-body">Who&rsquo;s coming?</h2>
+                  <h2 className="font-display text-lg font-semibold text-body">
+                    Who&rsquo;s coming?
+                  </h2>
                   <p className="text-sm text-body-muted">
                     We&rsquo;ll match you to a table that seats everyone.
                   </p>
@@ -483,7 +527,9 @@ export function ReservationWizard({ onCreated }) {
             {step === 2 && (
               <>
                 <div className="flex flex-col gap-1">
-                  <h2 className="font-display text-lg font-semibold text-body">Choose your table</h2>
+                  <h2 className="font-display text-lg font-semibold text-body">
+                    Choose your table
+                  </h2>
                   <p className="text-sm text-body-muted">
                     Tables too small for {form.guestCount || 'your party'} are shown unavailable.
                   </p>
@@ -539,30 +585,99 @@ export function ReservationWizard({ onCreated }) {
 
                 <div className="flex flex-col gap-4 rounded-2xl border border-gold-300 bg-gold-100/60 p-5 dark:border-gold-700 dark:bg-gold-100/10">
                   <div>
-                    <span className={LABEL}>Table reservation cost ({durationLabel(durationMinutes)})</span>
-                    <p className="mt-1 text-sm font-semibold text-body">{selectedTable ? money(reservationCost) : 'Select a table first'}</p>
-                    <p className="mt-1 text-xs text-body-muted">Required 20% advance: {selectedTable ? money(advanceAmount) : 'Select a table first'}.</p>
+                    <span className={LABEL}>
+                      Table reservation cost ({durationLabel(durationMinutes)})
+                    </span>
+                    <p className="mt-1 text-sm font-semibold text-body">
+                      {selectedTable ? money(reservationCost) : 'Select a table first'}
+                    </p>
+                    <p className="mt-1 text-xs text-body-muted">
+                      Required {ADVANCE_PERCENT}% advance:{' '}
+                      {selectedTable ? money(advanceAmount) : 'Select a table first'}.
+                    </p>
                     <p className="mt-2 text-sm font-semibold text-body">
-                      Pay to {paymentContact?.restaurantName || 'FoodFusion'}: {paymentContact?.restaurantPhone || 'Contact the restaurant'}
+                      Pay to {paymentContact?.restaurantName || 'FoodFusion'}:{' '}
+                      {paymentContact?.restaurantPhone || 'Contact the restaurant'}
                     </p>
                   </div>
-                  <input
-                    value={form.paymentReference}
-                    onChange={(event) => update('paymentReference', event.target.value)}
-                    className={FIELD}
-                    placeholder="Transaction ID / Reference ID"
-                  />
-                  <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-rule bg-card px-4 py-3 text-sm text-body-muted">
-                    <Upload className="h-4 w-4" />
-                    <span>{form.paymentProof ? form.paymentProof.name : 'Upload payment screenshot or photo'}</span>
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      onChange={(event) => update('paymentProof', event.target.files?.[0] ?? null)}
-                      className="sr-only"
-                    />
-                  </label>
-                  <p className="text-xs text-body-faint">Your proof is sent to the restaurant for verification before the reservation is confirmed.</p>
+                  <div
+                    role="radiogroup"
+                    aria-label="How to pay the advance"
+                    className="grid gap-2 sm:grid-cols-2"
+                  >
+                    {[
+                      {
+                        value: 'ONLINE',
+                        title: 'Pay online now',
+                        hint: 'Card, bKash, Nagad, Rocket via SSLCommerz',
+                        icon: ShieldCheck,
+                      },
+                      {
+                        value: 'MANUAL',
+                        title: 'Pay manually',
+                        hint: 'Send money, then add the TrxID or a screenshot',
+                        icon: Upload,
+                      },
+                    ].map(({ value, title, hint, icon: Icon }) => {
+                      const active = form.paymentMethod === value
+                      return (
+                        <button
+                          key={value}
+                          type="button"
+                          role="radio"
+                          aria-checked={active}
+                          onClick={() => update('paymentMethod', value)}
+                          className={`flex items-start gap-3 rounded-xl border-2 p-3.5 text-left transition-colors ${
+                            active
+                              ? 'border-gold-500 bg-card'
+                              : 'border-rule bg-card/60 hover:border-gold-300'
+                          }`}
+                        >
+                          <Icon className="mt-0.5 h-5 w-5 flex-none text-gold-700 dark:text-gold-300" />
+                          <span className="flex flex-col">
+                            <span className="text-sm font-semibold text-body">{title}</span>
+                            <span className="text-xs text-body-muted">{hint}</span>
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                  {form.paymentMethod === 'ONLINE' ? (
+                    <p className="text-xs text-body-faint">
+                      After you confirm, you&rsquo;ll be taken to SSLCommerz&rsquo;s secure page to
+                      pay {selectedTable ? money(advanceAmount) : 'the advance'}. Your booking is
+                      confirmed once the payment goes through.
+                    </p>
+                  ) : (
+                    <>
+                      <input
+                        value={form.paymentReference}
+                        onChange={(event) => update('paymentReference', event.target.value)}
+                        className={FIELD}
+                        placeholder="Transaction ID / Reference ID"
+                      />
+                      <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-rule bg-card px-4 py-3 text-sm text-body-muted">
+                        <Upload className="h-4 w-4" />
+                        <span>
+                          {form.paymentProof
+                            ? form.paymentProof.name
+                            : 'Upload payment screenshot or photo'}
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          onChange={(event) =>
+                            update('paymentProof', event.target.files?.[0] ?? null)
+                          }
+                          className="sr-only"
+                        />
+                      </label>
+                      <p className="text-xs text-body-faint">
+                        Your proof is sent to the restaurant for verification before the reservation
+                        is confirmed.
+                      </p>
+                    </>
+                  )}
                 </div>
 
                 <div className="flex flex-col gap-1.5">
@@ -589,7 +704,11 @@ export function ReservationWizard({ onCreated }) {
                   <div className="grid gap-3 sm:grid-cols-2">
                     {[
                       { value: false, title: 'Reserve only', hint: 'Order when you arrive' },
-                      { value: true, title: 'Reserve + pre-order', hint: 'Food ready as you sit down' },
+                      {
+                        value: true,
+                        title: 'Reserve + pre-order',
+                        hint: 'Food ready as you sit down',
+                      },
                     ].map(({ value, title, hint }) => {
                       const active = preOrder === value
                       return (

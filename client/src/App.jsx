@@ -52,6 +52,9 @@ import WaiterOrdersPage from '@/pages/staff/waiter/WaiterOrdersPage'
 import WaiterTablesPage from '@/pages/staff/waiter/WaiterTablesPage'
 import WaiterReservationsPage from '@/pages/staff/waiter/WaiterReservationsPage'
 import StaffSettingsPage from '@/pages/staff/StaffSettingsPage'
+import MyPayslipsPage from '@/pages/staff/MyPayslipsPage'
+import PaymentResultPage from '@/pages/payments/PaymentResultPage'
+import PayrollPage from '@/pages/dashboard/payroll/PayrollPage'
 import NotFound from '@/pages/NotFound'
 import Unauthorized from '@/pages/Unauthorized'
 
@@ -95,6 +98,7 @@ const router = createBrowserRouter([
           { path: '/bills', element: <MyBillsPage /> },
           { path: '/loyalty', element: <LoyaltyPage /> },
           { path: '/favorites', element: <FavoritesPage /> },
+          { path: '/payment/result', element: <PaymentResultPage /> },
         ],
       },
     ],
@@ -112,7 +116,10 @@ const router = createBrowserRouter([
       { path: '/staff/orders', element: <StaffOrdersRedirect /> },
       { path: '/staff/inventory', element: <Navigate to="/staff/chef/inventory" replace /> },
       { path: '/staff/tables', element: <Navigate to="/staff/waiter/tables" replace /> },
-      { path: '/staff/reservations', element: <Navigate to="/staff/waiter/reservations" replace /> },
+      {
+        path: '/staff/reservations',
+        element: <Navigate to="/staff/waiter/reservations" replace />,
+      },
       { path: '/staff/profile', element: <StaffProfileRedirect /> },
       { path: '/staff/settings', element: <StaffSettingsRedirect /> },
 
@@ -127,7 +134,11 @@ const router = createBrowserRouter([
               { path: '/staff/chef/orders', element: <ChefOrdersPage /> },
               { path: '/staff/chef/inventory', element: <ChefInventoryPage /> },
               { path: '/staff/chef/profile', element: <ProfilePage /> },
-              { path: '/staff/chef/settings', element: <StaffSettingsPage profilePath="/staff/chef/profile" /> },
+              { path: '/staff/chef/payslips', element: <MyPayslipsPage /> },
+              {
+                path: '/staff/chef/settings',
+                element: <StaffSettingsPage profilePath="/staff/chef/profile" />,
+              },
             ],
           },
         ],
@@ -145,7 +156,11 @@ const router = createBrowserRouter([
               { path: '/staff/waiter/tables', element: <WaiterTablesPage /> },
               { path: '/staff/waiter/reservations', element: <WaiterReservationsPage /> },
               { path: '/staff/waiter/profile', element: <ProfilePage /> },
-              { path: '/staff/waiter/settings', element: <StaffSettingsPage profilePath="/staff/waiter/profile" /> },
+              { path: '/staff/waiter/payslips', element: <MyPayslipsPage /> },
+              {
+                path: '/staff/waiter/settings',
+                element: <StaffSettingsPage profilePath="/staff/waiter/profile" />,
+              },
             ],
           },
         ],
@@ -175,14 +190,40 @@ const router = createBrowserRouter([
       {
         element: <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]} />,
         children: [
-          { index: true, path: '/dashboard', element: <DashboardHome />, handle: { title: 'Dashboard' } },
-          { path: '/dashboard/menu', element: <MenuItemsPage />, handle: { title: 'Menu Management' } },
-          { path: '/dashboard/categories', element: <CategoriesPage />, handle: { title: 'Categories' } },
+          {
+            index: true,
+            path: '/dashboard',
+            element: <DashboardHome />,
+            handle: { title: 'Dashboard' },
+          },
+          {
+            path: '/dashboard/menu',
+            element: <MenuItemsPage />,
+            handle: { title: 'Menu Management' },
+          },
+          {
+            path: '/dashboard/categories',
+            element: <CategoriesPage />,
+            handle: { title: 'Categories' },
+          },
           { path: '/dashboard/tables', element: <TablesPage />, handle: { title: 'Tables' } },
-          { path: '/dashboard/reservations', element: <ReservationsPage />, handle: { title: 'Reservations' } },
-          { path: '/dashboard/customers', element: <CustomersPage />, handle: { title: 'Customers' } },
+          {
+            path: '/dashboard/reservations',
+            element: <ReservationsPage />,
+            handle: { title: 'Reservations' },
+          },
+          {
+            path: '/dashboard/customers',
+            element: <CustomersPage />,
+            handle: { title: 'Customers' },
+          },
           { path: '/dashboard/staff', element: <StaffPage />, handle: { title: 'Staff' } },
-          { path: '/dashboard/inventory', element: <InventoryPage />, handle: { title: 'Inventory' } },
+          { path: '/dashboard/payroll', element: <PayrollPage />, handle: { title: 'Payroll' } },
+          {
+            path: '/dashboard/inventory',
+            element: <InventoryPage />,
+            handle: { title: 'Inventory' },
+          },
           { path: '/dashboard/reports', element: <ReportsPage />, handle: { title: 'Reports' } },
           { path: '/dashboard/settings', element: <SettingsPage />, handle: { title: 'Settings' } },
         ],

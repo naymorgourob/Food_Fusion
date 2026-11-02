@@ -46,7 +46,7 @@ export function AdminTableCard({ table, todayReservation, onView, onEdit, onDele
           <span className="font-display text-2xl font-bold text-body leading-none">
             {table.number}
           </span>
-          <span className="text-[0.65rem] font-semibold uppercase tracking-widest text-body-faint">
+          <span className="text-[0.78rem] font-semibold uppercase tracking-widest text-body-faint">
             Table
           </span>
         </div>
@@ -82,7 +82,7 @@ export function AdminTableCard({ table, todayReservation, onView, onEdit, onDele
               />
             ))}
             {table.capacity > 8 && (
-              <span className="text-[0.6rem] font-bold text-body-faint">+{table.capacity - 8}</span>
+              <span className="text-[0.72rem] font-bold text-body-faint">+{table.capacity - 8}</span>
             )}
           </div>
         </div>
@@ -95,12 +95,12 @@ export function AdminTableCard({ table, todayReservation, onView, onEdit, onDele
         {/* Today's reservation (if any) */}
         {todayReservation ? (
           <div className="flex flex-col gap-0.5 rounded-xl border border-warning-soft bg-warning-soft/40 px-3 py-2.5">
-            <span className="flex items-center gap-1.5 text-[0.65rem] font-bold uppercase tracking-wide text-warning">
+            <span className="flex items-center gap-1.5 text-[0.78rem] font-bold uppercase tracking-wide text-warning">
               <CalendarDays className="h-3 w-3" />
               Today's reservation
             </span>
             <span className="text-xs font-semibold text-body">{todayReservation.customerName}</span>
-            <span className="text-[0.65rem] text-body-faint">
+            <span className="text-[0.78rem] text-body-faint">
               {todayReservation.guestCount} guests · {todayReservation.reservationTime}
             </span>
           </div>

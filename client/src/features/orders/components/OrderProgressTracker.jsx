@@ -55,7 +55,9 @@ export function OrderProgressTracker({ orderType, status }) {
               </span>
             </div>
             {!isLast && (
-              <div className={`mt-4 h-0.5 flex-1 transition-colors ${isComplete ? 'bg-ember-600' : 'bg-border'}`} />
+              <div
+                className={`mt-4 h-0.5 flex-1 transition-colors ${isComplete ? 'bg-ember-600' : 'bg-border'}`}
+              />
             )}
           </Fragment>
         )

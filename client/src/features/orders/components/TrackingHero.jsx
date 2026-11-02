@@ -111,11 +111,18 @@ export function TrackingHero({ order }) {
           </svg>
 
           <span className="absolute flex flex-col items-center gap-1">
-            <StatusIcon className={`h-7 w-7 ${cancelled ? 'text-white/60' : 'text-gold-300'}`} strokeWidth={1.75} />
+            <StatusIcon
+              className={`h-7 w-7 ${cancelled ? 'text-white/60' : 'text-gold-300'}`}
+              strokeWidth={1.75}
+            />
             {!cancelled && (
               <>
-                <span className="font-display text-3xl leading-none font-semibold">{progress}%</span>
-                <span className="text-[0.65rem] tracking-wide text-white/60 uppercase">complete</span>
+                <span className="font-display text-3xl leading-none font-semibold">
+                  {progress}%
+                </span>
+                <span className="text-[0.78rem] tracking-wide text-white/60 uppercase">
+                  complete
+                </span>
               </>
             )}
           </span>
@@ -175,7 +182,9 @@ export function TrackingHero({ order }) {
             <span className="flex items-center justify-center gap-2 text-sm text-white/70 sm:justify-start">
               <UserRound className="h-4 w-4 text-gold-300" />
               {order.assignedStaff.fullName}
-              <span className="text-white/45">· {order.assignedStaff.position ?? 'Your server'}</span>
+              <span className="text-white/45">
+                · {order.assignedStaff.position ?? 'Your server'}
+              </span>
             </span>
           )}
         </div>

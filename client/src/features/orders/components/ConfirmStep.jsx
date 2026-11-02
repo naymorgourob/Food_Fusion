@@ -1,4 +1,13 @@
-import { UtensilsCrossed, Bike, ShoppingBag, MapPin, Clock, Users, CreditCard, ScrollText } from 'lucide-react'
+import {
+  UtensilsCrossed,
+  Bike,
+  ShoppingBag,
+  MapPin,
+  Clock,
+  Users,
+  CreditCard,
+  ScrollText,
+} from 'lucide-react'
 import { getImageUrl } from '@/constants'
 import { money } from '@/utils/format'
 import { PAYMENT_METHODS } from '@/features/orders/components/PaymentMethodStep'
@@ -81,7 +90,7 @@ export function ConfirmStep({
               <li key={item.id} className="flex items-center gap-3">
                 <div className="h-12 w-12 flex-none overflow-hidden rounded-lg bg-canvas-2">
                   {image ? (
-                    <img src={image} alt="" className="h-full w-full object-cover" />
+                    <img src={image} alt="" className="h-full w-full object-contain" />
                   ) : (
                     <span className="flex h-full w-full items-center justify-center">
                       <UtensilsCrossed className="h-4 w-4 text-brand-200 dark:text-brand-400/50" />
@@ -92,7 +101,9 @@ export function ConfirmStep({
                   <span className="truncate text-sm font-medium text-body">
                     {item.name} <span className="text-body-faint">×{quantity}</span>
                   </span>
-                  {notes && <span className="truncate text-xs text-body-faint italic">“{notes}”</span>}
+                  {notes && (
+                    <span className="truncate text-xs text-body-faint italic">“{notes}”</span>
+                  )}
                 </div>
                 <span className="flex-none text-sm font-semibold text-body">
                   {money(Number(item.price) * quantity)}

@@ -10,7 +10,11 @@ const EMPTY_FORM = { name: '', description: '', isActive: true }
 // state, read once per mount, never goes stale — no reset effect needed.
 function getInitialForm(category) {
   if (!category) return EMPTY_FORM
-  return { name: category.name, description: category.description ?? '', isActive: category.isActive }
+  return {
+    name: category.name,
+    description: category.description ?? '',
+    isActive: category.isActive,
+  }
 }
 
 /**
@@ -81,7 +85,10 @@ export function CategoryFormModal({ isOpen, onClose, onSubmit, category, isSubmi
             className="relative flex max-h-[92vh] w-full max-w-md flex-col overflow-hidden rounded-t-3xl bg-card shadow-2xl sm:rounded-3xl"
           >
             <header className="flex flex-none items-center justify-between border-b border-rule px-6 py-4">
-              <h2 id="category-form-title" className="flex items-center gap-2.5 font-display text-lg font-semibold text-body">
+              <h2
+                id="category-form-title"
+                className="flex items-center gap-2.5 font-display text-lg font-semibold text-body"
+              >
                 <Tag className="h-4 w-4 text-brand-700 dark:text-brand-400" />
                 {isEditing ? 'Edit category' : 'Add category'}
               </h2>
@@ -95,7 +102,11 @@ export function CategoryFormModal({ isOpen, onClose, onSubmit, category, isSubmi
               </button>
             </header>
 
-            <form id="category-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-5">
+            <form
+              id="category-form"
+              onSubmit={handleSubmit}
+              className="flex-1 overflow-y-auto px-6 py-5"
+            >
               <div className="flex flex-col gap-5">
                 {errors.length > 0 && (
                   <ul
@@ -143,7 +154,8 @@ export function CategoryFormModal({ isOpen, onClose, onSubmit, category, isSubmi
                   <span className="flex flex-col gap-0.5">
                     <span className="text-sm font-medium text-body">Active</span>
                     <span className="text-xs text-body-faint">
-                      Inactive categories stay on the menu but are hidden from customers browsing by status.
+                      Inactive categories stay on the menu but are hidden from customers browsing by
+                      status.
                     </span>
                   </span>
                   <span className="relative inline-flex h-6 w-11 flex-none items-center">

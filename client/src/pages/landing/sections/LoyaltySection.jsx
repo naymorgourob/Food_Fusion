@@ -33,15 +33,15 @@ export function LoyaltySection() {
     <Section tone="alt">
       <Container>
         <Reveal>
-          <div className="relative isolate overflow-hidden rounded-[2rem] bg-brand-800 px-7 py-14 sm:px-12 lg:px-16 lg:py-20">
+          <div className="relative isolate overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#4a3a2e_0%,#3a2e25_55%,#2f2620_100%)] px-7 py-14 ring-1 ring-gold-300/15 sm:px-12 lg:px-16 lg:py-20">
             {/* Gold bloom, top-right, keeping the panel from reading flat. */}
             <span
               aria-hidden
-              className="pointer-events-none absolute -top-24 -right-16 -z-10 h-80 w-80 rounded-full bg-gold-500/20 blur-3xl"
+              className="pointer-events-none absolute -top-24 -right-16 -z-10 h-80 w-80 rounded-full bg-gold-500/25 blur-3xl"
             />
             <span
               aria-hidden
-              className="pointer-events-none absolute inset-0 -z-10 opacity-[0.07]"
+              className="pointer-events-none absolute inset-0 -z-10 opacity-[0.04]"
               style={{
                 backgroundImage:
                   'linear-gradient(to right, #FFF 1px, transparent 1px), linear-gradient(to bottom, #FFF 1px, transparent 1px)',
@@ -53,14 +53,14 @@ export function LoyaltySection() {
               <div className="flex flex-col gap-6">
                 <span className="flex items-center gap-3">
                   <span className="h-px w-8 bg-gold-300" />
-                  <span className="text-xs font-semibold tracking-[0.22em] text-gold-300 uppercase">
+                  <span className="text-sm font-semibold tracking-[0.22em] text-gold-300 uppercase">
                     Loyalty programme
                   </span>
                 </span>
                 <h2 className="font-display text-3xl leading-[1.15] font-semibold text-white text-balance sm:text-4xl">
                   Eat well. Get rewarded for it.
                 </h2>
-                <p className="text-base leading-relaxed text-white/75">
+                <p className="text-lg leading-relaxed text-white/80">
                   Join once and every order counts toward your next one. No card, no app — points
                   land on your account the moment an order is completed.
                 </p>
@@ -69,15 +69,15 @@ export function LoyaltySection() {
                   {TIERS.map((tier, index) => (
                     <span key={tier} className="flex items-center gap-2">
                       <span
-                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                        className={`rounded-full px-3.5 py-1.5 text-sm font-semibold ${
                           index === TIERS.length - 1
                             ? 'bg-gold-500 text-charcoal'
-                            : 'bg-white/10 text-white/80'
+                            : 'bg-gold-300/15 text-gold-100'
                         }`}
                       >
                         {tier}
                       </span>
-                      {index < TIERS.length - 1 && <span className="text-white/30">→</span>}
+                      {index < TIERS.length - 1 && <span className="text-gold-300/50">→</span>}
                     </span>
                   ))}
                 </div>
@@ -95,14 +95,14 @@ export function LoyaltySection() {
                   <Reveal
                     key={title}
                     delay={index * 0.08}
-                    className="flex gap-4 rounded-2xl border border-white/12 bg-white/[0.07] p-5 backdrop-blur"
+                    className="flex gap-4 rounded-2xl border border-gold-300/15 bg-[#f3ece4]/[0.06] p-6 backdrop-blur"
                   >
-                    <span className="flex h-11 w-11 flex-none items-center justify-center rounded-xl bg-gold-500/15 text-gold-300">
-                      <Icon className="h-5 w-5" strokeWidth={1.75} />
+                    <span className="flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-gold-500/20 text-gold-300">
+                      <Icon className="h-6 w-6" strokeWidth={1.75} />
                     </span>
                     <div className="flex flex-col gap-1">
-                      <h3 className="font-display text-base font-semibold text-white">{title}</h3>
-                      <p className="text-sm leading-relaxed text-white/70">{description}</p>
+                      <h3 className="font-display text-xl font-semibold text-white">{title}</h3>
+                      <p className="text-base leading-relaxed text-white/75">{description}</p>
                     </div>
                   </Reveal>
                 ))}

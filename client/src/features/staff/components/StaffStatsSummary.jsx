@@ -82,7 +82,7 @@ export function StaffStatsSummary({ staff, activeStatusFilter, onStatusFilterCha
               <span className="font-display text-2xl font-bold text-body leading-none">
                 {card.value}
               </span>
-              <span className="mt-1 text-[11px] text-body-faint">{card.sublabel}</span>
+              <span className="mt-1 text-[0.8rem] text-body-faint">{card.sublabel}</span>
             </div>
           </Component>
         )

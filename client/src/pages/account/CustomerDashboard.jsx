@@ -31,7 +31,14 @@ import { money, orderNo } from '@/utils/format'
 import { AMBIENCE_IMAGE } from '@/pages/landing/content'
 import { ROUTES } from '@/constants'
 
-const ACTIVE_ORDER_STATUSES = new Set(['PENDING', 'ACCEPTED', 'PREPARING', 'READY', 'ON_THE_WAY', 'SERVED'])
+const ACTIVE_ORDER_STATUSES = new Set([
+  'PENDING',
+  'ACCEPTED',
+  'PREPARING',
+  'READY',
+  'ON_THE_WAY',
+  'SERVED',
+])
 const UPCOMING_RESERVATION_STATUSES = new Set(['PENDING', 'CONFIRMED'])
 
 const QUICK_ACTIONS = [
@@ -68,7 +75,13 @@ export function CustomerDashboard({ context }) {
   const { summary: loyaltySummary, isLoading: loyaltyLoading } = loyalty
 
   const { bills, isLoading: billsLoading } = useBills()
-  const { favorites, isLoading: favoritesLoading, isFavorite, toggleFavorite, pendingId } = useFavorites()
+  const {
+    favorites,
+    isLoading: favoritesLoading,
+    isFavorite,
+    toggleFavorite,
+    pendingId,
+  } = useFavorites()
   const { items: recommended, isLoading: recommendedLoading } = useRecommendedItems(8)
 
   // Newest first — orders arrive sorted by createdAt desc from the API.
@@ -90,16 +103,24 @@ export function CustomerDashboard({ context }) {
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
       {/* --- Welcome hero ------------------------------------------------ */}
       <Rise>
-        <section className="relative isolate overflow-hidden rounded-3xl">
-          <img
-            src={AMBIENCE_IMAGE.src}
-            alt=""
-            aria-hidden
-            className="absolute inset-0 -z-20 h-full w-full object-cover"
-          />
-          <span aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-r from-brand-900/95 via-brand-900/85 to-brand-900/50" />
+        {/* The dining-room photo is shown whole on the right (it's nearly
+            square, so a full-width background crops most of it away); on
+            small screens it sits on top instead. */}
+        <section className="relative isolate grid overflow-hidden rounded-3xl bg-brand-900 lg:min-h-[32rem] lg:grid-cols-[1fr_minmax(0,34rem)]">
+          <div className="relative order-first aspect-[1200/1130] max-h-80 w-full sm:max-h-96 lg:order-last lg:max-h-none lg:h-full">
+            <img
+              src={AMBIENCE_IMAGE.src}
+              alt={AMBIENCE_IMAGE.alt}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            {/* Feathers the photo into the panel so there's no hard seam. */}
+            <span
+              aria-hidden
+              className="absolute inset-0 bg-gradient-to-t from-brand-900 via-transparent to-transparent lg:bg-gradient-to-r lg:from-brand-900 lg:via-brand-900/20"
+            />
+          </div>
 
-          <div className="flex flex-col gap-6 p-7 sm:p-10">
+          <div className="flex flex-col justify-center gap-7 p-7 sm:p-10 lg:p-14">
             <div className="flex flex-col gap-3">
               <span className="flex items-center gap-2.5">
                 <span className="h-px w-7 bg-gold-300" />
@@ -107,10 +128,10 @@ export function CustomerDashboard({ context }) {
                   Tonight at FoodFusion
                 </span>
               </span>
-              <h1 className="max-w-xl font-display text-2xl leading-tight font-semibold text-white text-balance sm:text-3xl lg:text-4xl">
+              <h1 className="max-w-xl font-display text-3xl leading-tight font-semibold text-white text-balance sm:text-4xl lg:text-5xl">
                 Welcome back, {firstName}. Your table is always ready.
               </h1>
-              <p className="max-w-lg text-sm leading-relaxed text-white/75 sm:text-base">
+              <p className="max-w-lg text-base leading-relaxed text-white/75 sm:text-lg">
                 The autumn tasting menu has just landed — and members earn double points on dine-in
                 orders this week.
               </p>
@@ -119,14 +140,14 @@ export function CustomerDashboard({ context }) {
             <div className="flex flex-wrap gap-3">
               <Link
                 to={`${ROUTES.ORDERS}/new`}
-                className="group inline-flex items-center gap-2 rounded-full bg-gold-500 px-5 py-3 text-sm font-bold text-charcoal transition-all hover:-translate-y-0.5 hover:bg-gold-400"
+                className="group inline-flex items-center gap-2 rounded-full bg-gold-500 px-6 py-3.5 text-base font-bold text-charcoal transition-all hover:-translate-y-0.5 hover:bg-gold-400"
               >
                 Order food
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
               <Link
                 to={ROUTES.RESERVATIONS}
-                className="inline-flex items-center gap-2 rounded-full border border-white/30 px-5 py-3 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/10"
+                className="inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3.5 text-base font-semibold text-white backdrop-blur transition-colors hover:bg-white/10"
               >
                 <CalendarPlus className="h-4 w-4" />
                 Reserve a table
@@ -236,7 +257,10 @@ export function CustomerDashboard({ context }) {
               ) : (
                 <div className="flex flex-col gap-3">
                   {recentOrders.map((order) => (
-                    <Card key={order.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4">
+                    <Card
+                      key={order.id}
+                      className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4"
+                    >
                       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="font-display text-sm font-semibold text-body">
@@ -246,7 +270,9 @@ export function CustomerDashboard({ context }) {
                           <OrderStatusBadge status={order.status} />
                         </div>
                         <p className="truncate text-xs text-body-muted">
-                          {order.items.map((item) => `${item.menuItem.name} ×${item.quantity}`).join(', ')}
+                          {order.items
+                            .map((item) => `${item.menuItem.name} ×${item.quantity}`)
+                            .join(', ')}
                         </p>
                       </div>
 
@@ -315,7 +341,9 @@ export function CustomerDashboard({ context }) {
                               month: 'short',
                             })}
                           </span>
-                          <span className="text-xs text-body-muted">{reservation.reservationTime}</span>
+                          <span className="text-xs text-body-muted">
+                            {reservation.reservationTime}
+                          </span>
                         </div>
                         <ReservationStatusBadge status={reservation.status} />
                       </div>
@@ -323,7 +351,8 @@ export function CustomerDashboard({ context }) {
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-body-muted">
                         <span className="flex items-center gap-1">
                           <Users className="h-3.5 w-3.5" />
-                          {reservation.guestCount} {reservation.guestCount === 1 ? 'guest' : 'guests'}
+                          {reservation.guestCount}{' '}
+                          {reservation.guestCount === 1 ? 'guest' : 'guests'}
                         </span>
                         <span>Table {reservation.table?.number}</span>
                         {reservation.occasion && (

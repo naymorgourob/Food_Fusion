@@ -1,30 +1,65 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Heart, Plus, ArrowRight } from 'lucide-react'
-import { Container, Section, SectionHeading, Reveal, Rating, Button, Photo } from '@/components/landing/primitives'
-import { MENU_CATEGORIES, MENU_ITEMS } from '@/pages/landing/content'
+import { Heart, Plus, ArrowRight, Clock } from 'lucide-react'
+import {
+  Container,
+  Section,
+  SectionHeading,
+  Reveal,
+  Button,
+} from '@/components/landing/primitives'
+import { useCategories } from '@/features/menu/hooks/useCategories'
+import { useMenuItems } from '@/features/menu/hooks/useMenuItems'
+import { FullPhoto } from '@/features/menu/components/FullPhoto'
 import { ROUTES } from '@/constants'
 import { money } from '@/utils/format'
 
+const SHOWN = 4
+
+// Tabs over the real menu. "Chef's picks" is the isChefPick flag; the rest
+// are real categories, matched by name so a renamed or removed category
+// simply drops its tab instead of breaking the section.
+const TABS = [
+  { label: "Chef's picks", tag: 'chef' },
+  { label: 'Bangladeshi', match: /bangla/i },
+  { label: 'Mains', match: /main course/i },
+  { label: 'Coffee', match: /^coffee$/i },
+  { label: 'Desserts', match: /dessert/i },
+]
 
 /**
  * Section 5 — Featured Menu.
  *
- * "Popular" is a computed view over isPopular rather than a category on the
- * items themselves, so a dish can be both a Burger and popular without
- * being duplicated in the data.
+ * Shows real dishes from the menu API (which is public), so everything a
+ * visitor sees here can actually be ordered. No ratings are shown: the menu
+ * doesn't store any, and made-up stars would mislead.
  *
  * The favourite heart is local, optimistic state on purpose: this is the
  * public page and a visitor may not be signed in. Adding to the cart sends
  * them into the real ordering flow, which is where auth is enforced.
  */
 export function MenuSection() {
-  const [category, setCategory] = useState('Popular')
+  const [tabLabel, setTabLabel] = useState(TABS[0].label)
   const [favorites, setFavorites] = useState(() => new Set())
+  const { categories } = useCategories()
 
-  const visible =
-    category === 'Popular' ? MENU_ITEMS.filter((item) => item.isPopular) : MENU_ITEMS.filter((item) => item.category === category)
+  const tabs = TABS.map((tab) => ({
+    ...tab,
+    categoryId: tab.match
+      ? categories.find((category) => tab.match.test(category.name))?.id
+      : undefined,
+  })).filter((tab) => tab.tag || tab.categoryId)
+  const tab = tabs.find((candidate) => candidate.label === tabLabel) ?? tabs[0]
+
+  const { items, isLoading } = useMenuItems({
+    isAvailable: 'true',
+    tag: tab?.tag,
+    categoryId: tab?.categoryId,
+    sortBy: 'newest',
+    page: 1,
+    pageSize: SHOWN,
+  })
 
   function toggleFavorite(id) {
     setFavorites((current) => {
@@ -46,13 +81,13 @@ export function MenuSection() {
 
         {/* Category tabs */}
         <Reveal className="flex flex-wrap justify-center gap-2">
-          {MENU_CATEGORIES.map((name) => {
-            const active = name === category
+          {tabs.map(({ label: name }) => {
+            const active = name === tab?.label
             return (
               <button
                 key={name}
                 type="button"
-                onClick={() => setCategory(name)}
+                onClick={() => setTabLabel(name)}
                 aria-pressed={active}
                 className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${
                   active
@@ -70,7 +105,12 @@ export function MenuSection() {
           {/* AnimatePresence + layout keeps the grid from snapping when the
               filter changes — cards fade and settle into their new slots. */}
           <AnimatePresence mode="popLayout">
-            {visible.map((item) => (
+            {isLoading &&
+              items.length === 0 &&
+              Array.from({ length: SHOWN }).map((_, index) => (
+                <div key={`skeleton-${index}`} className="skeleton h-96 rounded-3xl" aria-hidden />
+              ))}
+            {items.map((item) => (
               <motion.article
                 key={item.id}
                 layout
@@ -81,12 +121,7 @@ export function MenuSection() {
                 className="group flex flex-col overflow-hidden rounded-3xl border border-rule bg-card shadow-lg shadow-brand-900/5 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-brand-900/12"
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
-                  <Photo
-                    src={item.image}
-                    alt={item.alt}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
+                  <FullPhoto dish={item} zoomOnHover />
                   <button
                     type="button"
                     onClick={() => toggleFavorite(item.id)}
@@ -105,7 +140,7 @@ export function MenuSection() {
                     />
                   </button>
                   <span className="absolute bottom-3 left-3 rounded-full bg-charcoal/80 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur">
-                    {item.category}
+                    {item.category?.name}
                   </span>
                 </div>
 
@@ -118,11 +153,20 @@ export function MenuSection() {
                       {money(item.price)}
                     </span>
                   </div>
-                  <p className="flex-1 text-sm leading-relaxed text-body-muted">{item.description}</p>
+                  <p className="flex-1 text-sm leading-relaxed text-body-muted">
+                    {item.description}
+                  </p>
                   <div className="flex items-center justify-between gap-3 pt-1">
-                    <Rating value={item.rating} />
+                    {item.prepTimeMinutes ? (
+                      <span className="flex items-center gap-1.5 text-sm text-body-faint">
+                        <Clock className="h-4 w-4" />
+                        Ready in ~{item.prepTimeMinutes} min
+                      </span>
+                    ) : (
+                      <span />
+                    )}
                     <Link
-                      to={`${ROUTES.ORDERS}/new`}
+                      to={`${ROUTES.ORDERS}/new?q=${encodeURIComponent(item.name)}`}
                       aria-label={`Add ${item.name} to your order`}
                       className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-700 text-white transition-all hover:scale-110 hover:bg-brand-800"
                     >
@@ -136,7 +180,13 @@ export function MenuSection() {
         </div>
 
         <Reveal className="flex justify-center">
-          <Button as={Link} to={`${ROUTES.ORDERS}/new`} variant="outline" size="lg" className="group">
+          <Button
+            as={Link}
+            to={`${ROUTES.ORDERS}/new`}
+            variant="outline"
+            size="lg"
+            className="group"
+          >
             View the full menu
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Button>

@@ -74,8 +74,16 @@ export function ReservationHero({ onStart }) {
         <div className="grid gap-3 border-t border-white/15 pt-6 sm:grid-cols-3">
           {[
             { icon: Clock, title: 'Pick your arrival', body: 'Tell us when you plan to walk in.' },
-            { icon: ChefHat, title: 'We start early', body: 'The kitchen begins before you arrive.' },
-            { icon: Utensils, title: 'Eat straight away', body: 'Your first course lands as you sit.' },
+            {
+              icon: ChefHat,
+              title: 'We start early',
+              body: 'The kitchen begins before you arrive.',
+            },
+            {
+              icon: Utensils,
+              title: 'Eat straight away',
+              body: 'Your first course lands as you sit.',
+            },
           ].map(({ icon: Icon, title, body }) => (
             <div key={title} className="flex items-start gap-3">
               <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-white/10 text-gold-300">

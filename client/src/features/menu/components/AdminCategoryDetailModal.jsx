@@ -69,15 +69,16 @@ export function AdminCategoryDetailModal({ category, isOpen, onClose, onEdit, on
                 <UtensilsCrossed className="h-7 w-7" strokeWidth={1.5} />
               </span>
 
-              <h2 id="category-detail-title" className="font-display text-xl font-semibold text-body">
+              <h2
+                id="category-detail-title"
+                className="font-display text-xl font-semibold text-body"
+              >
                 {category.name}
               </h2>
 
               <span
                 className={`rounded-full px-3 py-1 text-xs font-bold ${
-                  inactive
-                    ? 'bg-canvas-2 text-body-faint'
-                    : 'bg-brand-700 text-white'
+                  inactive ? 'bg-canvas-2 text-body-faint' : 'bg-brand-700 text-white'
                 }`}
               >
                 {inactive ? 'Inactive' : 'Active'}
