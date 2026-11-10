@@ -27,6 +27,8 @@ export async function updateSettings(data) {
     loyaltyPointsPerCurrency,
     loyaltyPointValue,
     firstOrderBonusPoints,
+    openingTime,
+    closingTime,
   } = data
 
   // Built once and spread into both branches — the two used to be
@@ -43,6 +45,8 @@ export async function updateSettings(data) {
     loyaltyPointsPerCurrency,
     loyaltyPointValue,
     firstOrderBonusPoints: Number(firstOrderBonusPoints),
+    openingTime,
+    closingTime,
   }
 
   return prisma.settings.upsert({

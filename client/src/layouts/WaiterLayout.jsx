@@ -3,6 +3,8 @@ import { Outlet } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { WaiterSidebar } from '@/components/staff/WaiterSidebar'
 import { StaffTopBar } from '@/components/staff/StaffTopBar'
+import { RestaurantClosedBanner } from '@/features/settings/components/RestaurantStatus'
+import { useRestaurantStatus } from '@/features/settings/hooks/useRestaurantStatus'
 import { useOrders } from '@/features/orders/hooks/useOrders'
 import { useReservations } from '@/features/reservations/hooks/useReservations'
 import { useTables } from '@/features/tables/hooks/useTables'
@@ -25,7 +27,8 @@ export function WaiterShell({ children }) {
     workspace: 'waiter',
   })
 
-  const context = { orders, reservations, tables }
+  const { isOpen: isRestaurantOpen } = useRestaurantStatus()
+  const context = { orders, reservations, tables, isRestaurantOpen }
 
   function toggleCollapsed() {
     setCollapsed((current) => {
@@ -61,6 +64,7 @@ export function WaiterShell({ children }) {
           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
           className="flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8"
         >
+          <RestaurantClosedBanner message="Orders can't be taken, served or updated until the restaurant opens. You can still view orders, tables and reservations." />
           {typeof children === 'function' ? children(context) : children}
         </motion.main>
       </div>

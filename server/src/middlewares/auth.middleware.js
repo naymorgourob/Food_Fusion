@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { verifyToken } from '../utils/jwt.js'
 import { ApiError } from '../utils/ApiError.js'
+import { getRestaurantStatus, closedMessage } from '../services/restaurantStatus.service.js'
 
 /**
  * Verifies the request carries a valid, unexpired JWT. On success attaches
@@ -52,3 +53,15 @@ export const authorizeCustomer = authorizeRoles('CUSTOMER')
 // write access as Admin on a single route — a combined export instead of
 // stacking two single-role checks on the route.
 export const authorizeStaffOrAdmin = authorizeRoles('ADMIN', 'STAFF')
+
+/**
+ * Blocks order work (placing, accepting, updating) while the restaurant is
+ * closed. Admin is never blocked, so they can still fix things after hours.
+ * Must run after authenticateUser.
+ */
+export async function requireRestaurantOpen(req, res, next) {
+  if (req.user.role === 'ADMIN') return next()
+  const status = await getRestaurantStatus()
+  if (!status.isOpen) throw new ApiError(409, closedMessage(status))
+  next()
+}

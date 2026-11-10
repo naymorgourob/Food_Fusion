@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Menu, Search, Bell, ChevronDown, UserRound, LogOut, Circle } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useClickOutside } from '@/hooks/useClickOutside'
+import { RestaurantStatusBadge } from '@/features/settings/components/RestaurantStatus'
 import { ROUTES } from '@/constants'
 
 function greetingFor(date = new Date()) {
@@ -102,6 +103,7 @@ export function StaffTopBar({ onOpenMobileSidebar, notifications = [], workspace
         </form>
 
         <div className="flex flex-none items-center gap-1 sm:gap-2">
+          <RestaurantStatusBadge className="mr-1" />
           <div ref={notifRef} className="relative">
             <button
               onClick={() => setNotifOpen((open) => !open)}

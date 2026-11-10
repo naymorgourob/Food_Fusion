@@ -10,6 +10,8 @@ import { CheckoutPanel } from '@/features/orders/components/CheckoutPanel'
 import { OrderSuccess } from '@/features/orders/components/OrderSuccess'
 import { PAYMENT_METHODS, PAY_AT_RESTAURANT } from '@/features/orders/components/PaymentMethodStep'
 import { useCart } from '@/features/orders/hooks/useCart'
+import { RestaurantClosedBanner } from '@/features/settings/components/RestaurantStatus'
+import { useRestaurantStatus } from '@/features/settings/hooks/useRestaurantStatus'
 import { useFavorites } from '@/features/favorites/hooks/useFavorites'
 import { useLoyalty } from '@/features/loyalty/hooks/useLoyalty'
 import { fetchTables } from '@/features/tables/services/tableService'
@@ -116,6 +118,7 @@ export default function NewOrderPage() {
 
   const [tables, setTables] = useState([])
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const { isOpen: isRestaurantOpen } = useRestaurantStatus()
   const [errors, setErrors] = useState([])
 
   // Tables come with reservation availability for the slot being booked,
@@ -350,6 +353,10 @@ export default function NewOrderPage() {
 
   return (
     <div className="relative flex flex-col gap-8">
+      {mode !== 'success' && (
+        <RestaurantClosedBanner message="You can browse the menu and fill your cart, but orders can only be placed while we're open." />
+      )}
+
       {(repeatOrderId || favoriteIds) && mode === 'browse' && (
         <p className="rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-800 dark:border-brand-900 dark:bg-brand-900/30 dark:text-brand-100">
           {repeatOrderId
@@ -424,6 +431,7 @@ export default function NewOrderPage() {
           paymentContact={paymentContact}
           errors={errors}
           isSubmitting={isSubmitting}
+          isClosed={!isRestaurantOpen}
           onSubmit={handleSubmit}
           onBackToMenu={backToMenu}
         />

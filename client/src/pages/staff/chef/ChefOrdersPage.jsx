@@ -40,7 +40,7 @@ const TABS = [
 ]
 
 export default function ChefOrdersPage() {
-  const { orders } = useOutletContext()
+  const { orders, isRestaurantOpen } = useOutletContext()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [assignableStaff, setAssignableStaff] = useState([])
@@ -436,7 +436,8 @@ export default function ChefOrdersPage() {
                     <button
                       type="button"
                       onClick={() => setEtaOrder(order)}
-                      className="text-[0.82rem] font-bold text-brand-700 hover:underline dark:text-brand-400"
+                      disabled={!isRestaurantOpen}
+                      className="text-[0.82rem] disabled:cursor-not-allowed disabled:opacity-50 disabled:no-underline font-bold text-brand-700 hover:underline dark:text-brand-400"
                     >
                       {etaIso ? 'Change ETA' : 'Set ETA'}
                     </button>
@@ -484,7 +485,7 @@ export default function ChefOrdersPage() {
                           <button
                             type="button"
                             onClick={() => handleAdvanceStatus(order, 'ACCEPTED')}
-                            disabled={isUpdatingThis || !canAccept}
+                            disabled={isUpdatingThis || !canAccept || !isRestaurantOpen}
                             title={!canAccept ? 'Payment evidence is required before accepting this order' : undefined}
                             className="flex items-center justify-center gap-1.5 rounded-xl border border-rule bg-canvas-2 py-2 text-xs font-semibold text-body hover:bg-canvas disabled:opacity-50"
                           >
@@ -493,7 +494,7 @@ export default function ChefOrdersPage() {
                           <button
                             type="button"
                             onClick={() => setEtaOrder(order)}
-                            disabled={isUpdatingThis || !canAccept}
+                            disabled={isUpdatingThis || !canAccept || !isRestaurantOpen}
                             title={!canAccept ? 'Payment evidence is required before accepting this order' : undefined}
                             className="flex items-center justify-center gap-1.5 rounded-xl bg-brand-700 py-2 text-xs font-bold text-white transition hover:bg-brand-800 shadow-sm disabled:opacity-50"
                           >
@@ -504,7 +505,7 @@ export default function ChefOrdersPage() {
                         <button
                           type="button"
                           onClick={() => handleAdvanceStatus(order, action.status)}
-                          disabled={isUpdatingThis}
+                          disabled={isUpdatingThis || !isRestaurantOpen}
                           className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-700 py-2.5 text-xs font-bold text-white transition hover:bg-brand-800 shadow-sm disabled:opacity-50"
                         >
                           <Check className="h-4 w-4" />

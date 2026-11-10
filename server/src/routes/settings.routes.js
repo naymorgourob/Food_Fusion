@@ -4,6 +4,8 @@ import {
   getSettingsHandler,
   getPaymentContactHandler,
   putSettingsHandler,
+  getRestaurantStatusHandler,
+  putRestaurantStatusHandler,
 } from '../controllers/settings.controller.js'
 
 const router = Router()
@@ -13,6 +15,10 @@ const router = Router()
 // (Billing's VAT default reads settings.service.js directly, server-side).
 router.get('/', authenticateUser, authorizeAdmin, getSettingsHandler)
 router.get('/payment-contact', getPaymentContactHandler)
+// Public: the website, customer, staff and admin screens all show whether
+// the restaurant is open, including before anyone logs in.
+router.get('/status', getRestaurantStatusHandler)
+router.put('/status', authenticateUser, authorizeAdmin, putRestaurantStatusHandler)
 router.put('/', authenticateUser, authorizeAdmin, putSettingsHandler)
 
 export default router

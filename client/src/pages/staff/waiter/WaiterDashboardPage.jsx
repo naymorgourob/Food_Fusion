@@ -83,7 +83,7 @@ function KpiCard({ icon: Icon, label, value, to, subtext, tone = 'brand', highli
 }
 
 export default function WaiterDashboardPage() {
-  const { orders, reservations, tables } = useOutletContext()
+  const { orders, reservations, tables, isRestaurantOpen } = useOutletContext()
 
   const [isTakeOrderOpen, setIsTakeOrderOpen] = useState(false)
   const [takeOrderTableId, setTakeOrderTableId] = useState(null)
@@ -279,7 +279,7 @@ export default function WaiterDashboardPage() {
 
                   <button
                     type="button"
-                    disabled={servingOrderId === order.id}
+                    disabled={servingOrderId === order.id || !isRestaurantOpen}
                     onClick={() => handleServeOrder(order.id)}
                     className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-50"
                   >

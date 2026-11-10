@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Menu, X, Search, ShoppingBag } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { ROUTES, USER_ROLES, getHomeRouteForRole } from '@/constants'
+import { RestaurantStatusBadge } from '@/features/settings/components/RestaurantStatus'
 
 const NAV_LINKS = [
   { label: 'Home', href: '#top' },
@@ -86,6 +87,7 @@ export function Navbar() {
         </div>
 
         <div className="hidden items-center gap-2 lg:flex">
+          <RestaurantStatusBadge className="mr-1" />
           {/* Search and cart point at real destinations rather than being
               decorative: search scrolls to the menu, cart opens the
               customer's order flow (which already exists). */}

@@ -19,6 +19,7 @@ import { fetchMenuItems } from '@/features/menu/services/menuItemService'
 import { createOrder } from '@/features/orders/services/orderService'
 import { money } from '@/utils/format'
 import { getImageUrl } from '@/constants'
+import { useRestaurantStatus } from '@/features/settings/hooks/useRestaurantStatus'
 
 export function TakeOrderModal({
   isOpen,
@@ -28,6 +29,7 @@ export function TakeOrderModal({
   initialGuestName = '',
   onOrderCreated,
 }) {
+  const { isOpen: isRestaurantOpen } = useRestaurantStatus()
   const [menuItems, setMenuItems] = useState([])
   const [isLoadingMenu, setIsLoadingMenu] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState('')
@@ -500,11 +502,15 @@ export function TakeOrderModal({
                 <button
                   type="button"
                   onClick={handleSubmitOrder}
-                  disabled={isSubmitting || cartEntries.length === 0}
+                  disabled={isSubmitting || cartEntries.length === 0 || !isRestaurantOpen}
                   className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-700 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-brand-800 disabled:opacity-50"
                 >
                   <UtensilsCrossed className="h-4 w-4" />
-                  {isSubmitting ? 'Sending to Kitchen…' : 'Send Order to Kitchen'}
+                  {!isRestaurantOpen
+                    ? 'Restaurant closed'
+                    : isSubmitting
+                      ? 'Sending to Kitchen…'
+                      : 'Send Order to Kitchen'}
                 </button>
               </div>
             </div>

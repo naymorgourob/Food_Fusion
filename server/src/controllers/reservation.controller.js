@@ -4,7 +4,9 @@ import {
   createReservation,
   updateReservationStatus,
   cancelReservation,
+  RESERVATION_DURATION_MINUTES,
 } from '../services/reservation.service.js'
+import { assertSlotWithinOpeningHours } from '../services/restaurantStatus.service.js'
 import { sendSuccess } from '../utils/ApiResponse.js'
 import { ApiError } from '../utils/ApiError.js'
 
@@ -17,6 +19,10 @@ export async function postReservation(req, res) {
   const input = { ...req.body, paymentProofImage: req.file?.filename }
   const errors = validateReservation(input)
   if (errors.length > 0) throw new ApiError(400, 'Validation failed.', errors)
+  await assertSlotWithinOpeningHours({
+    ...input,
+    durationMinutes: input.durationMinutes || RESERVATION_DURATION_MINUTES,
+  })
 
   const reservation = await createReservation(req.user.id, input)
   sendSuccess(res, {

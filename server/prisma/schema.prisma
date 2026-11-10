@@ -442,6 +442,14 @@ model Settings {
   // One-time bonus on a customer's first completed order.
   firstOrderBonusPoints    Int     @default(50) @map("first_order_bonus_points")
 
+  // --- Opening hours (restaurant time, Asia/Dhaka) ---
+  // The restaurant opens and closes on these times automatically, every day.
+  openingTime  String  @default("11:00") @map("opening_time")
+  closingTime  String  @default("23:00") @map("closing_time")
+  // Set when Admin closes early: the restaurant stays closed for the rest of
+  // that date (YYYY-MM-DD, restaurant time) and opens as normal the next day.
+  closedOnDate String? @map("closed_on_date")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

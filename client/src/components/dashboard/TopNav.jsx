@@ -2,6 +2,7 @@ import { Menu, Search } from 'lucide-react'
 import { Breadcrumb } from '@/components/dashboard/Breadcrumb'
 import { NotificationDropdown } from '@/components/dashboard/NotificationDropdown'
 import { ProfileDropdown } from '@/components/dashboard/ProfileDropdown'
+import { RestaurantStatusBadge } from '@/features/settings/components/RestaurantStatus'
 import { useCurrentPageTitle } from '@/hooks/useCurrentPageTitle'
 
 /**
@@ -47,6 +48,7 @@ export function TopNav({ onOpenMobileSidebar }) {
         />
       </form>
 
+      <RestaurantStatusBadge />
       <NotificationDropdown />
       <ProfileDropdown />
     </header>

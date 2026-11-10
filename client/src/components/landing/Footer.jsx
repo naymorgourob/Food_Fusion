@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom'
 import { MapPin, Phone, Mail, Globe, MessageCircle, Rss, Share2 } from 'lucide-react'
 import { Container } from '@/components/landing/primitives'
 import { OPENING_HOURS, CONTACT } from '@/pages/landing/content'
+import { RestaurantStatusBadge } from '@/features/settings/components/RestaurantStatus'
+import { useRestaurantStatus } from '@/features/settings/hooks/useRestaurantStatus'
 import { ROUTES } from '@/constants'
 
 const NAV_LINKS = [
@@ -23,6 +25,11 @@ const SOCIALS = [
 
 /** Section 14 — footer. Deep emerald, so the page closes on the brand colour. */
 export function Footer() {
+  const { status } = useRestaurantStatus()
+  const openingHours = status
+    ? [{ days: 'Every day', hours: `${status.openingTime} — ${status.closingTime}` }]
+    : OPENING_HOURS
+
   return (
     <footer id="contact" className="scroll-mt-28 bg-brand-900 text-white">
       <Container className="grid gap-12 py-16 sm:grid-cols-2 lg:grid-cols-4 lg:py-20">
@@ -84,7 +91,8 @@ export function Footer() {
           <h3 className="font-display text-sm font-semibold tracking-wide text-white uppercase">
             Opening hours
           </h3>
-          {OPENING_HOURS.map(({ days, hours }) => (
+          <RestaurantStatusBadge className="self-start" />
+          {openingHours.map(({ days, hours }) => (
             <div key={days} className="flex flex-col gap-0.5">
               <span className="text-sm text-white/80">{days}</span>
               <span className="font-mono text-xs text-gold-300">{hours}</span>

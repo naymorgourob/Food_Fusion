@@ -34,7 +34,7 @@ const TABS = [
 ]
 
 export default function WaiterOrdersPage() {
-  const { orders, tables } = useOutletContext()
+  const { orders, tables, isRestaurantOpen } = useOutletContext()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [assignableStaff, setAssignableStaff] = useState([])
@@ -436,7 +436,7 @@ export default function WaiterOrdersPage() {
                       <button
                         type="button"
                         onClick={() => handleMarkServed(order)}
-                        disabled={isUpdating}
+                        disabled={isUpdating || !isRestaurantOpen}
                         className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white shadow-md transition hover:bg-emerald-700 disabled:opacity-50"
                       >
                         <Check className="h-4 w-4" />
@@ -446,7 +446,7 @@ export default function WaiterOrdersPage() {
                       <button
                         type="button"
                         onClick={() => handleCompleteOrder(order)}
-                        disabled={isUpdating}
+                        disabled={isUpdating || !isRestaurantOpen}
                         className="flex w-full items-center justify-center gap-2 rounded-xl border border-rule bg-canvas-2 py-2 text-xs font-semibold text-body hover:bg-canvas disabled:opacity-50"
                       >
                         <Check className="h-3.5 w-3.5" />

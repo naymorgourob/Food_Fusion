@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { ChefSidebar } from '@/components/staff/ChefSidebar'
 import { StaffTopBar } from '@/components/staff/StaffTopBar'
+import { RestaurantClosedBanner } from '@/features/settings/components/RestaurantStatus'
+import { useRestaurantStatus } from '@/features/settings/hooks/useRestaurantStatus'
 import { useOrders } from '@/features/orders/hooks/useOrders'
 import { useInventory } from '@/features/inventory/hooks/useInventory'
 import { useStaffNotifications } from '@/features/notifications/useStaffNotifications'
@@ -21,7 +23,8 @@ export function ChefShell({ children }) {
     workspace: 'chef',
   })
 
-  const context = { orders, inventory }
+  const { isOpen: isRestaurantOpen } = useRestaurantStatus()
+  const context = { orders, inventory, isRestaurantOpen }
 
   function toggleCollapsed() {
     setCollapsed((current) => {
@@ -52,6 +55,7 @@ export function ChefShell({ children }) {
         />
 
         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+          <RestaurantClosedBanner message="Orders can't be accepted or updated until the restaurant opens. You can still view orders and inventory." />
           {typeof children === 'function' ? children(context) : children}
         </main>
       </div>

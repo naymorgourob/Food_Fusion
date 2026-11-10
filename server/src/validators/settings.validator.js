@@ -1,5 +1,6 @@
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const PHONE_REGEX = /^[+\d][\d\s-]{6,14}\d$/
+const TIME_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/
 
 export function validateSettings({
   restaurantName,
@@ -11,6 +12,8 @@ export function validateSettings({
   loyaltyPointsPerCurrency,
   loyaltyPointValue,
   firstOrderBonusPoints,
+  openingTime,
+  closingTime,
 }) {
   const errors = []
 
@@ -74,6 +77,15 @@ export function validateSettings({
   ) {
     errors.push('First order bonus must be zero or a positive whole number.')
   }
+
+  // Opening hours: same-day only (no closing after midnight), so opening
+  // must come before closing.
+  if (!openingTime || !TIME_REGEX.test(openingTime))
+    errors.push('Opening time must be in HH:MM format.')
+  if (!closingTime || !TIME_REGEX.test(closingTime))
+    errors.push('Closing time must be in HH:MM format.')
+  else if (TIME_REGEX.test(openingTime ?? '') && closingTime <= openingTime)
+    errors.push('Closing time must be later than opening time.')
 
   return errors
 }

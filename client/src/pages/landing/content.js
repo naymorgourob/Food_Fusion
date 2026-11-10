@@ -91,11 +91,8 @@ export const GALLERY = [
 ]
 
 // Section 14 — footer.
-export const OPENING_HOURS = [
-  { days: 'Monday — Thursday', hours: '12:00 — 22:30' },
-  { days: 'Friday — Saturday', hours: '12:00 — 23:30' },
-  { days: 'Sunday', hours: '12:00 — 21:00' },
-]
+// Fallback until the live hours load (Footer reads GET /settings/status).
+export const OPENING_HOURS = [{ days: 'Every day', hours: '11:00 — 23:00' }]
 
 export const CONTACT = {
   address: '14 Gulshan Avenue, Dhaka 1212',

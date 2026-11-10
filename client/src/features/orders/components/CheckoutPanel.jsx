@@ -108,6 +108,7 @@ export function CheckoutPanel({
   paymentContact,
   errors,
   isSubmitting,
+  isClosed = false,
   onSubmit,
   onBackToMenu,
 }) {
@@ -307,12 +308,17 @@ export function CheckoutPanel({
             ) : (
               <button
                 type="button"
-                disabled={isSubmitting || isEmpty}
+                disabled={isSubmitting || isEmpty || isClosed}
+                title={isClosed ? 'Orders can only be placed while the restaurant is open' : undefined}
                 onClick={onSubmit}
                 className="inline-flex items-center gap-2 rounded-full bg-gold-500 px-7 py-3.5 text-sm font-bold text-charcoal transition-all hover:-translate-y-0.5 hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
               >
                 <ShoppingBag className="h-4 w-4" />
-                {isSubmitting ? 'Placing order…' : `Place order · ${money(grandTotal)}`}
+                {isClosed
+                  ? 'Closed — ordering unavailable'
+                  : isSubmitting
+                    ? 'Placing order…'
+                    : `Place order · ${money(grandTotal)}`}
               </button>
             )}
           </div>

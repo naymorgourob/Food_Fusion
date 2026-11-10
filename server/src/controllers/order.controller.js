@@ -15,6 +15,8 @@ import {
 } from '../services/order.service.js'
 import { sendSuccess } from '../utils/ApiResponse.js'
 import { ApiError } from '../utils/ApiError.js'
+import { assertSlotWithinOpeningHours } from '../services/restaurantStatus.service.js'
+import { RESERVATION_DURATION_MINUTES } from '../services/reservation.service.js'
 
 export async function getOrders(req, res) {
   const orders = await listOrders(req.user)
@@ -49,6 +51,15 @@ export async function postOrder(req, res) {
       req.user.role === 'CUSTOMER' && !['ONLINE', 'AT_RESTAURANT'].includes(input.paymentMethod),
   })
   if (errors.length > 0) throw new ApiError(400, 'Validation failed.', errors)
+  // A table picked at checkout is booked like a reservation, so its slot
+  // has to fit opening hours too.
+  if (input.tableId && input.reservationDate && input.reservationTime) {
+    await assertSlotWithinOpeningHours({
+      reservationDate: input.reservationDate,
+      reservationTime: input.reservationTime,
+      durationMinutes: RESERVATION_DURATION_MINUTES,
+    })
+  }
 
   const customerId =
     req.user.role !== 'CUSTOMER' && req.body.customerId ? req.body.customerId : req.user.id

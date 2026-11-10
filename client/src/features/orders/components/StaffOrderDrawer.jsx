@@ -20,6 +20,7 @@ import {
 import { ORDER_TYPE_ICONS } from '@/features/orders/staffOrderHelpers'
 import { orderNo, money } from '@/utils/format'
 import { getImageUrl } from '@/constants'
+import { useRestaurantStatus } from '@/features/settings/hooks/useRestaurantStatus'
 
 // Matches order.service.js's updateOrderStatus branch guard exactly —
 // same list OrderDetailsModal (the Admin equivalent) uses, so Staff is
@@ -72,6 +73,8 @@ export function StaffOrderDrawer({
   onUpdateEstimatedTime,
   isUpdatingEstimatedTime,
 }) {
+  // Order changes are blocked server-side while the restaurant is closed.
+  const { isOpen: isRestaurantOpen } = useRestaurantStatus()
   // Lazy initializers, not an effect: the parent remounts this drawer with
   // key={order.id} whenever a different order is opened (see
   // StaffOrdersPage), so these only ever need to be set once per mount —
@@ -302,7 +305,7 @@ export function StaffOrderDrawer({
                   <select
                     id="staff-order-status"
                     value={order.status}
-                    disabled={isUpdatingStatus}
+                    disabled={isUpdatingStatus || !isRestaurantOpen}
                     onChange={(event) => onStatusChange(event.target.value)}
                     className="rounded-xl border border-rule bg-card px-3.5 py-2.5 text-sm text-body focus:border-brand-400 focus:ring-3 focus:ring-brand-100 focus:outline-none dark:focus:ring-brand-900"
                   >
@@ -325,7 +328,7 @@ export function StaffOrderDrawer({
                   <select
                     id="staff-order-assign"
                     value={order.assignedStaff?.id ?? ''}
-                    disabled={isAssigningStaff}
+                    disabled={isAssigningStaff || !isRestaurantOpen}
                     onChange={(event) => onAssignStaff(event.target.value || null)}
                     className="rounded-xl border border-rule bg-card px-3.5 py-2.5 text-sm text-body focus:border-brand-400 focus:ring-3 focus:ring-brand-100 focus:outline-none dark:focus:ring-brand-900"
                   >
@@ -361,7 +364,7 @@ export function StaffOrderDrawer({
                   />
                   <button
                     type="submit"
-                    disabled={isUpdatingEstimatedTime}
+                    disabled={isUpdatingEstimatedTime || !isRestaurantOpen}
                     className="mt-1 w-fit rounded-full bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isUpdatingEstimatedTime ? 'Saving…' : 'Save estimated time'}
