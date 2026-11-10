@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Check, Copy, Info, Smartphone, Landmark, Upload } from 'lucide-react'
 import { money } from '@/utils/format'
 import { ADVANCE_METHODS } from '@/features/payments/constants'
+import { compressImage } from '@/utils/compressImage'
 
 /**
  * Pay the advance by sending money: pick bKash / Nagad / Rocket / bank,
@@ -117,7 +118,11 @@ export function AdvancePaymentFields({
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp"
-              onChange={(event) => onProofChange(event.target.files?.[0] ?? null)}
+              onChange={async (event) => {
+                const file = event.target.files?.[0] ?? null
+                // Smaller upload: full-size screenshots timed out on slow connections.
+                onProofChange(file ? await compressImage(file) : null)
+              }}
               className="sr-only"
             />
           </label>
