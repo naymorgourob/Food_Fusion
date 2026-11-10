@@ -49,9 +49,16 @@ export async function postOrder(req, res) {
     requirePaymentProof: req.user.role === 'CUSTOMER' && input.paymentMethod !== 'AT_RESTAURANT',
   })
   if (errors.length > 0) throw new ApiError(400, 'Validation failed.', errors)
-  // A table picked at checkout is booked like a reservation, so its slot
-  // has to fit opening hours too.
-  if (input.tableId && input.reservationDate && input.reservationTime) {
+  // A table picked for a scheduled dine-in is booked like a reservation, so
+  // its slot has to be in the future and fit opening hours. "Dine-in now"
+  // books from the current minute (the guest is sitting down), so it skips
+  // this check.
+  if (
+    input.tableId &&
+    input.scheduledArrivalTime &&
+    input.reservationDate &&
+    input.reservationTime
+  ) {
     await assertSlotWithinOpeningHours({
       reservationDate: input.reservationDate,
       reservationTime: input.reservationTime,
