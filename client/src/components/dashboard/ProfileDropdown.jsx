@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { User, Settings, LogOut } from 'lucide-react'
+import { User, Settings, LogOut, UserCog } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useClickOutside } from '@/hooks/useClickOutside'
 import { ROUTES, USER_ROLES, getImageUrl } from '@/constants'
@@ -58,13 +58,22 @@ export function ProfileDropdown() {
               reaches via /dashboard/orders and /dashboard/billing), so the
               link itself has to be hidden rather than just gated by the route. */}
           {user?.role === USER_ROLES.ADMIN && (
-            <Link
-              to="/dashboard/settings"
-              onClick={() => setOpen(false)}
-              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-ink-muted hover:bg-surface-2 hover:text-ink"
-            >
-              <Settings className="h-4 w-4" /> Settings
-            </Link>
+            <>
+              <Link
+                to="/dashboard/account-settings"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-ink-muted hover:bg-surface-2 hover:text-ink"
+              >
+                <UserCog className="h-4 w-4" /> Account Settings
+              </Link>
+              <Link
+                to="/dashboard/settings"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-ink-muted hover:bg-surface-2 hover:text-ink"
+              >
+                <Settings className="h-4 w-4" /> Restaurant Settings
+              </Link>
+            </>
           )}
           <button
             onClick={handleLogout}

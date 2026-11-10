@@ -16,8 +16,8 @@ import {
   ChevronsLeft,
   ChevronsRight,
   X,
-  ExternalLink,
   Wallet,
+  UserCog,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { ROUTES, USER_ROLES } from '@/constants'
@@ -123,9 +123,15 @@ const NAV_SECTIONS = [
         roles: [USER_ROLES.ADMIN],
       },
       {
-        label: 'Settings',
+        label: 'Restaurant Settings',
         path: '/dashboard/settings',
         icon: SettingsIcon,
+        roles: [USER_ROLES.ADMIN],
+      },
+      {
+        label: 'Account Settings',
+        path: '/dashboard/account-settings',
+        icon: UserCog,
         roles: [USER_ROLES.ADMIN],
       },
     ],
@@ -342,20 +348,6 @@ export function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobil
               </span>
             </div>
           </div>
-
-          {/* Quick link to public restaurant site */}
-          <Link
-            to={ROUTES.HOME}
-            target="_blank"
-            rel="noopener noreferrer"
-            title={collapsed ? 'View Public Restaurant' : undefined}
-            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-base font-medium text-ink-muted hover:bg-surface-2 hover:text-ink transition-colors ${
-              collapsed ? 'lg:justify-center lg:px-0' : ''
-            }`}
-          >
-            <ExternalLink className="h-5 w-5 flex-none text-ink-faint" />
-            <span className={`truncate ${collapsed ? 'lg:hidden' : ''}`}>View Restaurant</span>
-          </Link>
 
           {/* Logout Action */}
           <button

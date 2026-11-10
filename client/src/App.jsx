@@ -225,7 +225,16 @@ const router = createBrowserRouter([
             handle: { title: 'Inventory' },
           },
           { path: '/dashboard/reports', element: <ReportsPage />, handle: { title: 'Reports' } },
-          { path: '/dashboard/settings', element: <SettingsPage />, handle: { title: 'Settings' } },
+          {
+            path: '/dashboard/settings',
+            element: <SettingsPage />,
+            handle: { title: 'Restaurant Settings' },
+          },
+          {
+            path: '/dashboard/account-settings',
+            element: <AccountSettingsPage profilePath="/dashboard/profile" />,
+            handle: { title: 'Account Settings' },
+          },
         ],
       },
       {
