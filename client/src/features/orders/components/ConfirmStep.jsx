@@ -157,7 +157,11 @@ export function ConfirmStep({
 
         <Row icon={CreditCard} label="Paying by">
           {method?.label ?? 'At the restaurant'}
-          <span className="block text-xs text-body-faint">Payment is taken at the restaurant</span>
+          <span className="block text-xs text-body-faint">
+            {paymentMethod === 'AT_RESTAURANT' || !method
+              ? 'Payment is taken at the restaurant'
+              : 'Advance sent — the restaurant approves it, and the rest is paid on your bill'}
+          </span>
         </Row>
 
         {specialInstructions && (

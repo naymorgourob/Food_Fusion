@@ -13,7 +13,10 @@ import { AUTH_TOKEN_KEY } from '@/constants/auth'
 // every time, matching whatever `data` actually is.
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api/v1',
-  timeout: 10000,
+  // 60s, not 10s: the free Render server sleeps when idle and takes up to
+  // a minute to wake, and an order with a payment screenshot is a bigger
+  // upload. A shorter limit gave up before the server answered.
+  timeout: 60000,
 })
 
 // Attaches the JWT to every request if one is stored, in whichever storage
@@ -27,3 +30,15 @@ api.interceptors.request.use((config) => {
   }
   return config
 })
+
+// The message to show for a failed request. With no response at all (the
+// server never answered), say so rather than a vague "something went wrong".
+export function requestErrorMessage(error) {
+  if (error.response?.data?.message) return error.response.data.message
+  if (!error.response) {
+    return error.code === 'ECONNABORTED'
+      ? 'The server took too long to answer — it may be waking up. Please try again in a moment.'
+      : "Couldn't reach the server. Check your connection and try again."
+  }
+  return 'Something went wrong. Please try again.'
+}

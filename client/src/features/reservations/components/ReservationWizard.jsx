@@ -20,6 +20,7 @@ import { money } from '@/utils/format'
 import { ADVANCE_RATE, ADVANCE_PERCENT } from '@/constants/payments'
 import { AdvancePaymentFields } from '@/features/payments/components/AdvancePaymentFields'
 import { fetchPaymentContact } from '@/features/settings/services/settingsService'
+import { requestErrorMessage } from '@/services/api'
 
 /**
  * The booking flow (UI-06): when → who → where → anything else.
@@ -247,7 +248,7 @@ export function ReservationWizard({ onCreated }) {
       onCreated(reservation, { preOrder })
     } catch (error) {
       const details = error.response?.data?.details
-      const message = error.response?.data?.message ?? 'Something went wrong. Please try again.'
+      const message = requestErrorMessage(error)
       setErrors(details && details.length > 0 ? details : [message])
     } finally {
       setIsSubmitting(false)

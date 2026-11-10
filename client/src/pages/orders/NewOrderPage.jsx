@@ -19,6 +19,7 @@ import { money } from '@/utils/format'
 import { fetchPaymentContact } from '@/features/settings/services/settingsService'
 import { ADVANCE_RATE } from '@/constants/payments'
 import { fetchMenuItemById } from '@/features/menu/services/menuItemService'
+import { requestErrorMessage } from '@/services/api'
 
 // Must match DELIVERY_CHARGE in server/src/services/order.service.js —
 // this is a display-only preview, the server applies the real charge.
@@ -327,7 +328,7 @@ export default function NewOrderPage() {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (error) {
       const details = error.response?.data?.details
-      const message = error.response?.data?.message ?? 'Something went wrong. Please try again.'
+      const message = requestErrorMessage(error)
       setErrors(details && details.length > 0 ? details : [message])
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } finally {
