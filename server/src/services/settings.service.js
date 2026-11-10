@@ -29,6 +29,10 @@ export async function updateSettings(data) {
     firstOrderBonusPoints,
     openingTime,
     closingTime,
+    bkashNumber = '',
+    nagadNumber = '',
+    rocketNumber = '',
+    bankAccount = '',
   } = data
 
   // Built once and spread into both branches — the two used to be
@@ -47,6 +51,10 @@ export async function updateSettings(data) {
     firstOrderBonusPoints: Number(firstOrderBonusPoints),
     openingTime,
     closingTime,
+    bkashNumber: bkashNumber.trim(),
+    nagadNumber: nagadNumber.trim(),
+    rocketNumber: rocketNumber.trim(),
+    bankAccount: bankAccount.trim(),
   }
 
   return prisma.settings.upsert({

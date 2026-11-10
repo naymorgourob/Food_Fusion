@@ -21,12 +21,4 @@ export const env = {
   databaseUrl: process.env.DATABASE_URL,
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
-  apiPublicUrl: (process.env.API_PUBLIC_URL ?? `http://localhost:${process.env.PORT ?? 5000}`)
-    .trim()
-    .replace(/\/+$/, ''),
-  sslcommerz: {
-    storeId: process.env.SSLCOMMERZ_STORE_ID,
-    storePassword: process.env.SSLCOMMERZ_STORE_PASSWORD,
-    live: process.env.SSLCOMMERZ_LIVE === 'true',
-  },
 }

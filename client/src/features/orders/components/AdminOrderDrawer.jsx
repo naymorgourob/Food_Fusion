@@ -22,6 +22,8 @@ import {
 import { ORDER_TYPE_ICONS } from '@/features/orders/staffOrderHelpers'
 import { getImageUrl } from '@/constants'
 import { orderNo, money } from '@/utils/format'
+import { AdvanceStatusChip } from '@/features/payments/components/AdvanceStatusChip'
+import { PAYMENT_METHOD_LABELS } from '@/features/payments/constants'
 
 // Matches order.service.js's updateOrderStatus branch guard exactly — a
 // delivery order is never "Ready to Serve," a dine-in/takeaway order is
@@ -80,6 +82,8 @@ export function AdminOrderDrawer({
   isAssigningStaff,
   onUpdateEstimatedTime,
   isUpdatingEstimatedTime,
+  onApprovePayment,
+  isApprovingPayment,
 }) {
   // Lazy initializers, not an effect: the parent remounts this drawer with
   // key={order.id} whenever a different order is opened, so these only
@@ -197,12 +201,20 @@ export function AdminOrderDrawer({
                   </section>
 
                   <section className="flex flex-col gap-3 rounded-2xl border border-gold-300 bg-gold-100/40 p-4 dark:border-gold-700 dark:bg-gold-100/5">
-                    <span className="text-xs font-semibold tracking-wide text-gold-700 uppercase dark:text-gold-300">
-                      Advance payment proof
-                    </span>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-xs font-semibold tracking-wide text-gold-700 uppercase dark:text-gold-300">
+                        Advance payment
+                      </span>
+                      <AdvanceStatusChip record={order} />
+                    </div>
                     <Row icon={Receipt} label="Advance amount">
                       {money(order.advanceAmount ?? 0)}
                     </Row>
+                    {order.paymentMethod && (
+                      <Row icon={Receipt} label="Sent with">
+                        {PAYMENT_METHOD_LABELS[order.paymentMethod] ?? order.paymentMethod}
+                      </Row>
+                    )}
                     <Row icon={Receipt} label="Transaction / Reference ID">
                       {order.paymentReference}
                     </Row>
@@ -219,6 +231,26 @@ export function AdminOrderDrawer({
                     {!order.paymentReference && !order.paymentProofImage && (
                       <span className="text-sm text-red-600">No payment proof submitted</span>
                     )}
+                    {Number(order.advanceAmount) > 0 &&
+                      !order.advancePaid &&
+                      order.status !== 'CANCELLED' &&
+                      onApprovePayment && (
+                        <div className="flex flex-col gap-1.5 border-t border-gold-300/60 pt-3 dark:border-gold-700/60">
+                          <p className="text-xs text-body-muted">
+                            Check the money arrived in the restaurant&apos;s account, then approve.
+                            The kitchen can accept the order after that. If it never arrived,
+                            cancel the order instead.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={onApprovePayment}
+                            disabled={isApprovingPayment}
+                            className="self-start rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+                          >
+                            {isApprovingPayment ? 'Approving…' : 'Approve payment'}
+                          </button>
+                        </div>
+                      )}
                   </section>
 
                   {order.orderType === 'DELIVERY' && (

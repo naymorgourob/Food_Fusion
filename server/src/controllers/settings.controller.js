@@ -13,7 +13,18 @@ export async function getPaymentContactHandler(req, res) {
   const settings = await getSettings()
   sendSuccess(res, {
     message: 'Payment contact fetched successfully.',
-    data: { restaurantName: settings.restaurantName, restaurantPhone: settings.restaurantPhone },
+    data: {
+      restaurantName: settings.restaurantName,
+      restaurantPhone: settings.restaurantPhone,
+      // Where customers send the advance. An empty value means that method
+      // isn't offered at checkout.
+      accounts: {
+        BKASH: settings.bkashNumber,
+        NAGAD: settings.nagadNumber,
+        ROCKET: settings.rocketNumber,
+        BANK: settings.bankAccount,
+      },
+    },
   })
 }
 

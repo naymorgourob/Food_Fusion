@@ -48,6 +48,7 @@ export async function createReservation(customerId, input) {
     specialRequest,
     occasion,
     occasionNote,
+    paymentMethod,
     paymentReference,
     paymentProofImage,
   } = input
@@ -115,6 +116,7 @@ export async function createReservation(customerId, input) {
           occasionNote: occasion === 'OTHER' ? occasionNote?.trim() || null : null,
           totalAmount: amount,
           advanceAmount,
+          paymentMethod,
           paymentReference: paymentReference?.trim() || null,
           paymentProofImage: paymentProofImage || null,
           paymentSubmittedAt: new Date(),
@@ -137,9 +139,13 @@ export async function updateReservationStatus(id, status) {
   ) {
     throw new ApiError(400, 'Payment proof must be submitted before confirming this reservation.')
   }
+  // Confirming is Admin approving the booking, after checking the advance
+  // arrived in the restaurant's account.
+  const data = { status }
+  if (status === 'CONFIRMED' && !reservation.orderId) data.advancePaid = true
   return prisma.reservation.update({
     where: { id },
-    data: { status },
+    data,
     include: { table: { select: TABLE_SELECT }, order: { select: ORDER_SELECT } },
   })
 }

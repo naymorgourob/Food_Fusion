@@ -8,10 +8,9 @@ import { CartDrawer } from '@/features/orders/components/CartDrawer'
 import { AddedToCartToast } from '@/features/orders/components/AddedToCartToast'
 import { CheckoutPanel } from '@/features/orders/components/CheckoutPanel'
 import { OrderSuccess } from '@/features/orders/components/OrderSuccess'
-import { PAYMENT_METHODS, PAY_AT_RESTAURANT } from '@/features/orders/components/PaymentMethodStep'
+import { PAY_AT_RESTAURANT, PAYMENT_METHOD_LABELS } from '@/features/payments/constants'
 import { useCart } from '@/features/orders/hooks/useCart'
 import { RestaurantClosedBanner } from '@/features/settings/components/RestaurantStatus'
-import { useRestaurantStatus } from '@/features/settings/hooks/useRestaurantStatus'
 import { useFavorites } from '@/features/favorites/hooks/useFavorites'
 import { useLoyalty } from '@/features/loyalty/hooks/useLoyalty'
 import { fetchTables } from '@/features/tables/services/tableService'
@@ -19,7 +18,6 @@ import { createOrder, fetchOrderById } from '@/features/orders/services/orderSer
 import { money } from '@/utils/format'
 import { fetchPaymentContact } from '@/features/settings/services/settingsService'
 import { ADVANCE_RATE } from '@/constants/payments'
-import { startAdvancePayment } from '@/features/payments/services/paymentService'
 import { fetchMenuItemById } from '@/features/menu/services/menuItemService'
 
 // Must match DELIVERY_CHARGE in server/src/services/order.service.js —
@@ -99,7 +97,8 @@ export default function NewOrderPage() {
   // backward jumps without letting anyone skip ahead past required fields.
   const [furthestReached, setFurthestReached] = useState(0)
   const [orderType, setOrderType] = useState(null)
-  const [paymentMethod, setPaymentMethod] = useState('ONLINE')
+  // '' = paying the advance, account not picked yet.
+  const [paymentMethod, setPaymentMethod] = useState('')
   const [paymentReference, setPaymentReference] = useState('')
   const [paymentProof, setPaymentProof] = useState(null)
   const [paymentContact, setPaymentContact] = useState(null)
@@ -118,7 +117,6 @@ export default function NewOrderPage() {
 
   const [tables, setTables] = useState([])
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const { isOpen: isRestaurantOpen } = useRestaurantStatus()
   const [errors, setErrors] = useState([])
 
   // Tables come with reservation availability for the slot being booked,
@@ -293,13 +291,8 @@ export default function NewOrderPage() {
       )
       if (combinedInstructions) payload.append('specialInstructions', combinedInstructions)
       if (requestedPoints > 0) payload.append('pointsToRedeem', String(requestedPoints))
-      payload.append(
-        'paymentMethod',
-        paymentMethod === 'ONLINE' || paymentMethod === PAY_AT_RESTAURANT
-          ? paymentMethod
-          : 'MANUAL',
-      )
-      if (paymentMethod !== 'ONLINE' && paymentMethod !== PAY_AT_RESTAURANT) {
+      payload.append('paymentMethod', paymentMethod)
+      if (paymentMethod !== PAY_AT_RESTAURANT) {
         if (paymentReference.trim()) payload.append('paymentReference', paymentReference.trim())
         if (paymentProof) payload.append('paymentProof', paymentProof)
       }
@@ -325,15 +318,6 @@ export default function NewOrderPage() {
 
       const order = await createOrder(payload)
 
-      // Online: hand over to SSLCommerz to pay the advance. The order
-      // already exists, so if the customer abandons the payment page it
-      // simply waits unpaid and can be paid later from the result page.
-      if (paymentMethod === 'ONLINE') {
-        cart.clear()
-        const { gatewayUrl } = await startAdvancePayment('order', order.id)
-        window.location.assign(gatewayUrl)
-        return
-      }
       // Show the confirmation rather than jumping straight to tracking —
       // the order number and total used to flash past unread.
       setPlacedOrder(order)
@@ -354,7 +338,7 @@ export default function NewOrderPage() {
   return (
     <div className="relative flex flex-col gap-8">
       {mode !== 'success' && (
-        <RestaurantClosedBanner message="You can browse the menu and fill your cart, but orders can only be placed while we're open." />
+        <RestaurantClosedBanner message="You can still place your order now. The kitchen will accept it once we open." />
       )}
 
       {(repeatOrderId || favoriteIds) && mode === 'browse' && (
@@ -369,11 +353,7 @@ export default function NewOrderPage() {
         <OrderSuccess
           order={placedOrder}
           total={placedTotal}
-          paymentLabel={
-            paymentMethod === 'ONLINE'
-              ? 'Pay online (SSLCommerz)'
-              : (PAYMENT_METHODS.find((m) => m.id === paymentMethod)?.label ?? 'At the restaurant')
-          }
+          paymentLabel={PAYMENT_METHOD_LABELS[paymentMethod] ?? 'At the restaurant'}
         />
       ) : mode === 'browse' ? (
         <MenuBrowser
@@ -431,7 +411,6 @@ export default function NewOrderPage() {
           paymentContact={paymentContact}
           errors={errors}
           isSubmitting={isSubmitting}
-          isClosed={!isRestaurantOpen}
           onSubmit={handleSubmit}
           onBackToMenu={backToMenu}
         />

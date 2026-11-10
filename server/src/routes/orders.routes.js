@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import {
   authenticateUser,
+  authorizeAdmin,
   authorizeStaffOrAdmin,
   requireRestaurantOpen,
 } from '../middlewares/auth.middleware.js'
@@ -13,6 +14,7 @@ import {
   patchAssignStaff,
   patchEstimatedTime,
   removeOrder,
+  patchApprovePayment,
 } from '../controllers/order.controller.js'
 import { uploadPaymentProof } from '../config/multer.js'
 
@@ -26,8 +28,8 @@ router.get('/', authenticateUser, getOrders)
 router.get('/assignable-staff', authenticateUser, authorizeStaffOrAdmin, getAssignableStaff)
 router.get('/:id', authenticateUser, getOrder)
 // Customer places own order; Waiter/Staff places dining or takeaway order for guests.
-// requireRestaurantOpen: order work only happens during opening hours
-// (Admin is exempt). Cancelling stays allowed at any time.
+// requireRestaurantOpen: staff only work on orders during opening hours.
+// Customers order and Admin approves at any time; cancelling is always allowed.
 router.post('/', authenticateUser, requireRestaurantOpen, uploadPaymentProof, postOrder)
 router.put('/:id', authenticateUser, authorizeStaffOrAdmin, requireRestaurantOpen, putOrderStatus)
 router.patch(
@@ -44,6 +46,8 @@ router.patch(
   requireRestaurantOpen,
   patchEstimatedTime,
 )
+// Admin confirms the advance arrived — any time, not just opening hours.
+router.patch('/:id/approve-payment', authenticateUser, authorizeAdmin, patchApprovePayment)
 // Role-scoped inside cancelOrder itself (owning Customer, or Admin/Staff)
 // — Part 18 adds a Cancel button to the customer's own tracking page,
 // alongside the Admin/Staff cancel action from Part 12.

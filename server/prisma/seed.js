@@ -26,6 +26,12 @@ async function seed() {
       loyaltyPointsPerCurrency: 0.1,
       loyaltyPointValue: 0.1,
       firstOrderBonusPoints: 50,
+      // Demo accounts for the advance payment — replace with the real ones in
+      // Restaurant Settings.
+      bkashNumber: '01700-000001',
+      nagadNumber: '01700-000002',
+      rocketNumber: '01700-000003',
+      bankAccount: 'FoodFusion Restaurant · A/C 0000-1111-2222 · Demo Bank, Gulshan',
     },
   })
 

@@ -18,7 +18,6 @@ import activityLogsRoutes from './activityLogs.routes.js'
 // scaffold, since loyalty and favorites weren't planned modules then.
 import loyaltyRoutes from './loyalty.routes.js'
 import favoritesRoutes from './favorites.routes.js'
-import paymentsRoutes from './payments.routes.js'
 import payrollRoutes from './payroll.routes.js'
 
 // One mount point per API group from docs/02-database-design.md Step 12 —
@@ -43,7 +42,6 @@ router.use('/notifications', notificationsRoutes)
 router.use('/activity-logs', activityLogsRoutes)
 router.use('/loyalty', loyaltyRoutes)
 router.use('/favorites', favoritesRoutes)
-router.use('/payments', paymentsRoutes)
 router.use('/payroll', payrollRoutes)
 
 export default router

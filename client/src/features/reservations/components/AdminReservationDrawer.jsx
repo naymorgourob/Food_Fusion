@@ -17,6 +17,8 @@ import { StatusBadge } from '@/features/reservations/components/StatusBadge'
 import { OCCASION_LABELS } from '@/features/reservations/constants'
 import { orderNo, money } from '@/utils/format'
 import { getImageUrl } from '@/constants'
+import { AdvanceStatusChip } from '@/features/payments/components/AdvanceStatusChip'
+import { PAYMENT_METHOD_LABELS } from '@/features/payments/constants'
 
 const STATUS_OPTIONS = ['PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED']
 
@@ -170,12 +172,20 @@ export function AdminReservationDrawer({
                 )}
 
                 <section className="flex flex-col gap-3 rounded-2xl border border-gold-300 bg-gold-100/40 p-4 dark:border-gold-700 dark:bg-gold-100/5">
-                  <span className="text-xs font-semibold tracking-wide text-gold-700 uppercase dark:text-gold-300">
-                    Advance payment proof
-                  </span>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-xs font-semibold tracking-wide text-gold-700 uppercase dark:text-gold-300">
+                      Advance payment
+                    </span>
+                    <AdvanceStatusChip record={reservation} />
+                  </div>
                   <Row icon={Receipt} label="Advance amount">
                     {money(reservation.advanceAmount ?? 0)}
                   </Row>
+                  {reservation.paymentMethod && (
+                    <Row icon={Receipt} label="Sent with">
+                      {PAYMENT_METHOD_LABELS[reservation.paymentMethod] ?? reservation.paymentMethod}
+                    </Row>
+                  )}
                   <Row icon={Receipt} label="Transaction / Reference ID">
                     {reservation.paymentReference}
                   </Row>
@@ -191,6 +201,13 @@ export function AdminReservationDrawer({
                   )}
                   {!reservation.paymentReference && !reservation.paymentProofImage && (
                     <span className="text-sm text-red-600">No payment proof submitted</span>
+                  )}
+                  {reservation.status === 'PENDING' && Number(reservation.advanceAmount) > 0 && (
+                    <p className="text-xs text-body-muted">
+                      Check the money arrived in the restaurant&apos;s account, then set the status
+                      to <strong>Confirmed</strong> &mdash; that approves the payment and the
+                      booking. If it never arrived, set it to Cancelled.
+                    </p>
                   )}
                 </section>
 

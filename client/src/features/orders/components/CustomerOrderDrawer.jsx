@@ -24,6 +24,7 @@ import { OrderTypeBadge } from '@/features/orders/components/OrderTypeBadge'
 import { ORDER_STATUS_LABELS, orderGrandTotal } from '@/features/orders/constants'
 import { money, orderNo } from '@/utils/format'
 import { getImageUrl, ROUTES } from '@/constants'
+import { AdvanceStatusChip } from '@/features/payments/components/AdvanceStatusChip'
 
 const ACTIVE_STATUSES = new Set([
   'PENDING',
@@ -93,6 +94,7 @@ export function CustomerOrderDrawer({ order, isOpen, onClose }) {
                     Order {orderNo(order.orderNumber)}
                   </h2>
                   <OrderStatusBadge status={order.status} />
+                  <AdvanceStatusChip record={order} />
                 </div>
                 <span className="text-xs text-body-muted">
                   Placed on{' '}

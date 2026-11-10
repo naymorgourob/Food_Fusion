@@ -108,7 +108,6 @@ export function CheckoutPanel({
   paymentContact,
   errors,
   isSubmitting,
-  isClosed = false,
   onSubmit,
   onBackToMenu,
 }) {
@@ -128,9 +127,8 @@ export function CheckoutPanel({
       : step === 1
         ? Boolean(orderType) && canLeaveDetails
         : step === 2
-          ? paymentMethod === 'ONLINE' ||
-            paymentMethod === PAY_AT_RESTAURANT ||
-            (Boolean(paymentMethod) && Boolean(paymentReference.trim() || paymentProof))
+          ? paymentMethod === PAY_AT_RESTAURANT ||
+            (Boolean(paymentMethod) && Boolean(paymentReference.trim()))
           : true
 
   const etaLabel =
@@ -247,7 +245,6 @@ export function CheckoutPanel({
                 <PaymentMethodStep
                   selected={paymentMethod}
                   onSelect={onPaymentMethodChange}
-                  orderType={orderType}
                   loyaltySummary={loyaltySummary}
                   itemsTotal={itemsTotal}
                   pointsToRedeem={pointsToRedeem}
@@ -308,17 +305,12 @@ export function CheckoutPanel({
             ) : (
               <button
                 type="button"
-                disabled={isSubmitting || isEmpty || isClosed}
-                title={isClosed ? 'Orders can only be placed while the restaurant is open' : undefined}
+                disabled={isSubmitting || isEmpty}
                 onClick={onSubmit}
                 className="inline-flex items-center gap-2 rounded-full bg-gold-500 px-7 py-3.5 text-sm font-bold text-charcoal transition-all hover:-translate-y-0.5 hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
               >
                 <ShoppingBag className="h-4 w-4" />
-                {isClosed
-                  ? 'Closed — ordering unavailable'
-                  : isSubmitting
-                    ? 'Placing order…'
-                    : `Place order · ${money(grandTotal)}`}
+                {isSubmitting ? 'Placing order…' : `Place order · ${money(grandTotal)}`}
               </button>
             )}
           </div>

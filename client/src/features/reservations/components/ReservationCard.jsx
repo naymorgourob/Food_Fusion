@@ -14,6 +14,7 @@ import {
 import { StatusBadge } from '@/features/reservations/components/StatusBadge'
 import { OCCASION_LABELS } from '@/features/reservations/constants'
 import { orderNo } from '@/utils/format'
+import { AdvanceStatusChip } from '@/features/payments/components/AdvanceStatusChip'
 
 /**
  * One booking, as a card (UI-06).
@@ -89,7 +90,10 @@ export function ReservationCard({ reservation, onCancel, isCancelling }) {
             {formatTime(reservation.reservationTime) ?? reservation.reservationTime}
           </span>
         </div>
-        <StatusBadge status={reservation.status} />
+        <div className="flex flex-col items-end gap-1.5">
+          <StatusBadge status={reservation.status} />
+          <AdvanceStatusChip record={reservation} />
+        </div>
       </div>
 
       <dl className="flex flex-wrap gap-x-6 gap-y-2.5 border-t border-rule pt-4 text-sm">

@@ -1,3 +1,5 @@
+import { MANUAL_PAYMENT_METHODS } from '../config/payments.js'
+
 const PHONE_REGEX = /^[+\d][\d\s-]{6,14}\d$/
 const TIME_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/
 const MIN_DURATION_MINUTES = 30
@@ -22,19 +24,16 @@ export function validateReservation({
   durationMinutes,
   occasion,
   paymentReference,
-  paymentProofImage,
   paymentMethod,
 }) {
   const errors = []
 
-  // ONLINE: the advance is paid through SSLCommerz right after booking.
-  if (
-    paymentMethod !== 'ONLINE' &&
-    (!paymentReference || !String(paymentReference).trim()) &&
-    !paymentProofImage
-  ) {
-    errors.push('Submit a transaction/reference ID or upload payment proof.')
-  }
+  // The advance: which account it was sent to, plus the transaction ID
+  // (a screenshot is optional extra proof).
+  if (!MANUAL_PAYMENT_METHODS.includes(paymentMethod))
+    errors.push('Choose how you sent the advance: bKash, Nagad, Rocket or bank transfer.')
+  if (!paymentReference || !String(paymentReference).trim())
+    errors.push('Enter the transaction ID (TrxID) of your payment.')
 
   if (!customerName || !customerName.trim()) errors.push('Customer name is required.')
 

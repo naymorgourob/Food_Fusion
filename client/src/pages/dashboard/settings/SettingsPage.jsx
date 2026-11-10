@@ -16,6 +16,10 @@ const EMPTY_FORM = {
   firstOrderBonusPoints: '',
   openingTime: '',
   closingTime: '',
+  bkashNumber: '',
+  nagadNumber: '',
+  rocketNumber: '',
+  bankAccount: '',
 }
 
 const INPUT_CLASSES =
@@ -34,6 +38,10 @@ function formFromSettings(settings) {
     firstOrderBonusPoints: settings.firstOrderBonusPoints,
     openingTime: settings.openingTime,
     closingTime: settings.closingTime,
+    bkashNumber: settings.bkashNumber,
+    nagadNumber: settings.nagadNumber,
+    rocketNumber: settings.rocketNumber,
+    bankAccount: settings.bankAccount,
   }
 }
 
@@ -268,6 +276,73 @@ export default function SettingsPage() {
                 Awarded once, on a customer&apos;s first completed order.
               </p>
             </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-4 border-t border-border pt-4">
+          <div className="flex flex-col gap-1">
+            <h3 className="text-sm font-semibold text-ink">Advance Payment Accounts</h3>
+            <p className="text-xs text-ink-faint">
+              Customers send the 30% advance to these and enter the TrxID; you approve it once the
+              money arrives. Leave a field empty to hide that method.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="settings-bkash" className="text-sm font-medium text-ink">
+                bKash number
+              </label>
+              <input
+                id="settings-bkash"
+                inputMode="tel"
+                placeholder="01XXXXXXXXX"
+                value={form.bkashNumber}
+                onChange={updateField('bkashNumber')}
+                className={INPUT_CLASSES}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="settings-nagad" className="text-sm font-medium text-ink">
+                Nagad number
+              </label>
+              <input
+                id="settings-nagad"
+                inputMode="tel"
+                placeholder="01XXXXXXXXX"
+                value={form.nagadNumber}
+                onChange={updateField('nagadNumber')}
+                className={INPUT_CLASSES}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="settings-rocket" className="text-sm font-medium text-ink">
+                Rocket number
+              </label>
+              <input
+                id="settings-rocket"
+                inputMode="tel"
+                placeholder="01XXXXXXXXX"
+                value={form.rocketNumber}
+                onChange={updateField('rocketNumber')}
+                className={INPUT_CLASSES}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="settings-bank" className="text-sm font-medium text-ink">
+              Bank account details
+            </label>
+            <textarea
+              id="settings-bank"
+              rows={2}
+              maxLength={200}
+              placeholder="Account name · account number · bank and branch"
+              value={form.bankAccount}
+              onChange={updateField('bankAccount')}
+              className={INPUT_CLASSES}
+            />
           </div>
         </div>
 

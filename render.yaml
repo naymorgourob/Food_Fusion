@@ -26,11 +26,3 @@ services:
         sync: false
       - key: CLIENT_URL
         sync: false
-      - key: API_PUBLIC_URL
-        sync: false
-      - key: SSLCOMMERZ_STORE_ID
-        value: testbox
-      - key: SSLCOMMERZ_STORE_PASSWORD
-        value: qwerty
-      - key: SSLCOMMERZ_LIVE
-        value: 'false'

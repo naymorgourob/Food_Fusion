@@ -287,9 +287,12 @@ export default function ChefOrdersPage() {
             const etaIso =
               order.orderType === 'DELIVERY' ? order.estimatedDeliveryTime : order.estimatedReadyTime
             const etaDiffMin = minutesFromNow(etaIso)
-            const hasPaymentEvidence = Boolean(order.paymentReference || order.paymentProofImage)
+            // A customer's advance must be approved by Admin before the
+            // kitchen accepts; pay-at-restaurant and staff orders have none.
+            const noAdvance =
+              Number(order.advanceAmount) <= 0 || order.customer?.role !== 'CUSTOMER'
             const billPaid = order.bill?.paymentStatus === 'PAID'
-            const canAccept = hasPaymentEvidence || billPaid
+            const canAccept = noAdvance || order.advancePaid || billPaid
 
             return (
               <motion.div
@@ -365,22 +368,30 @@ export default function ChefOrdersPage() {
                   )}
 
                   <div className={`mt-3 flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5 text-xs ${
-                    billPaid || hasPaymentEvidence
+                    canAccept
                       ? 'border-emerald-200 bg-emerald-50/70 text-emerald-800 dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:text-emerald-300'
-                      : 'border-red-200 bg-red-50/70 text-red-800 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-300'
+                      : 'border-amber-200 bg-amber-50/70 text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-300'
                   }`}>
                     <span className="flex min-w-0 items-center gap-2">
                       <Receipt className="h-4 w-4 flex-none" />
                       <span className="flex min-w-0 flex-col">
-                        <strong>{billPaid ? 'Bill paid' : hasPaymentEvidence ? 'Payment submitted' : 'Payment required'}</strong>
+                        <strong>
+                          {billPaid
+                            ? 'Bill paid'
+                            : noAdvance
+                              ? 'Pay at the restaurant'
+                              : order.advancePaid
+                                ? 'Payment approved'
+                                : 'Waiting for payment approval'}
+                        </strong>
                         <span className="truncate text-[0.68rem] opacity-80">
                           {billPaid
                             ? 'Verified in billing'
-                            : hasPaymentEvidence
-                              ? order.paymentReference
-                                ? `Reference: ${order.paymentReference}`
-                                : 'Payment screenshot uploaded'
-                              : 'Chef must verify payment before accepting'}
+                            : noAdvance
+                              ? 'No advance on this order'
+                              : order.advancePaid
+                                ? `Approved by admin${order.paymentReference ? ` · TrxID ${order.paymentReference}` : ''}`
+                                : 'Admin is checking the advance before the kitchen accepts'}
                         </span>
                       </span>
                     </span>
@@ -486,7 +497,7 @@ export default function ChefOrdersPage() {
                             type="button"
                             onClick={() => handleAdvanceStatus(order, 'ACCEPTED')}
                             disabled={isUpdatingThis || !canAccept || !isRestaurantOpen}
-                            title={!canAccept ? 'Payment evidence is required before accepting this order' : undefined}
+                            title={!canAccept ? 'Waiting for admin to approve the advance payment' : undefined}
                             className="flex items-center justify-center gap-1.5 rounded-xl border border-rule bg-canvas-2 py-2 text-xs font-semibold text-body hover:bg-canvas disabled:opacity-50"
                           >
                             <Check className="h-3.5 w-3.5" /> Quick Accept
@@ -495,7 +506,7 @@ export default function ChefOrdersPage() {
                             type="button"
                             onClick={() => setEtaOrder(order)}
                             disabled={isUpdatingThis || !canAccept || !isRestaurantOpen}
-                            title={!canAccept ? 'Payment evidence is required before accepting this order' : undefined}
+                            title={!canAccept ? 'Waiting for admin to approve the advance payment' : undefined}
                             className="flex items-center justify-center gap-1.5 rounded-xl bg-brand-700 py-2 text-xs font-bold text-white transition hover:bg-brand-800 shadow-sm disabled:opacity-50"
                           >
                             <ChefHat className="h-3.5 w-3.5" /> Accept + ETA

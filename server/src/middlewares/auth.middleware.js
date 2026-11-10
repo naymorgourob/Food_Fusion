@@ -55,12 +55,13 @@ export const authorizeCustomer = authorizeRoles('CUSTOMER')
 export const authorizeStaffOrAdmin = authorizeRoles('ADMIN', 'STAFF')
 
 /**
- * Blocks order work (placing, accepting, updating) while the restaurant is
- * closed. Admin is never blocked, so they can still fix things after hours.
- * Must run after authenticateUser.
+ * Staff (chefs and waiters) only work on orders during opening hours:
+ * taking, accepting and updating them. Customers can still place orders and
+ * book at any time, and Admin can approve at any time; the kitchen picks
+ * those orders up once the restaurant opens. Must run after authenticateUser.
  */
 export async function requireRestaurantOpen(req, res, next) {
-  if (req.user.role === 'ADMIN') return next()
+  if (req.user.role !== 'STAFF') return next()
   const status = await getRestaurantStatus()
   if (!status.isOpen) throw new ApiError(409, closedMessage(status))
   next()

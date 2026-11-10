@@ -196,10 +196,10 @@ export function StaffOrderDrawer({
                 <section
                   className={`flex flex-col gap-3 rounded-2xl border p-4 ${
                     order.bill?.paymentStatus === 'PAID' ||
-                    order.paymentReference ||
-                    order.paymentProofImage
+                    order.advancePaid ||
+                    Number(order.advanceAmount) <= 0
                       ? 'border-emerald-200 bg-emerald-50/60 dark:border-emerald-900/50 dark:bg-emerald-950/20'
-                      : 'border-red-200 bg-red-50/60 dark:border-red-900/50 dark:bg-red-950/20'
+                      : 'border-amber-200 bg-amber-50/60 dark:border-amber-900/50 dark:bg-amber-950/20'
                   }`}
                 >
                   <span className="flex items-center gap-2 text-xs font-semibold tracking-wide uppercase">
@@ -207,11 +207,11 @@ export function StaffOrderDrawer({
                   </span>
                   <div className="grid grid-cols-2 gap-3">
                     <Row icon={Receipt} label="Advance payment">
-                      {order.paymentReference || order.paymentProofImage
-                        ? order.paymentReference
-                          ? `Submitted · ${order.paymentReference}`
-                          : 'Screenshot submitted'
-                        : 'Not submitted'}
+                      {Number(order.advanceAmount) <= 0
+                        ? 'None (pay at the restaurant)'
+                        : order.advancePaid
+                          ? `Approved by admin${order.paymentReference ? ` · ${order.paymentReference}` : ''}`
+                          : `Awaiting admin approval${order.paymentReference ? ` · ${order.paymentReference}` : ''}`}
                     </Row>
                     <Row icon={Receipt} label="Bill status">
                       {order.bill?.paymentStatus === 'PAID'
@@ -231,9 +231,9 @@ export function StaffOrderDrawer({
                       View payment screenshot
                     </a>
                   )}
-                  {!order.paymentReference && !order.paymentProofImage && (
-                    <p className="text-xs font-medium text-red-700 dark:text-red-300">
-                      Payment evidence is required before accepting this order.
+                  {Number(order.advanceAmount) > 0 && !order.advancePaid && (
+                    <p className="text-xs font-medium text-amber-700 dark:text-amber-300">
+                      Admin has to approve the advance before the kitchen accepts this order.
                     </p>
                   )}
                 </section>

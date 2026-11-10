@@ -53,7 +53,6 @@ import WaiterTablesPage from '@/pages/staff/waiter/WaiterTablesPage'
 import WaiterReservationsPage from '@/pages/staff/waiter/WaiterReservationsPage'
 import StaffSettingsPage from '@/pages/staff/StaffSettingsPage'
 import MyPayslipsPage from '@/pages/staff/MyPayslipsPage'
-import PaymentResultPage from '@/pages/payments/PaymentResultPage'
 import PayrollPage from '@/pages/dashboard/payroll/PayrollPage'
 import NotFound from '@/pages/NotFound'
 import Unauthorized from '@/pages/Unauthorized'
@@ -98,7 +97,6 @@ const router = createBrowserRouter([
           { path: '/bills', element: <MyBillsPage /> },
           { path: '/loyalty', element: <LoyaltyPage /> },
           { path: '/favorites', element: <FavoritesPage /> },
-          { path: '/payment/result', element: <PaymentResultPage /> },
         ],
       },
     ],

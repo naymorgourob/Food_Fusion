@@ -38,7 +38,7 @@ import {
  * already fetches — not a new endpoint.
  */
 export default function OrdersPage() {
-  const { orders, isLoading, error, refetch } = useOrders()
+  const { orders, isLoading, error, refetch, replaceOrder } = useOrders()
   const [searchParams] = useSearchParams()
 
   const [assignableStaff, setAssignableStaff] = useState([])
@@ -59,6 +59,7 @@ export default function OrdersPage() {
   const [viewingOrder, setViewingOrder] = useState(null)
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false)
   const [isAssigningStaff, setIsAssigningStaff] = useState(false)
+  const [isApprovingPayment, setIsApprovingPayment] = useState(false)
   const [isUpdatingEstimatedTime, setIsUpdatingEstimatedTime] = useState(false)
 
   const [cancelTarget, setCancelTarget] = useState(null)
@@ -106,6 +107,18 @@ export default function OrdersPage() {
       refetch()
     } finally {
       setIsAssigningStaff(false)
+    }
+  }
+
+  async function handleApprovePayment() {
+    setIsApprovingPayment(true)
+    try {
+      const updated = await orderService.approvePayment(viewingOrder.id)
+      setViewingOrder(updated)
+      replaceOrder(updated)
+      refetch()
+    } finally {
+      setIsApprovingPayment(false)
     }
   }
 
@@ -349,6 +362,8 @@ export default function OrdersPage() {
         assignableStaff={assignableStaff}
         onAssignStaff={handleAssignStaff}
         isAssigningStaff={isAssigningStaff}
+        onApprovePayment={handleApprovePayment}
+        isApprovingPayment={isApprovingPayment}
         onUpdateEstimatedTime={handleUpdateEstimatedTime}
         isUpdatingEstimatedTime={isUpdatingEstimatedTime}
       />

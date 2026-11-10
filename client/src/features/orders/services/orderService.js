@@ -41,3 +41,9 @@ export async function updateEstimatedTime(id, payload) {
   const { data } = await api.patch(`/orders/${id}/estimated-time`, payload)
   return data.data.order
 }
+
+// Admin: the advance arrived in the restaurant's account.
+export async function approvePayment(id) {
+  const { data } = await api.patch(`/orders/${id}/approve-payment`)
+  return data.data.order
+}

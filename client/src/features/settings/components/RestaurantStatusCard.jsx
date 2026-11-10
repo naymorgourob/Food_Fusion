@@ -44,9 +44,9 @@ export function RestaurantStatusCard() {
                 : closedLabel(status)}
             </p>
             <p className="text-xs text-ink-faint">
-              Opens and closes on its own every day, {hours} (Bangladesh time). While closed,
-              customers can&apos;t order and staff can&apos;t take or update orders. You can still
-              work, and customers can still book tables for later.
+              Opens and closes on its own every day, {hours} (Bangladesh time). While closed, chefs
+              and waiters can&apos;t accept, take or update orders. Customers can still order and
+              book, and you can still approve payments and bookings.
             </p>
           </div>
         </div>

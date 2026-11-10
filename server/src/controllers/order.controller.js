@@ -12,6 +12,7 @@ import {
   assignStaff,
   updateEstimatedTimes,
   listAssignableStaff,
+  approveOrderPayment,
 } from '../services/order.service.js'
 import { sendSuccess } from '../utils/ApiResponse.js'
 import { ApiError } from '../utils/ApiError.js'
@@ -42,13 +43,10 @@ export async function postOrder(req, res) {
       throw new ApiError(400, 'Order items must be valid JSON.')
     }
   }
-  // Paying online means the gateway verifies the advance instead of a
-  // manually submitted proof, and paying at the restaurant has no advance
-  // at all, so neither needs proof up front.
+  // Paying at the restaurant has no advance, so needs no payment details.
   const errors = validateOrder({
     ...input,
-    requirePaymentProof:
-      req.user.role === 'CUSTOMER' && !['ONLINE', 'AT_RESTAURANT'].includes(input.paymentMethod),
+    requirePaymentProof: req.user.role === 'CUSTOMER' && input.paymentMethod !== 'AT_RESTAURANT',
   })
   if (errors.length > 0) throw new ApiError(400, 'Validation failed.', errors)
   // A table picked at checkout is booked like a reservation, so its slot
@@ -91,4 +89,9 @@ export async function patchEstimatedTime(req, res) {
 export async function removeOrder(req, res) {
   const order = await cancelOrder(req.user, req.params.id)
   sendSuccess(res, { message: 'Order cancelled successfully.', data: { order } })
+}
+
+export async function patchApprovePayment(req, res) {
+  const order = await approveOrderPayment(req.params.id)
+  sendSuccess(res, { message: 'Payment approved.', data: { order } })
 }

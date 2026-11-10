@@ -1,3 +1,5 @@
+import { MANUAL_PAYMENT_METHODS } from '../config/payments.js'
+
 const VALID_STATUSES = [
   'PENDING',
   'ACCEPTED',
@@ -27,18 +29,19 @@ export function validateOrder({
   guestCount,
   reservationDate,
   reservationTime,
+  paymentMethod,
   paymentReference,
-  paymentProofImage,
   requirePaymentProof = true,
 }) {
   const errors = []
 
-  if (
-    requirePaymentProof &&
-    (!paymentReference || !String(paymentReference).trim()) &&
-    !paymentProofImage
-  ) {
-    errors.push('Submit a transaction/reference ID or upload payment proof.')
+  // The advance: which account it was sent to, plus the transaction ID
+  // (a screenshot is optional extra proof).
+  if (requirePaymentProof) {
+    if (!MANUAL_PAYMENT_METHODS.includes(paymentMethod))
+      errors.push('Choose how you sent the advance: bKash, Nagad, Rocket or bank transfer.')
+    if (!paymentReference || !String(paymentReference).trim())
+      errors.push('Enter the transaction ID (TrxID) of your payment.')
   }
 
   if (!Array.isArray(items) || items.length === 0) {

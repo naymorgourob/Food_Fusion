@@ -14,6 +14,10 @@ export function validateSettings({
   firstOrderBonusPoints,
   openingTime,
   closingTime,
+  bkashNumber = '',
+  nagadNumber = '',
+  rocketNumber = '',
+  bankAccount = '',
 }) {
   const errors = []
 
@@ -86,6 +90,19 @@ export function validateSettings({
     errors.push('Closing time must be in HH:MM format.')
   else if (TIME_REGEX.test(openingTime ?? '') && closingTime <= openingTime)
     errors.push('Closing time must be later than opening time.')
+
+  // Payment accounts are optional (empty hides that method at checkout).
+  for (const [label, value] of [
+    ['bKash number', bkashNumber],
+    ['Nagad number', nagadNumber],
+    ['Rocket number', rocketNumber],
+  ]) {
+    if (typeof value !== 'string') errors.push(`${label} must be text.`)
+    else if (value.trim() && !PHONE_REGEX.test(value.trim())) errors.push(`Enter a valid ${label}.`)
+  }
+  if (typeof bankAccount !== 'string') errors.push('Bank account details must be text.')
+  else if (bankAccount.trim().length > 200)
+    errors.push('Bank account details must be 200 characters or fewer.')
 
   return errors
 }

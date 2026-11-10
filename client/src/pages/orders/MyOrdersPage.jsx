@@ -26,6 +26,7 @@ import { useOrders } from '@/features/orders/hooks/useOrders'
 import { ORDER_STATUS_LABELS, orderGrandTotal } from '@/features/orders/constants'
 import { money, orderNo } from '@/utils/format'
 import { ROUTES } from '@/constants'
+import { AdvanceStatusChip } from '@/features/payments/components/AdvanceStatusChip'
 
 const ACTIVE_STATUSES = new Set([
   'PENDING',
@@ -181,12 +182,13 @@ export default function MyOrdersPage() {
                       {/* Top Bar: Order ID, Date, Total & ETA */}
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 border-b border-rule/60 pb-4">
                         <div className="flex flex-col gap-1">
-                          <div className="flex items-center gap-2.5">
+                          <div className="flex flex-wrap items-center gap-2.5">
                             <span className="font-display text-lg font-bold text-body">
                               Order {orderNo(order.orderNumber)}
                             </span>
                             <OrderTypeBadge orderType={order.orderType} />
                             <OrderStatusBadge status={order.status} />
+                            <AdvanceStatusChip record={order} />
                           </div>
                           <span className="text-xs text-body-muted">
                             Placed on{' '}
@@ -340,6 +342,7 @@ export default function MyOrdersPage() {
                           </span>
                           <OrderTypeBadge orderType={order.orderType} />
                           <OrderStatusBadge status={order.status} />
+                          <AdvanceStatusChip record={order} />
                         </div>
 
                         <span className="text-xs text-body-faint">

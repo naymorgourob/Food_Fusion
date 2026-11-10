@@ -26,6 +26,7 @@ import {
 import { EmptyState, Skeleton } from '@/components/customer/ui'
 import * as orderService from '@/features/orders/services/orderService'
 import { ROUTES } from '@/constants'
+import { AdvanceStatusChip } from '@/features/payments/components/AdvanceStatusChip'
 
 // Cancellation window matches order.service.js's cancelOrder guard exactly
 // — kept in sync deliberately so the button only ever appears when the
@@ -202,6 +203,7 @@ export default function OrderTrackingPage() {
             <span className="text-sm text-body-muted">Placed {placedOn}</span>
             <OrderTypeBadge orderType={order.orderType} />
             <OrderStatusBadge status={order.status} />
+            <AdvanceStatusChip record={order} />
           </div>
         </div>
 

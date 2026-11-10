@@ -117,6 +117,7 @@ export async function createOrder(customerId, input) {
   // assigned to settle the bill with the customer and serve the food.
   const payAtRestaurant = paymentMethod === 'AT_RESTAURANT'
   const paymentReference = payAtRestaurant ? null : input.paymentReference
+  const advanceMethod = payAtRestaurant ? null : paymentMethod || null
   const paymentProofImage = payAtRestaurant ? null : input.paymentProofImage
 
   // A table only means something for Dine-In — Delivery/Takeaway orders
@@ -256,6 +257,7 @@ export async function createOrder(customerId, input) {
           loyaltyDiscount,
           advanceAmount,
           assignedStaffId,
+          paymentMethod: advanceMethod,
           paymentReference: paymentReference?.trim() || null,
           paymentProofImage: paymentProofImage || null,
           paymentSubmittedAt: payAtRestaurant ? null : new Date(),
@@ -299,6 +301,7 @@ export async function createOrder(customerId, input) {
             reservationTime,
             durationMinutes: RESERVATION_DURATION_MINUTES,
             specialRequest: `Dine-in order #${String(order.orderNumber).padStart(6, '0')}`,
+            paymentMethod: advanceMethod,
             paymentReference: paymentReference?.trim() || null,
             paymentProofImage: paymentProofImage || null,
             paymentSubmittedAt: payAtRestaurant ? null : new Date(),
@@ -392,15 +395,13 @@ export async function updateOrderStatus(id, status, user) {
     }
   }
 
-  if (
-    status === 'ACCEPTED' &&
-    order.customer.role === 'CUSTOMER' &&
-    // Pay-at-restaurant orders carry no advance, so there is no proof to wait for.
-    Number(order.advanceAmount) > 0 &&
-    !order.paymentReference &&
-    !order.paymentProofImage
-  ) {
-    throw new ApiError(400, 'Payment proof must be submitted before accepting this order.')
+  // A customer's advance has to be approved by Admin (who checks the money
+  // arrived) before the kitchen accepts. Pay-at-restaurant orders carry no
+  // advance. Admin accepting directly counts as approving it.
+  const awaitingAdvance =
+    order.customer.role === 'CUSTOMER' && Number(order.advanceAmount) > 0 && !order.advancePaid
+  if (status === 'ACCEPTED' && awaitingAdvance && user.role !== 'ADMIN') {
+    throw new ApiError(400, "The advance payment hasn't been approved by Admin yet.")
   }
 
   // The branch after READY depends on order type — a delivery order is
@@ -416,6 +417,7 @@ export async function updateOrderStatus(id, status, user) {
 
   const timelineField = TIMELINE_FIELD_BY_STATUS[status]
   const data = { status }
+  if (status === 'ACCEPTED' && awaitingAdvance) data.advancePaid = true
   // Only stamped the first time — a status the order revisits (shouldn't
   // normally happen, but the dropdown is still a free choice) doesn't
   // overwrite the original timeline entry.
@@ -473,6 +475,19 @@ export async function updateOrderStatus(id, status, user) {
 // Chef/Waiter/Delivery Staff — role STAFF only, checked here since Prisma
 // can't express "only rows where role = STAFF" as a foreign key
 // constraint. staffId of null/empty clears the assignment.
+// Admin has checked the advance arrived in the restaurant's account. Allowed
+// at any time of day; the kitchen can then accept the order during opening
+// hours.
+export async function approveOrderPayment(id) {
+  const order = await prisma.order.findUnique({ where: { id } })
+  if (!order) throw new ApiError(404, 'Order not found.')
+  if (order.status === 'CANCELLED') throw new ApiError(400, 'This order was cancelled.')
+  if (Number(order.advanceAmount) <= 0) {
+    throw new ApiError(400, 'This order has no advance to approve.')
+  }
+  return prisma.order.update({ where: { id }, data: { advancePaid: true }, include: ORDER_INCLUDE })
+}
+
 export async function assignStaff(id, staffId) {
   await getOrderOrThrow(id)
 

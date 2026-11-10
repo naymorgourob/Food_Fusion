@@ -176,6 +176,7 @@ model Reservation {
   occasionNote       String?              @map("occasion_note")
   totalAmount        Decimal              @default(0) @map("total_amount") @db.Decimal(10, 2)
   advanceAmount      Decimal              @default(0) @map("advance_amount") @db.Decimal(10, 2)
+  paymentMethod      String?              @map("payment_method")
   paymentReference   String?              @map("payment_reference")
   paymentProofImage  String?              @map("payment_proof_image")
   paymentSubmittedAt DateTime?            @map("payment_submitted_at")
@@ -276,6 +277,9 @@ model Order {
   pointsRedeemed     Int       @default(0) @map("points_redeemed")
   loyaltyDiscount    Decimal   @default(0) @map("loyalty_discount") @db.Decimal(10, 2)
   advanceAmount      Decimal   @default(0) @map("advance_amount") @db.Decimal(10, 2)
+  // BKASH, NAGAD, ROCKET or BANK — the account the advance was sent to.
+  // Null for pay-at-restaurant orders and older rows.
+  paymentMethod      String?   @map("payment_method")
   paymentReference   String?   @map("payment_reference")
   paymentProofImage  String?   @map("payment_proof_image")
   paymentSubmittedAt DateTime? @map("payment_submitted_at")
@@ -449,6 +453,13 @@ model Settings {
   // Set when Admin closes early: the restaurant stays closed for the rest of
   // that date (YYYY-MM-DD, restaurant time) and opens as normal the next day.
   closedOnDate String? @map("closed_on_date")
+
+  // --- Where customers send the advance (shown at checkout) ---
+  // Empty means that method isn't offered.
+  bkashNumber  String @default("") @map("bkash_number")
+  nagadNumber  String @default("") @map("nagad_number")
+  rocketNumber String @default("") @map("rocket_number")
+  bankAccount  String @default("") @map("bank_account")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

@@ -8,8 +8,6 @@ import {
   Armchair,
   MessageSquare,
   UtensilsCrossed,
-  Upload,
-  ShieldCheck,
 } from 'lucide-react'
 import { fetchTables } from '@/features/tables/services/tableService'
 import { createReservation } from '@/features/reservations/services/reservationService'
@@ -20,7 +18,7 @@ import { FIELD, LABEL, OPTIONAL } from '@/features/orders/components/fieldStyles
 import { useAuth } from '@/hooks/useAuth'
 import { money } from '@/utils/format'
 import { ADVANCE_RATE, ADVANCE_PERCENT } from '@/constants/payments'
-import { startAdvancePayment } from '@/features/payments/services/paymentService'
+import { AdvancePaymentFields } from '@/features/payments/components/AdvancePaymentFields'
 import { fetchPaymentContact } from '@/features/settings/services/settingsService'
 
 /**
@@ -55,7 +53,7 @@ const EMPTY_FORM = {
   specialRequest: '',
   occasion: '',
   occasionNote: '',
-  paymentMethod: 'ONLINE',
+  paymentMethod: '',
   paymentReference: '',
   paymentProof: null,
 }
@@ -219,9 +217,8 @@ export function ReservationWizard({ onCreated }) {
               form.customerName &&
               form.customerPhone &&
               selectedTable &&
-              (form.paymentMethod === 'ONLINE' ||
-                form.paymentReference.trim() ||
-                form.paymentProof),
+              form.paymentMethod &&
+              form.paymentReference.trim(),
             )
 
   async function handleSubmit(event) {
@@ -243,20 +240,10 @@ export function ReservationWizard({ onCreated }) {
       const payload = new FormData()
       Object.entries(form).forEach(([key, value]) => {
         if (key === 'paymentProof' || value === '') return
-        // Online payers send no manual reference; the gateway verifies them.
-        if (form.paymentMethod === 'ONLINE' && key === 'paymentReference') return
         payload.append(key, value)
       })
-      if (form.paymentMethod !== 'ONLINE' && form.paymentProof) {
-        payload.append('paymentProof', form.paymentProof)
-      }
+      if (form.paymentProof) payload.append('paymentProof', form.paymentProof)
       const reservation = await createReservation(payload)
-      if (form.paymentMethod === 'ONLINE') {
-        // Booking saved; now pay the advance on SSLCommerz's secure page.
-        const { gatewayUrl } = await startAdvancePayment('reservation', reservation.id)
-        window.location.assign(gatewayUrl)
-        return
-      }
       onCreated(reservation, { preOrder })
     } catch (error) {
       const details = error.response?.data?.details
@@ -595,89 +582,18 @@ export function ReservationWizard({ onCreated }) {
                       Required {ADVANCE_PERCENT}% advance:{' '}
                       {selectedTable ? money(advanceAmount) : 'Select a table first'}.
                     </p>
-                    <p className="mt-2 text-sm font-semibold text-body">
-                      Pay to {paymentContact?.restaurantName || 'FoodFusion'}:{' '}
-                      {paymentContact?.restaurantPhone || 'Contact the restaurant'}
-                    </p>
                   </div>
-                  <div
-                    role="radiogroup"
-                    aria-label="How to pay the advance"
-                    className="grid gap-2 sm:grid-cols-2"
-                  >
-                    {[
-                      {
-                        value: 'ONLINE',
-                        title: 'Pay online now',
-                        hint: 'Card, bKash, Nagad, Rocket via SSLCommerz',
-                        icon: ShieldCheck,
-                      },
-                      {
-                        value: 'MANUAL',
-                        title: 'Pay manually',
-                        hint: 'Send money, then add the TrxID or a screenshot',
-                        icon: Upload,
-                      },
-                    ].map(({ value, title, hint, icon: Icon }) => {
-                      const active = form.paymentMethod === value
-                      return (
-                        <button
-                          key={value}
-                          type="button"
-                          role="radio"
-                          aria-checked={active}
-                          onClick={() => update('paymentMethod', value)}
-                          className={`flex items-start gap-3 rounded-xl border-2 p-3.5 text-left transition-colors ${
-                            active
-                              ? 'border-gold-500 bg-card'
-                              : 'border-rule bg-card/60 hover:border-gold-300'
-                          }`}
-                        >
-                          <Icon className="mt-0.5 h-5 w-5 flex-none text-gold-700 dark:text-gold-300" />
-                          <span className="flex flex-col">
-                            <span className="text-sm font-semibold text-body">{title}</span>
-                            <span className="text-xs text-body-muted">{hint}</span>
-                          </span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                  {form.paymentMethod === 'ONLINE' ? (
-                    <p className="text-xs text-body-faint">
-                      After you confirm, you&rsquo;ll be taken to SSLCommerz&rsquo;s secure page to
-                      pay {selectedTable ? money(advanceAmount) : 'the advance'}. Your booking is
-                      confirmed once the payment goes through.
-                    </p>
-                  ) : (
-                    <>
-                      <input
-                        value={form.paymentReference}
-                        onChange={(event) => update('paymentReference', event.target.value)}
-                        className={FIELD}
-                        placeholder="Transaction ID / Reference ID"
-                      />
-                      <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-rule bg-card px-4 py-3 text-sm text-body-muted">
-                        <Upload className="h-4 w-4" />
-                        <span>
-                          {form.paymentProof
-                            ? form.paymentProof.name
-                            : 'Upload payment screenshot or photo'}
-                        </span>
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          onChange={(event) =>
-                            update('paymentProof', event.target.files?.[0] ?? null)
-                          }
-                          className="sr-only"
-                        />
-                      </label>
-                      <p className="text-xs text-body-faint">
-                        Your proof is sent to the restaurant for verification before the reservation
-                        is confirmed.
-                      </p>
-                    </>
-                  )}
+                  <AdvancePaymentFields
+                    accounts={paymentContact?.accounts}
+                    method={form.paymentMethod}
+                    onMethodChange={(value) => update('paymentMethod', value)}
+                    reference={form.paymentReference}
+                    onReferenceChange={(value) => update('paymentReference', value)}
+                    proof={form.paymentProof}
+                    onProofChange={(value) => update('paymentProof', value)}
+                    advanceAmount={selectedTable ? advanceAmount : null}
+                    approvalNote="The restaurant checks your payment and confirms your booking. You'll see it change to Confirmed under your reservations."
+                  />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
@@ -775,7 +691,7 @@ export function ReservationWizard({ onCreated }) {
             <button
               key="submit"
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !canAdvance}
               className="rounded-full bg-gold-500 px-7 py-3.5 text-sm font-bold text-charcoal transition-all hover:-translate-y-0.5 hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
             >
               {isSubmitting ? 'Reserving…' : 'Confirm reservation'}
