@@ -1,6 +1,15 @@
 @import 'tailwindcss';
 
 /*
+ * dark: utilities follow the in-app theme (data-theme on <html>, set by
+ * ThemeProvider), not the OS setting. Tailwind's default is the OS media
+ * query, which left every dark: style switched on when the app was in day
+ * mode on a dark-mode computer: light icons and text on light backgrounds.
+ * .theme-dark keeps one region dark in either theme (the admin sidebar).
+ */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *, .theme-dark, .theme-dark *));
+
+/*
  * Design tokens from docs/03-design-system.md.
  * Everything inside @theme registers a Tailwind utility (bg-paper, text-ink,
  * rounded-lg, font-mono, ...). Nothing else in the app should hardcode a hex
@@ -65,19 +74,31 @@
   --color-brand-50: #eef1f6;
   --color-brand-100: #d7dee9;
   --color-brand-200: #b0bdd0;
+  /* 300, 500 and 950 are used across the app (dark-mode text, focus rings,
+     active markers) but were missing, so those classes silently did nothing. */
+  --color-brand-300: #a8b7cc;
   --color-brand-400: #9fb0c8;
+  --color-brand-500: #5c6f8c;
   --color-brand-600: #303f54;
   --color-brand-700: #233245;
   --color-brand-800: #1b2738;
   --color-brand-900: #2b221c;
+  --color-brand-950: #120e0b;
 
   /* Accent — warm sand (#ceb59c). gold-700 is a deep walnut reserved for
      accent text on light surfaces, where sand would fail contrast. */
+  /* 50, 200, 600, 800, 900 and 950 fill gaps the app already uses. */
+  --color-gold-50: #faf6f1;
   --color-gold-100: #f3ece4;
+  --color-gold-200: #ebdfd2;
   --color-gold-300: #e2d2c1;
   --color-gold-400: #d8c3ad;
   --color-gold-500: #ceb59c;
+  --color-gold-600: #a88a6c;
   --color-gold-700: #7a5f45;
+  --color-gold-800: #5a4532;
+  --color-gold-900: #3d2f22;
+  --color-gold-950: #241b13;
 
   /* Neutrals — warm white page, white cards, charcoal ink. */
   --color-linen: #fbfaf7;
@@ -188,10 +209,21 @@
     --color-body: #f4efe8;
     --color-body-muted: #cfc5b9;
     --color-body-faint: #a99e92;
+
+  /* Status colours had no dark values, so chips stayed light-on-white. */
+  --color-success: #8fd19e;
+  --color-success-soft: #1d2e20;
+  --color-warning: #e8b45c;
+  --color-warning-soft: #33260f;
+  --color-danger: #f19a92;
+  --color-danger-soft: #3a1714;
+  --color-info: #9cbcf0;
+  --color-info-soft: #17253a;
   }
 }
 
-:root[data-theme='dark'] {
+:root[data-theme='dark'],
+.theme-dark {
   --color-paper: #14100d;
   --color-surface: #1d1712;
   --color-surface-2: #241c16;
@@ -214,6 +246,16 @@
   --color-body: #f4efe8;
   --color-body-muted: #cfc5b9;
   --color-body-faint: #a99e92;
+
+  /* Status colours had no dark values, so chips stayed light-on-white. */
+  --color-success: #8fd19e;
+  --color-success-soft: #1d2e20;
+  --color-warning: #e8b45c;
+  --color-warning-soft: #33260f;
+  --color-danger: #f19a92;
+  --color-danger-soft: #3a1714;
+  --color-info: #9cbcf0;
+  --color-info-soft: #17253a;
 }
 
 :root[data-theme='light'] {
@@ -238,6 +280,14 @@
   --color-body: #1b2230;
   --color-body-muted: #4d5566;
   --color-body-faint: #636b7a;
+  --color-success: #325736;
+  --color-success-soft: #eef4ec;
+  --color-warning: #93600f;
+  --color-warning-soft: #fbf3e3;
+  --color-danger: #8f1e17;
+  --color-danger-soft: #fbeaea;
+  --color-info: #204a85;
+  --color-info-soft: #eaf0f7;
 }
 
 @layer base {

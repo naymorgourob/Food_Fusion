@@ -163,9 +163,11 @@ export function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobil
       )}
 
       {/* Main Sidebar Rail */}
+      {/* theme-dark: the admin rail stays dark in day mode too, like the
+          customer and staff sidebars. */}
       <aside
         aria-label="Admin Navigation"
-        className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-surface transition-all duration-300 shadow-xs
+        className={`theme-dark fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-surface transition-all duration-300 shadow-xs
           ${collapsed ? 'lg:w-20' : 'lg:w-80'}
           ${mobileOpen ? 'w-80 translate-x-0 shadow-2xl' : 'w-80 -translate-x-full lg:translate-x-0'}
         `}
