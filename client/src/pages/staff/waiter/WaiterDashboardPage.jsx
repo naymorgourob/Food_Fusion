@@ -152,8 +152,9 @@ export default function WaiterDashboardPage() {
     setServingOrderId(orderId)
     setErrorMsg('')
     try {
-      await orderService.updateOrderStatus(orderId, 'SERVED')
-      await orders?.refetch?.()
+      const updated = await orderService.updateOrderStatus(orderId, 'SERVED')
+      orders?.replaceOrder?.(updated)
+      orders?.refetch?.()
     } catch (err) {
       setErrorMsg(err.response?.data?.message || 'Failed to update order status.')
     } finally {

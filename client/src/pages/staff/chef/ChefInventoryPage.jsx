@@ -180,10 +180,12 @@ export default function ChefInventoryPage() {
         <button
           type="button"
           onClick={() => inventory?.refetch()}
-          disabled={isLoading}
+          disabled={inventory?.isRefreshing}
           className="inline-flex items-center gap-2 self-start rounded-full border border-rule bg-card px-4 py-2 text-xs font-semibold text-body shadow-sm transition hover:bg-canvas-2 disabled:opacity-50 sm:self-auto"
         >
-          <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+          <RefreshCw
+            className={`h-3.5 w-3.5 ${inventory?.isRefreshing ? 'animate-spin' : ''}`}
+          />
           Refresh Stock
         </button>
       </div>

@@ -136,12 +136,11 @@ export default function WaiterTablesPage() {
   async function handleStatusChange(orderId, newStatus) {
     setIsUpdatingStatus(true)
     try {
-      await orderService.updateOrderStatus(orderId, newStatus)
-      await orders?.refetch?.()
-      await tables?.refetch?.()
-      if (viewingOrder?.id === orderId) {
-        setViewingOrder((prev) => (prev ? { ...prev, status: newStatus } : null))
-      }
+      const updated = await orderService.updateOrderStatus(orderId, newStatus)
+      orders?.replaceOrder?.(updated)
+      if (viewingOrder?.id === orderId) setViewingOrder(updated)
+      orders?.refetch?.()
+      tables?.refetch?.()
     } catch (err) {
       console.error(err)
     } finally {

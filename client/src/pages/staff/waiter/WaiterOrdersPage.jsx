@@ -129,7 +129,8 @@ export default function WaiterOrdersPage() {
     setUpdatingOrderId(order.id)
     try {
       const targetStatus = order.orderType === 'DELIVERY' ? 'ON_THE_WAY' : 'SERVED'
-      await orderService.updateOrderStatus(order.id, targetStatus)
+      const updated = await orderService.updateOrderStatus(order.id, targetStatus)
+      orders.replaceOrder(updated)
       orders.refetch()
     } finally {
       setUpdatingOrderId(null)
@@ -139,7 +140,8 @@ export default function WaiterOrdersPage() {
   async function handleCompleteOrder(order) {
     setUpdatingOrderId(order.id)
     try {
-      await orderService.updateOrderStatus(order.id, 'COMPLETED')
+      const updated = await orderService.updateOrderStatus(order.id, 'COMPLETED')
+      orders.replaceOrder(updated)
       orders.refetch()
       tables?.refetch?.()
     } finally {
@@ -151,8 +153,9 @@ export default function WaiterOrdersPage() {
     setIsCancelling(true)
     setCancelError('')
     try {
-      await orderService.cancelOrder(cancelTarget.id)
+      const updated = await orderService.cancelOrder(cancelTarget.id)
       setCancelTarget(null)
+      orders.replaceOrder(updated)
       orders.refetch()
       tables?.refetch?.()
     } catch (error) {
@@ -491,6 +494,7 @@ export default function WaiterOrdersPage() {
           try {
             const updated = await orderService.updateOrderStatus(viewingOrder.id, status)
             setViewingOrder(updated)
+            orders.replaceOrder(updated)
             orders.refetch()
             tables?.refetch?.()
           } finally {
@@ -504,6 +508,7 @@ export default function WaiterOrdersPage() {
           try {
             const updated = await orderService.assignStaff(viewingOrder.id, staffId)
             setViewingOrder(updated)
+            orders.replaceOrder(updated)
             orders.refetch()
           } finally {
             setIsAssigningStaff(false)
@@ -514,6 +519,7 @@ export default function WaiterOrdersPage() {
           try {
             const updated = await orderService.updateEstimatedTime(viewingOrder.id, payload)
             setViewingOrder(updated)
+            orders.replaceOrder(updated)
             orders.refetch()
           } catch {
             orders.refetch()

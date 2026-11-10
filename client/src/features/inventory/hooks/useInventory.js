@@ -1,25 +1,37 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { fetchInventoryItems } from '@/features/inventory/services/inventoryService'
 
 export function useInventory() {
   const [items, setItems] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const [refetchIndex, setRefetchIndex] = useState(0)
+  const hasLoadedRef = useRef(false)
 
   useEffect(() => {
     let cancelled = false
 
+    // Skeletons only until the first successful load. A refetch after that
+    // (e.g. after a staff action) keeps the current list on screen and swaps
+    // in the fresh data when it arrives, instead of blanking the page.
     async function load() {
-      setIsLoading(true)
+      if (!hasLoadedRef.current) setIsLoading(true)
+      setIsRefreshing(true)
       setError(null)
       try {
         const data = await fetchInventoryItems()
-        if (!cancelled) setItems(data)
+        if (!cancelled) {
+          setItems(data)
+          hasLoadedRef.current = true
+        }
       } catch (err) {
         if (!cancelled) setError(err.response?.data?.message ?? 'Failed to load inventory.')
       } finally {
-        if (!cancelled) setIsLoading(false)
+        if (!cancelled) {
+          setIsLoading(false)
+          setIsRefreshing(false)
+        }
       }
     }
 
@@ -31,5 +43,5 @@ export function useInventory() {
 
   const refetch = useCallback(() => setRefetchIndex((index) => index + 1), [])
 
-  return { items, isLoading, error, refetch }
+  return { items, isLoading, isRefreshing, error, refetch }
 }

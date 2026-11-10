@@ -138,7 +138,8 @@ export default function ChefOrdersPage() {
   async function handleAdvanceStatus(order, nextStatus) {
     setUpdatingOrderId(order.id)
     try {
-      await orderService.updateOrderStatus(order.id, nextStatus)
+      const updated = await orderService.updateOrderStatus(order.id, nextStatus)
+      orders.replaceOrder(updated)
       orders.refetch()
     } catch {
       orders.refetch()
@@ -157,14 +158,15 @@ export default function ChefOrdersPage() {
       } else {
         payload.estimatedReadyTime = targetIso
       }
-      await orderService.updateEstimatedTime(order.id, payload)
+      let updated = await orderService.updateEstimatedTime(order.id, payload)
 
       // If order is still PENDING, also advance to ACCEPTED
       if (order.status === 'PENDING') {
-        await orderService.updateOrderStatus(order.id, 'ACCEPTED')
+        updated = await orderService.updateOrderStatus(order.id, 'ACCEPTED')
       }
 
       setEtaOrder(null)
+      orders.replaceOrder(updated)
       orders.refetch()
     } catch (error) {
       setEtaError(error.response?.data?.message ?? 'Unable to save the ETA. Please try again.')
@@ -177,8 +179,9 @@ export default function ChefOrdersPage() {
     setIsCancelling(true)
     setCancelError('')
     try {
-      await orderService.cancelOrder(cancelTarget.id)
+      const updated = await orderService.cancelOrder(cancelTarget.id)
       setCancelTarget(null)
+      orders.replaceOrder(updated)
       orders.refetch()
     } catch (error) {
       setCancelError(error.response?.data?.message ?? 'Failed to cancel order.')
@@ -541,6 +544,7 @@ export default function ChefOrdersPage() {
           try {
             const updated = await orderService.updateOrderStatus(viewingOrder.id, status)
             setViewingOrder(updated)
+            orders.replaceOrder(updated)
             orders.refetch()
           } finally {
             setIsUpdatingStatus(false)
@@ -553,6 +557,7 @@ export default function ChefOrdersPage() {
           try {
             const updated = await orderService.assignStaff(viewingOrder.id, staffId)
             setViewingOrder(updated)
+            orders.replaceOrder(updated)
             orders.refetch()
           } finally {
             setIsAssigningStaff(false)
@@ -563,6 +568,7 @@ export default function ChefOrdersPage() {
           try {
             const updated = await orderService.updateEstimatedTime(viewingOrder.id, payload)
             setViewingOrder(updated)
+            orders.replaceOrder(updated)
             orders.refetch()
           } catch {
             orders.refetch()
